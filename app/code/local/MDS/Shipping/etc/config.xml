@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<MDS_Shipping>
+			<version>0.1.0</version>
+		</MDS_Shipping>
+	</modules>
+	<global>
+		<models>
+			<mds_shipping>
+				<class>MDS_Shipping_Model</class>
+			</mds_shipping>
+		</models>
+	</global>
+	<default>
+		<carriers>
+			<mds_collivery>
+				<active>1</active>
+				<model>mds_shipping/carrier_collivery</model>
+				<title>MDS Collivery</title>
+				<lengthLabel>length</lengthLabel>
+				<widthLabel>width</widthLabel>
+				<heightLabel>height</heightLabel>
+				<markup>10</markup>
+				<specificerrmsg>This shipping method is currently unavailable. If you would like to ship using this shipping method, please contact us.</specificerrmsg>
+				<sallowspecific>1</sallowspecific>
+				<specificcountry>ZA</specificcountry>
+			</mds_collivery>
+		</carriers>
+	</default>
+</config>

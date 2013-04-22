@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<config>
+	<sections>
+		<carriers>
+			<groups>
+				<mds_collivery translate="label" module="shipping">
+					<label>MDS Collivery</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>13</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<active translate="label">
+							<label>Enabled</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</active>
+						<title translate="label">
+							<label>Title</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>2</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</title>
+						<mds_user translate="label">
+							<label>MDS Account Email</label>
+							<frontend_type>text</frontend_type>
+							<backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+							<sort_order>3</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</mds_user>
+						<mds_pass translate="label">
+							<label>Password</label>
+							<frontend_type>text</frontend_type>
+							<backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+							<sort_order>4</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</mds_pass>
+						<markup translate="label">
+							<label>Percentage Markup</label>
+							<frontend_type>text</frontend_type>
+							<validate>validate-number</validate>
+							<sort_order>5</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</markup>
+						<lengthLabel translate="label">
+							<label>Length Attribute Name</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</lengthLabel>
+						<widthLabel translate="label">
+							<label>Width Attribute Name</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>11</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</widthLabel>
+						<heightLabel translate="label">
+							<label>Height Attribute Name</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>12</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</heightLabel>
+						<specificerrmsg translate="label">
+							<label>Displayed Error Message</label>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>80</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</specificerrmsg>
+					</fields>
+				</mds_collivery>
+			</groups>
+		</carriers>
+	</sections>
+</config>
