@@ -10,7 +10,102 @@
 			<mds_shipping>
 				<class>MDS_Shipping_Model</class>
 			</mds_shipping>
+			<sales>
+				<rewrite>
+					<order>MDS_Shipping_Model_Sales_Order</order>
+				</rewrite>
+			</sales>
+			<mds_collivery_mysql4>
+				<class>MDS_Shipping_Model_Mysql4</class>
+				<entities>
+					<mds_collivery_quote>
+						<table>mds_collivery_quote</table>
+					</mds_collivery_quote>
+					<mds_collivery_order>
+						<table>mds_collivery_sale</table>
+					</mds_collivery_order>
+				</entities>
+			</mds_collivery_mysql4>
 		</models>
+		<events>
+			<sales_quote_save_before>
+				<!-- Name of Event -->
+				<observers>
+					<save_before>
+						<type>singleton</type>
+						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<method>saveQuoteBefore</method> <!-- name of function -->
+					</save_before>
+				</observers>
+			</sales_quote_save_before>
+			<sales_quote_save_after>
+				<!-- Name of Event -->
+				<observers>
+					<save_after>
+						<type>singleton</type>
+						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<method>saveQuoteAfter</method> <!-- name of function -->
+					</save_after>
+				</observers>
+			</sales_quote_save_after>
+			<sales_quote_load_after>
+				<observers>
+					<load_after>
+						<type>singleton</type>
+						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<method>loadQuoteAfter</method> <!-- name of function -->
+					</load_after>
+				</observers>
+			</sales_quote_load_after>
+			<sales_model_service_quote_submit_after>
+				<observers>
+					<sales_model_service_quote_submit_after>
+						<type>singleton</type>
+						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<method>saveOrderAfter</method> <!-- name of function -->
+					</sales_model_service_quote_submit_after>
+				</observers>
+			</sales_model_service_quote_submit_after>
+			<sales_order_load_after>
+				<observers>
+					<sales_order_load_after>
+						<type>singleton</type>
+						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<method>loadOrderAfter</method> <!-- name of function -->
+					</sales_order_load_after>
+				</observers>
+			</sales_order_load_after>
+		</events>
+		<resources>
+			<mds_collivery_setup>
+				<setup>
+					<module>MDS_Shipping</module>
+				</setup>
+				<connection>
+					<use>core_setup</use>
+				</connection>
+			</mds_collivery_setup>
+			<mds_collivery_write>
+				<connection>
+					<use>core_write</use>
+				</connection>
+			</mds_collivery_write>
+			<mds_collivery_read>
+				<connection>
+					<use>core_read</use>
+				</connection>
+			</mds_collivery_read>
+		</resources>
+		<blocks>
+			<mds_collivery>
+				<class>MDS_Shipping_Block</class>
+			</mds_collivery>
+		</blocks>
+		<helpers>
+			<mds_collivery>
+				<class>MDS_Shipping_Helper</class>
+			</mds_collivery>
+		</helpers>
 	</global>
 	<default>
 		<carriers>
@@ -28,4 +123,42 @@
 			</mds_collivery>
 		</carriers>
 	</default>
+	<frontend>
+		<routers>
+			<mds_collivery>
+				<use>standard</use>
+				<args>
+					<module>MDS_Shipping</module>
+					<frontName>mds_collivery</frontName>
+				</args>
+			</mds_collivery>
+		</routers>
+		<layout>
+			<updates>
+				<mds_collivery>
+					<file>mds_collivery.xml</file>
+				</mds_collivery>
+			</updates>
+		</layout>
+	</frontend>
+	<admin>
+		<routers>
+			<mds_collivery>
+				<use>admin</use>
+				<args>
+					<module>MDS_Shipping</module>
+					<frontName>mds_collivery</frontName>
+				</args>
+			</mds_collivery>
+		</routers>
+	</admin>
+	<adminhtml>
+		<layout>
+			<updates>
+				<mds_collivery>
+					<file>mds_collivery.xml</file>
+				</mds_collivery>
+			</updates>
+		</layout>
+	</adminhtml>
 </config>
