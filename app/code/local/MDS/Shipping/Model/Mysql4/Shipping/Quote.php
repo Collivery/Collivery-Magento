@@ -1,18 +1,18 @@
 <?php
-class MDS_Shipping_Model_Mysql4_Checkout_Order extends Mage_Core_Model_Mysql4_Abstract{
+class MDS_Shipping_Model_Mysql4_Checkout_Quote extends Mage_Core_Model_Mysql4_Abstract{
 	public function _construct()
 	{
-		$this->_init('mds_collivery/checkout_quote', 'id');
+		$this->_init('collivery/shipping_quote', 'id');
 	}
-	public function deteleByOrder($order_id,$var){
+	public function deteleByQuote($quote_id,$var){
 		$table = $this->getMainTable();
-		$where = $this->_getWriteAdapter()->quoteInto('order_id = ? AND ', $order_id)
+		$where = $this->_getWriteAdapter()->quoteInto('quote_id = ? AND ', $quote_id)
 		.$this->_getWriteAdapter()->quoteInto('`key` = ? 	', $var);
 		$this->_getWriteAdapter()->delete($table,$where);
 	}
-	public function getByOrder($order_id,$var = ''){
+	public function getByQuote($quote_id,$var = ''){
 		$table = $this->getMainTable();
-		$where = $this->_getReadAdapter()->quoteInto('order_id = ?', $order_id);
+		$where = $this->_getReadAdapter()->quoteInto('quote_id = ?', $quote_id);
 		if(!empty($var)){
 			$where .= $this->_getReadAdapter()->quoteInto(' AND `key` = ? ', $var);
 		}

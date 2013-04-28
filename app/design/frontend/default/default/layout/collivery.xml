@@ -2,7 +2,7 @@
 <layout version="0.1.0">
 	<sales_order_view>
 		<reference name="my.account.wrapper">
-			<block type="mds_collivery/mds_collivery_order" name="mds_collivery.order" template="mds_collivery/order.phtml" after='sales.order.info' />
+			<block type="collivery/collivery_order" name="collivery.order" template="collivery/order.phtml" after='sales.order.info' />
 		</reference>
 	</sales_order_view>
 </layout>

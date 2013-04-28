@@ -9,7 +9,7 @@ extends Mage_Shipping_Model_Carrier_Abstract
 implements Mage_Shipping_Model_Carrier_Interface {
 
 	// Unique internal shipping method identifier
-	protected $_code = 'mds_collivery';
+	protected $_code = 'collivery';
 
 	// Protected Cached MDS Variables
 	protected $soap, $authenticate, $towns, $suburbs, $cptypes, $client_address, $my_address;

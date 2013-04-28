@@ -15,17 +15,17 @@
 					<order>MDS_Shipping_Model_Sales_Order</order>
 				</rewrite>
 			</sales>
-			<mds_collivery_mysql4>
+			<collivery_mysql4>
 				<class>MDS_Shipping_Model_Mysql4</class>
 				<entities>
-					<mds_collivery_quote>
+					<collivery_quote>
 						<table>mds_collivery_quote</table>
-					</mds_collivery_quote>
-					<mds_collivery_order>
+					</collivery_quote>
+					<collivery_order>
 						<table>mds_collivery_sale</table>
-					</mds_collivery_order>
+					</collivery_order>
 				</entities>
-			</mds_collivery_mysql4>
+			</collivery_mysql4>
 		</models>
 		<events>
 			<sales_quote_save_before>
@@ -77,39 +77,39 @@
 			</sales_order_load_after>
 		</events>
 		<resources>
-			<mds_collivery_setup>
+			<collivery_setup>
 				<setup>
 					<module>MDS_Shipping</module>
 				</setup>
 				<connection>
 					<use>core_setup</use>
 				</connection>
-			</mds_collivery_setup>
-			<mds_collivery_write>
+			</collivery_setup>
+			<collivery_write>
 				<connection>
 					<use>core_write</use>
 				</connection>
-			</mds_collivery_write>
-			<mds_collivery_read>
+			</collivery_write>
+			<collivery_read>
 				<connection>
 					<use>core_read</use>
 				</connection>
-			</mds_collivery_read>
+			</collivery_read>
 		</resources>
 		<blocks>
-			<mds_collivery>
+			<collivery>
 				<class>MDS_Shipping_Block</class>
-			</mds_collivery>
+			</collivery>
 		</blocks>
 		<helpers>
-			<mds_collivery>
+			<collivery>
 				<class>MDS_Shipping_Helper</class>
-			</mds_collivery>
+			</collivery>
 		</helpers>
 	</global>
 	<default>
 		<carriers>
-			<mds_collivery>
+			<collivery>
 				<active>1</active>
 				<model>mds_shipping/carrier_collivery</model>
 				<title>MDS Collivery</title>
@@ -120,44 +120,44 @@
 				<specificerrmsg>This shipping method is currently unavailable. If you would like to ship using this shipping method, please contact us.</specificerrmsg>
 				<sallowspecific>1</sallowspecific>
 				<specificcountry>ZA</specificcountry>
-			</mds_collivery>
+			</collivery>
 		</carriers>
 	</default>
 	<frontend>
 		<routers>
-			<mds_collivery>
+			<collivery>
 				<use>standard</use>
 				<args>
 					<module>MDS_Shipping</module>
-					<frontName>mds_collivery</frontName>
+					<frontName>collivery</frontName>
 				</args>
-			</mds_collivery>
+			</collivery>
 		</routers>
 		<layout>
 			<updates>
-				<mds_collivery>
-					<file>mds_collivery.xml</file>
-				</mds_collivery>
+				<collivery>
+					<file>collivery.xml</file>
+				</collivery>
 			</updates>
 		</layout>
 	</frontend>
 	<admin>
 		<routers>
-			<mds_collivery>
+			<collivery>
 				<use>admin</use>
 				<args>
 					<module>MDS_Shipping</module>
-					<frontName>mds_collivery</frontName>
+					<frontName>collivery</frontName>
 				</args>
-			</mds_collivery>
+			</collivery>
 		</routers>
 	</admin>
 	<adminhtml>
 		<layout>
 			<updates>
-				<mds_collivery>
-					<file>mds_collivery.xml</file>
-				</mds_collivery>
+				<collivery>
+					<file>collivery.xml</file>
+				</collivery>
 			</updates>
 		</layout>
 	</adminhtml>

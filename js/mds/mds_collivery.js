@@ -21,7 +21,7 @@ $j(document).ready(function() {
 	}
 
 	function switchSelect () {
-		jQuery.post("mds_collivery/ajax/index", {neweval: "value"}, function(data){
+		jQuery.post("collivery/ajax/index", {neweval: "value"}, function(data){
 			$j("#billing\\:region").remove();
 			$j("#billing\\:region_id").after('<select title="Town" class="validate-select" name="billing[country_id]" id="billing:region"></select>');
 			$j("#billing\\:region").append();

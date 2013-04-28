@@ -3,7 +3,7 @@
 	<sections>
 		<carriers>
 			<groups>
-				<mds_collivery translate="label" module="shipping">
+				<collivery translate="label" module="shipping">
 					<label>MDS Collivery</label>
 					<frontend_type>text</frontend_type>
 					<sort_order>13</sort_order>
@@ -88,7 +88,7 @@
 							<show_in_store>1</show_in_store>
 						</specificerrmsg>
 					</fields>
-				</mds_collivery>
+				</collivery>
 			</groups>
 		</carriers>
 	</sections>
