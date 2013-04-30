@@ -6,7 +6,7 @@ $installer->startSetup();
 
 $installer->run("
 
-CREATE TABLE IF NOT EXISTS {$this->getTable('mds_collivery_sale')} (
+CREATE TABLE IF NOT EXISTS mds_collivery_sale (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `order_id` int(11) NOT NULL,
   `town` varchar(16) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS {$this->getTable('mds_collivery_sale')} (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 
-CREATE TABLE IF NOT EXISTS {$this->getTable('mds_collivery_quote')} (
+CREATE TABLE IF NOT EXISTS mds_collivery_quote (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `quote_id` int(11) NOT NULL,
   `town` varchar(16) NOT NULL,
