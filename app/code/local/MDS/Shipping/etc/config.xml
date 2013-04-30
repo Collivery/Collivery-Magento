@@ -9,6 +9,7 @@
 		<models>
 			<mds_shipping>
 				<class>MDS_Shipping_Model</class>
+				<resourceModel>collivery_mysql4</resourceModel>
 			</mds_shipping>
 			<sales>
 				<rewrite>
@@ -18,12 +19,12 @@
 			<collivery_mysql4>
 				<class>MDS_Shipping_Model_Mysql4</class>
 				<entities>
-					<collivery_quote>
+					<shipping_quote>
 						<table>mds_collivery_quote</table>
-					</collivery_quote>
-					<collivery_order>
+					</shipping_quote>
+					<shipping_order>
 						<table>mds_collivery_sale</table>
-					</collivery_order>
+					</shipping_order>
 				</entities>
 			</collivery_mysql4>
 		</models>
@@ -143,13 +144,13 @@
 	</frontend>
 	<admin>
 		<routers>
-			<collivery>
+			<colliveryadmin>
 				<use>admin</use>
 				<args>
 					<module>MDS_Shipping</module>
-					<frontName>collivery</frontName>
+					<frontName>colliveryadmin</frontName>
 				</args>
-			</collivery>
+			</colliveryadmin>
 		</routers>
 	</admin>
 	<adminhtml>

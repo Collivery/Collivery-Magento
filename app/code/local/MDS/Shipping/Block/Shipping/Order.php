@@ -1,7 +1,7 @@
 <?php
-class MDS_Shipping_Block_Checkout_Order extends Mage_Core_Block_Template{
+class MDS_Shipping_Block_Shipping_Order extends Mage_Core_Block_Template{
 	public function getMdsVars(){
-		$model = Mage::getModel('collivery/shipping_quote');
+		$model = Mage::getModel('mds_shipping/shipping_quote');
 		return $model->getByOrder($this->getOrder()->getId());
 	}
 	public function getOrder()

@@ -1,8 +1,8 @@
 <?php
-class MDS_Shipping_Model_Mysql4_Checkout_Order extends Mage_Core_Model_Mysql4_Abstract{
+class MDS_Shipping_Model_Mysql4_Shipping_Order extends Mage_Core_Model_Mysql4_Abstract{
 	public function _construct()
 	{
-		$this->_init('collivery/shipping_quote', 'id');
+		$this->_init('mds_shipping/shipping_order', 'id');
 	}
 	public function deteleByOrder($order_id,$var){
 		$table = $this->getMainTable();

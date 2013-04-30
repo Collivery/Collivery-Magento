@@ -25,7 +25,7 @@ class MDS_Shipping_Model_Observer {
 		if ($quote -> getSuburb()) {
 			$var = $quote -> getSuburb();
 			if (!empty($var)) {
-				$model = Mage::getModel('collivery/shipping_quote');
+				$model = Mage::getModel('mds_shipping/shipping_quote');
 				$model -> deteleByQuote($quote -> getId(), 'suburb');
 				$model -> setQuoteId($quote -> getId());
 				$model -> setKey('suburb');
@@ -43,7 +43,7 @@ class MDS_Shipping_Model_Observer {
 	 */
 	public function loadQuoteAfter($evt) {
 		$quote = $evt -> getQuote();
-		$model = Mage::getModel('collivery/shipping_quote');
+		$model = Mage::getModel('mds_shipping/shipping_quote');
 		$data = $model -> getByQuote($quote -> getId());
 		foreach ($data as $key => $value) {
 			$quote -> setData($key, $value);
@@ -62,7 +62,7 @@ class MDS_Shipping_Model_Observer {
 		if ($quote -> getSuburb()) {
 			$var = $quote -> getSuburb();
 			if (!empty($var)) {
-				$model = Mage::getModel('collivery/shipping_quote');
+				$model = Mage::getModel('mds_shipping/shipping_quote');
 				$model -> deleteByOrder($order -> getId(), 'suburb');
 				$model -> setOrderId($order -> getId());
 				$model -> setKey('suburb');
@@ -81,7 +81,7 @@ class MDS_Shipping_Model_Observer {
 	 */
 	public function loadOrderAfter($evt) {
 		$order = $evt -> getOrder();
-		$model = Mage::getModel('collivery/shipping_quote');
+		$model = Mage::getModel('mds_shipping/shipping_quote');
 		$data = $model -> getByOrder($order -> getId());
 		foreach ($data as $key => $value) {
 			$order -> setData($key, $value);
