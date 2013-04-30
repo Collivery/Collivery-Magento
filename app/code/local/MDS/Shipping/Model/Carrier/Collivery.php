@@ -258,30 +258,50 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * 
 	 * @return Array
 	 */
-	public function get_towns(){
+	public function get_towns($mode = 1){
 		if (!isset($this->towns))
 		{
 			$this->soap_init();
 			$this->towns = $this->soap->getTowns(null,$this->authenticate['token']);
 		}
-		return $this->towns;
+		if ($mode==1){
+			if (isset($this->towns['results']))
+				return $this->towns['results'];
+			else
+				return false;
+		} else{
+			return $this->towns;
+		}
 	}
 	
 	/**
 	 * Retrieve list of Suburbs from MDS
 	 * 
 	 * @param string Town Name
+	 * @param int Mode - 0: Return Array, 1: Return result, 2: Get town code and Return Array, 3: Get town code and Return Result
 	 * @return Array
 	 */
-	public function get_suburbs($town){
-		$town_code = $this->get_code($this->get_towns(),$town);
+	public function get_suburbs($town, $mode = 1){
+		if ($mode<1){
+			$town_code = $this->get_code($this->get_towns(),$town);
+			$mode -= 2;
+		} else {
+			$town_code = $town;
+		}
 		
 		if (!isset($this->suburbs[$town_code]))
 		{
 			$this->soap_init();
 			$this->suburbs[$town_code] = $this->soap->getSuburbs(null,$town_code,$this->authenticate['token']);
 		}
-		return $this->suburbs[$town_code];
+		if ($mode==1){
+			if (isset($this->suburbs[$town_code]['results']))
+				return $this->suburbs[$town_code]['results'];
+			else
+				return false;
+		} else{
+			return $this->suburbs[$town_code];
+		}
 	}
 	
 	/**
