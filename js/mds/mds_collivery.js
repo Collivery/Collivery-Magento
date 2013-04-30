@@ -5,37 +5,63 @@ $j(document).ready(function() {
 	var isZA;
 
 	jQuery('select#billing\\:country_id').live('change', function() {
-		//alert('Handler for .change() called.');
 		if ($j("#billing\\:country_id").val() == "ZA") {
-			switchSelect();
+			setZA();
 		} else {
 			if (isZA){
-				switchText();
+				unSetZA();
 			}
 		}
 	});
 
-	if ($j("#billing\\:country_id").val() == "ZA") {
-		alert('US Selected');
-		switchSelect();
-	}
+	jQuery('select#billing\\:region_id').live('change', function() {
+		if ($j("#billing\\:country_id").val() == "ZA") {
+			getSuburbs();
+		}
+	});
 
-	function switchSelect () {
-		jQuery.post("collivery/ajax/index", {neweval: "value"}, function(data){
-			$j("#billing\\:region").remove();
-			$j("#billing\\:region_id").after('<select title="Town" class="validate-select" name="billing[country_id]" id="billing:region"></select>');
-			$j("#billing\\:region").append();
-			isZA = true;
+	if ($j("#billing\\:country_id").val() == "ZA") {
+		setZA();
+	}
+	
+	function getSuburbs () {
+		
+		$j('#mds\\:billing_suburb').empty();
+		$j('#mds\\:billing_suburb').append('<option value="">Loading...</option>');
+		
+		var data = {
+			town		: 'Pretoria',
+		};
+		jQuery.ajax({
+			type : 'POST',
+			url : "http://localhost/magento/index.php/collivery/ajax/suburb",
+			data : data,
+			complete : function(response){
+				$j('#mds\\:billing_suburb').empty();
+				$j("#mds\\:billing_suburb").append(response['responseText']);
+			}
 		});
 		
 	}
 	
-	function switchText () {
-		var display = "";
-		if ($j("#billing\\:region").is(':visible'))
-			var display = 'style="display:none;"';
-		$j("#billing\\:region").remove();
-		$j("#billing\\:region_id").after('<input id="billing:region" ' + display + ' class="input-text required-entry" type="text" title="State/Province" value="" name="billing[region]">');
-		isZA = false;
+	function getSuburbLayout () {
+		jQuery.ajax({
+			type : 'POST',
+			url : "http://localhost/magento/index.php/collivery/ajax/suburbLayout",
+			complete : function(response){
+				$j("#billing\\:city").parent().parent().parent().prepend(response['responseText']);
+				$j('#billing\\:city').parent().parent().hide();
+			}
+		});
+		
 	}
+	
+	function setZA () {
+		getSuburbLayout();
+	}
+	
+	function unSetZA () {
+		
+	}
+
 });
