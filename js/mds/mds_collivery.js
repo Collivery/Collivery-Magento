@@ -30,7 +30,7 @@ $j(document).ready(function() {
 		$j('#mds\\:billing_suburb').append('<option value="">Loading...</option>');
 		
 		var data = {
-			town		: 'Pretoria',
+			town	: 'PTA',
 		};
 		jQuery.ajax({
 			type : 'POST',
@@ -44,24 +44,65 @@ $j(document).ready(function() {
 		
 	}
 	
-	function getSuburbLayout () {
+	function setFields () {
+		var suburb_html = 
+		'<div class="mds-billing field">' +
+		'	<label class="required" for="mds:billing_suburb"><em>*</em>Suburb</label>' +
+		'	<div class="input-box">' +
+		'		<select class="required-entry" title="Suburb" name="mds[billing_suburb]" id="mds:billing_suburb" defaultvalue="">' +
+		'			<option value="">Please select a Town first</option>' +
+		'		</select>' +
+		'	</div>' +
+		'</div>';
+		$j("#billing\\:city").parent().parent().parent().prepend(suburb_html);
+		$j('#billing\\:city').parent().parent().hide();
+		
+		var building_html = 
+		'<li class="mds-billing wide">' +
+		'	<label for="mds:billing_building" class="required"><em>*</em>Building Details</label>' +
+		'	<div class="input-box">' +
+		'		<input title="Building Details" name="mds[billing_building]" id="mds:billing_building" value="" class="input-text required-entry" type="text">' +
+		'	</div>' +
+		'</li>';
+		$j("#billing\\:street1").parent().parent().before(building_html);
+		
+		var cptypes_html = 
+		'<div class="mds-billing field">' +
+		'	<label class="required" for="mds:billing_cptypes"><em>*</em>Location Type</label>' +
+		'	<div class="input-box">' +
+		'		<select class="required-entry" title="Location Type" name="mds[billing_cptypes]" id="mds:billing_cptypes" defaultvalue="">' +
+		'			<option value="">Loading...</option>' +
+		'		</select>' +
+		'	</div>' +
+		'</div>';
+		$j("#billing\\:city").parent().parent().parent().append(cptypes_html);
+	}
+	
+	function getCPTypes () {
+		
+		$j('#mds\\:billing_cptypes').empty();
+		$j('#mds\\:billing_cptypes').append('<option value="">Loading...</option>');
+		
 		jQuery.ajax({
-			type : 'POST',
-			url : "http://localhost/magento/index.php/collivery/ajax/suburbLayout",
+			url : "http://localhost/magento/index.php/collivery/ajax/cptypes",
 			complete : function(response){
-				$j("#billing\\:city").parent().parent().parent().prepend(response['responseText']);
-				$j('#billing\\:city').parent().parent().hide();
+				$j('#mds\\:billing_cptypes').empty();
+				$j("#mds\\:billing_cptypes").append(response['responseText']);
 			}
 		});
 		
 	}
 	
 	function setZA () {
-		getSuburbLayout();
+		setFields();
+		getCPTypes();
+		isZA = true;
 	}
 	
 	function unSetZA () {
-		
+		$j('.mds-billing').remove();
+		$j('#billing\\:city').parent().parent().show();
+		isZA = false;
 	}
 
 });
