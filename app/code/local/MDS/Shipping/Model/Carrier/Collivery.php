@@ -309,13 +309,20 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * 
 	 * @param Array
 	 */
-	public function get_cptypes(){
+	public function get_cptypes($mode = 1){
 		if (!isset($this->cptypes))
 		{
 			$this->soap_init();
 			$this->cptypes = $this->soap->getCPTypes($this->authenticate['token']);
 		}
-		return $this->cptypes;
+		if ($mode==1){
+			if (isset($this->cptypes['results']))
+				return $this->cptypes['results'];
+			else
+				return false;
+		} else{
+			return $this->cptypes;
+		}
 	}
 	
 	/**
