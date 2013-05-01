@@ -45,6 +45,10 @@ $j(document).ready(function() {
 	}
 	
 	function setFields () {
+		$j("label[for='billing\\:region_id']").addClass('required');
+		$j("label[for='billing\\:region_id']").empty();
+		$j("label[for='billing\\:region_id']").append('<em>*</em>Town');
+		
 		var suburb_html = 
 		'<div class="mds-billing field">' +
 		'	<label class="required" for="mds:billing_suburb"><em>*</em>Suburb</label>' +
@@ -102,6 +106,9 @@ $j(document).ready(function() {
 	function unSetZA () {
 		$j('.mds-billing').remove();
 		$j('#billing\\:city').parent().parent().show();
+		$j("label[for='billing\\:region_id']").removeClass('required');
+		$j("label[for='billing\\:region_id']").empty();
+		$j("label[for='billing\\:region_id']").append('<em style="display: none;">*</em>State/Province');
 		isZA = false;
 	}
 
