@@ -6,7 +6,7 @@ $installer->startSetup();
 
 $installer->run("
 
-CREATE TABLE IF NOT EXISTS mds_collivery_sale (
+CREATE TABLE IF NOT EXISTS mds_collivery_order (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `order_id` int(11) NOT NULL,
   `town` varchar(16) NOT NULL,

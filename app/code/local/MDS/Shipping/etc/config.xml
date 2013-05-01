@@ -23,7 +23,7 @@
 						<table>mds_collivery_quote</table>
 					</shipping_quote>
 					<shipping_order>
-						<table>mds_collivery_sale</table>
+						<table>mds_collivery_order</table>
 					</shipping_order>
 				</entities>
 			</collivery_mysql4>

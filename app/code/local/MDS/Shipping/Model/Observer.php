@@ -8,9 +8,9 @@ class MDS_Shipping_Model_Observer {
 	public function saveQuoteBefore($evt) {
 		$quote = $evt -> getQuote();
 		$post = Mage::app() -> getFrontController() -> getRequest() -> getPost();
-		if (isset($post['mds']['suburb'])) {
-			$var = $post['mds']['suburb'];
-			$quote -> setSuburb($var);
+		if (isset($post['mds'])) {
+			$var = $post['mds'];
+			$quote -> setMds($var);
 		}
 	}
 
@@ -22,15 +22,18 @@ class MDS_Shipping_Model_Observer {
 	 */
 	public function saveQuoteAfter($evt) {
 		$quote = $evt -> getQuote();
-		if ($quote -> getSuburb()) {
-			$var = $quote -> getSuburb();
+		if ($quote -> getMds()) {
+			$var = $quote -> getMds();
 			if (!empty($var)) {
-				$model = Mage::getModel('mds_shipping/shipping_quote');
-				$model -> deteleByQuote($quote -> getId(), 'suburb');
-				$model -> setQuoteId($quote -> getId());
-				$model -> setKey('suburb');
-				$model -> setValue($var);
-				$model -> save();
+				
+				foreach ($var as $key => $value) {
+					$model = Mage::getModel('mds_shipping/shipping_quote');
+					$model -> deteleByQuote($quote -> getId(), $key);
+					$model -> setQuoteId($quote -> getId());
+					$model -> setKey($key);
+					$model -> setValue($value);
+					$model -> save();
+				}
 			}
 		}
 	}
@@ -53,22 +56,24 @@ class MDS_Shipping_Model_Observer {
 	/**
 	 *
 	 * This function is called after order gets saved to database.
-	 * Here we transfer our custom fields from quote table to order table i.e sales_order_custom
+	 * Here we transfer our custom fields from quote table to order table
 	 * @param $evt
 	 */
 	public function saveOrderAfter($evt) {
 		$order = $evt -> getOrder();
 		$quote = $evt -> getQuote();
-		if ($quote -> getSuburb()) {
-			$var = $quote -> getSuburb();
+		if ($quote -> getMds()) {
+			$var = $quote->getMds();
 			if (!empty($var)) {
-				$model = Mage::getModel('mds_shipping/shipping_quote');
-				$model -> deleteByOrder($order -> getId(), 'suburb');
-				$model -> setOrderId($order -> getId());
-				$model -> setKey('suburb');
-				$model -> setValue($var);
-				$order -> setSuburb($var);
-				$model -> save();
+				foreach ($var as $key => $value) {
+					$model = Mage::getModel('mds_shipping/shipping_order');
+					$model -> deleteByOrder($order -> getId(), $key);
+					$model -> setOrderId($order -> getId());
+					$model -> setKey($key);
+					$model -> setValue($value);
+					$order -> setMds($value);
+					$model -> save();
+				}
 			}
 		}
 	}
@@ -81,7 +86,7 @@ class MDS_Shipping_Model_Observer {
 	 */
 	public function loadOrderAfter($evt) {
 		$order = $evt -> getOrder();
-		$model = Mage::getModel('mds_shipping/shipping_quote');
+		$model = Mage::getModel('mds_shipping/shipping_order');
 		$data = $model -> getByOrder($order -> getId());
 		foreach ($data as $key => $value) {
 			$order -> setData($key, $value);

@@ -1,7 +1,7 @@
 <?php
 class MDS_Shipping_Model_Sales_Order extends Mage_Sales_Model_Order{
 	public function hasMdsFields(){
-		$var = $this->getSuburb();
+		$var = $this->getMds();
 		if($var && !empty($var)){
 			return true;
 		}else{
@@ -9,7 +9,7 @@ class MDS_Shipping_Model_Sales_Order extends Mage_Sales_Model_Order{
 		}
 	}
 	public function getFieldHtml(){
-		$var = $this->getSuburb();
+		$var = $this->getMds();
 		$html = '<b>Suburb:</b>'.$var.'<br/>';
 		return $html;
 	}
