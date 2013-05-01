@@ -53,7 +53,17 @@ implements Mage_Shipping_Model_Carrier_Interface {
 			return false;
 		}
 
-		$result = Mage::getModel('shipping/rate_result');
+		// Get custom MDS fields from Checkout
+		$checkout_session = Mage::getSingleton('checkout/session');
+		$quote_id = $checkout_session->getQuote()->getId();
+		$quote = Mage::getModel('mds_shipping/shipping_quote');
+		
+		$mds_vars = $quote->getByQuote($quote_id);
+		
+		// Skip if no values from Custom Fields recieved
+		if (!isset($mds_vars)||empty($mds_vars)) {
+			return false;
+		}
 
 		// Get cart items and put them in an Array or quit
 		$items = $request->getAllItems();
@@ -65,7 +75,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		$services = $this->get_available_services();
 		foreach ($services['results'] as $key => $value) {
 			// Get Shipping Estimate for current service
-			$i=$this->get_shipping_estimate('PTA', 1, $key, $cart['max_weight']);
+			$i=$this->get_shipping_estimate('PTA', $mds_vars['billing_cptype'], $key, $cart['max_weight']);
 			// Create Response Array
 			$response[] =
 					Array(
@@ -75,6 +85,9 @@ implements Mage_Shipping_Model_Carrier_Interface {
 						'price' => $i * (1+($this->getConfigData('markup')/100)),
 					);
 		}
+
+		// Result Object Returned
+		$result = Mage::getModel('shipping/rate_result');
 
 		foreach ($response as $rMethod) {
 			$method = Mage::getModel('shipping/rate_result_method');
