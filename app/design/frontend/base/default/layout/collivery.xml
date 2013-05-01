@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<layout version="0.1.0">
+	<checkout_onepage_index>
+        <reference name="head">
+            <action method="addJs"><script>jquery.min.js</script></action>
+            <action method="addJs"><script>mds/mds_collivery.js</script></action>
+        </reference>
+    </checkout_onepage_index>
+	<collivery_ajax_index>
+		<block type="collivery/shipping" name="root" template="mds/template.phtml" />
+	</collivery_ajax_index>
+	<sales_order_view>
+		<reference name="my.account.wrapper">
+			<block type="collivery/collivery_order" name="collivery.order" template="collivery/order.phtml" after='sales.order.info' />
+		</reference>
+	</sales_order_view>
+</layout>
