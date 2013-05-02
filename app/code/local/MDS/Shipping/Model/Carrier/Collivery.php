@@ -295,7 +295,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * @return Array
 	 */
 	public function get_suburbs($town, $mode = 1){
-		if ($mode<1){
+		if ($mode>1){
 			$town_code = $this->get_code($this->get_towns(),$town);
 			$mode -= 2;
 		} else {
