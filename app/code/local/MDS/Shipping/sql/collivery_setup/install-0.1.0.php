@@ -55,7 +55,7 @@ foreach ($attributes as $key => $value) {
 	$setup->addAttribute('catalog_product', $key, array(
 		'group'         => 'General',
 		'input'         => 'text',
-		'type'          => 'dec',
+		'type'          => 'decimal',
 		'label'         => $value,
 		'backend'       => '',
 		'visible'       => TRUE,
