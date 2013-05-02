@@ -4,52 +4,6 @@ $j(document).ready(function() {
 
 	var isZA;
 
-	jQuery('select#billing\\:country_id').live('change', function() {
-		if ($j("#billing\\:country_id").val() == "ZA") {
-			setZA();
-		} else {
-			if (isZA){
-				unSetZA();
-			}
-		}
-	});
-
-	jQuery('select#billing\\:region_id').live('change', function() {
-		if ($j("#billing\\:country_id").val() == "ZA") {
-			$j("#mds\\:billing_town").val($j("#billing\\:region_id option:selected").text());
-			getSuburbs();
-		}
-	});
-
-	jQuery('select#mds\\:billing_suburb').live('change', function() {
-		$j("#billing\\:city").val($j("#mds\\:billing_suburb option:selected").text());
-	});
-
-	if ($j("#billing\\:country_id").val() == "ZA") {
-		setZA();
-	}
-
-	function getSuburbs () {
-		
-		$j('#mds\\:billing_suburb').empty();
-		$j('#mds\\:billing_suburb').append('<option value="">Loading...</option>');
-		
-		var data = {
-			town	: $j("#billing\\:region_id option:selected").text(),
-		};
-		jQuery.ajax({
-			type : 'POST',
-			url : "http://localhost/magento/index.php/collivery/ajax/suburb",
-			data : data,
-			complete : function(response){
-				$j('#mds\\:billing_suburb').empty();
-				$j("#mds\\:billing_suburb").append(response['responseText']);
-				$j("#billing\\:city").val($j("#mds\\:billing_suburb option:selected").text());
-			}
-		});
-		
-	}
-
 	function setFields () {
 		$j("label[for='billing\\:region_id']").addClass('required');
 		$j("label[for='billing\\:region_id']").empty();
@@ -96,6 +50,27 @@ $j(document).ready(function() {
 		$j("#billing\\:city").parent().parent().parent().append(cptypes_html);
 	}
 
+	function getSuburbs () {
+		
+		$j('#mds\\:billing_suburb').empty();
+		$j('#mds\\:billing_suburb').append('<option value="">Loading...</option>');
+		
+		var data = {
+			town	: $j("#billing\\:region_id option:selected").text(),
+		};
+		jQuery.ajax({
+			type : 'POST',
+			url : "http://localhost/magento/index.php/collivery/ajax/suburb",
+			data : data,
+			complete : function(response){
+				$j('#mds\\:billing_suburb').empty();
+				$j("#mds\\:billing_suburb").append(response['responseText']);
+				$j("#billing\\:city").val($j("#mds\\:billing_suburb option:selected").text());
+			}
+		});
+		
+	}
+
 	function getCPTypes () {
 		
 		$j('#mds\\:billing_cptypes').empty();
@@ -124,6 +99,31 @@ $j(document).ready(function() {
 		$j("label[for='billing\\:region_id']").empty();
 		$j("label[for='billing\\:region_id']").append('<em style="display: none;">*</em>State/Province');
 		isZA = false;
+	}
+
+	jQuery('select#billing\\:country_id').live('change', function() {
+		if ($j("#billing\\:country_id").val() == "ZA") {
+			setZA();
+		} else {
+			if (isZA){
+				unSetZA();
+			}
+		}
+	});
+
+	jQuery('select#billing\\:region_id').live('change', function() {
+		if ($j("#billing\\:country_id").val() == "ZA") {
+			$j("#mds\\:billing_town").val($j("#billing\\:region_id option:selected").text());
+			getSuburbs();
+		}
+	});
+
+	jQuery('select#mds\\:billing_suburb').live('change', function() {
+		$j("#billing\\:city").val($j("#mds\\:billing_suburb option:selected").text());
+	});
+
+	if ($j("#billing\\:country_id").val() == "ZA") {
+		setZA();
 	}
 
 });
