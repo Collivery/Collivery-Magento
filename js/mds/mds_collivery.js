@@ -16,21 +16,26 @@ $j(document).ready(function() {
 
 	jQuery('select#billing\\:region_id').live('change', function() {
 		if ($j("#billing\\:country_id").val() == "ZA") {
+			$j("#mds\\:billing_town").val($j("#billing\\:region_id option:selected").text());
 			getSuburbs();
 		}
+	});
+
+	jQuery('select#mds\\:billing_suburb').live('change', function() {
+		$j("#billing\\:city").val($j("#mds\\:billing_suburb option:selected").text());
 	});
 
 	if ($j("#billing\\:country_id").val() == "ZA") {
 		setZA();
 	}
-	
+
 	function getSuburbs () {
 		
 		$j('#mds\\:billing_suburb').empty();
 		$j('#mds\\:billing_suburb').append('<option value="">Loading...</option>');
 		
 		var data = {
-			town	: 'PTA',
+			town	: $j("#billing\\:region_id option:selected").text(),
 		};
 		jQuery.ajax({
 			type : 'POST',
@@ -39,11 +44,12 @@ $j(document).ready(function() {
 			complete : function(response){
 				$j('#mds\\:billing_suburb').empty();
 				$j("#mds\\:billing_suburb").append(response['responseText']);
+				$j("#billing\\:city").val($j("#mds\\:billing_suburb option:selected").text());
 			}
 		});
 		
 	}
-	
+
 	function setFields () {
 		$j("label[for='billing\\:region_id']").addClass('required');
 		$j("label[for='billing\\:region_id']").empty();
@@ -80,8 +86,16 @@ $j(document).ready(function() {
 		'	</div>' +
 		'</div>';
 		$j("#billing\\:city").parent().parent().parent().append(cptypes_html);
+		
+		var cptypes_html = 
+		'<div class="mds-billing field" style="display: none;">' +
+		'	<div class="input-box">' +
+		'		<input name="mds[billing_town]" id="mds:billing_town" value="" class="input-text required-entry" type="text">' +
+		'	</div>' +
+		'</div>';
+		$j("#billing\\:city").parent().parent().parent().append(cptypes_html);
 	}
-	
+
 	function getCPTypes () {
 		
 		$j('#mds\\:billing_cptypes').empty();
@@ -96,13 +110,13 @@ $j(document).ready(function() {
 		});
 		
 	}
-	
+
 	function setZA () {
 		setFields();
 		getCPTypes();
 		isZA = true;
 	}
-	
+
 	function unSetZA () {
 		$j('.mds-billing').remove();
 		$j('#billing\\:city').parent().parent().show();

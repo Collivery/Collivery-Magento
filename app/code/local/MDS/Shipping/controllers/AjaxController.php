@@ -5,7 +5,7 @@ class MDS_Shipping_AjaxController extends Mage_Core_Controller_Front_Action
 	{
 		$model = Mage::getModel('mds_shipping/carrier_collivery');
 		
-		foreach ($model->get_suburbs($_POST['town']) as $key => $value) {
+		foreach ($model->get_suburbs($_POST['town'], 3) as $key => $value) {
 			echo '<option value="'. $key .'">'. $value .'</option>';
 		}
 	}
