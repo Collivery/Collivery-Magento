@@ -3,6 +3,7 @@ var $j = jQuery.noConflict();
 $j(document).ready(function() {
 
 	var isZA_B;
+	var isZA_S;
 
 	function setFields (shipto) {
 		$j("label[for='" + shipto + "\\:region_id']").addClass('required');
@@ -110,6 +111,18 @@ $j(document).ready(function() {
 			}
 		}
 	});
+	
+	jQuery('select#shipping\\:country_id').live('change', function() {
+		if ($j("#shipping\\:country_id").val() == "ZA") {
+			setZA('shipping');
+			isZA_S = true;
+		} else {
+			if (isZA_S){
+				unSetZA('shipping');
+				isZA_S = false;
+			}
+		}
+	});
 
 	jQuery('select#billing\\:region_id').live('change', function() {
 		if ($j("#billing\\:country_id").val() == "ZA") {
@@ -117,14 +130,30 @@ $j(document).ready(function() {
 			getSuburbs('billing');
 		}
 	});
+	
+	jQuery('select#shipping\\:region_id').live('change', function() {
+		if ($j("#shipping\\:country_id").val() == "ZA") {
+			$j("#mds\\:shipping_town").val($j("#shipping\\:region_id option:selected").text());
+			getSuburbs('shipping');
+		}
+	});
 
 	jQuery('select#mds\\:billing_suburb').live('change', function() {
 		$j("#billing\\:city").val($j("#mds\\:billing_suburb option:selected").text());
+	});
+	
+	jQuery('select#mds\\:shipping_suburb').live('change', function() {
+		$j("#shipping\\:city").val($j("#mds\\:shipping_suburb option:selected").text());
 	});
 
 	if ($j("#billing\\:country_id").val() == "ZA") {
 		setZA('billing');
 		isZA_B = true;
+	}
+	
+	if ($j("#shipping\\:country_id").val() == "ZA") {
+		setZA('shipping');
+		isZA_S = true;
 	}
 
 });
