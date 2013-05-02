@@ -55,14 +55,24 @@ implements Mage_Shipping_Model_Carrier_Interface {
 
 		// Get custom MDS fields from Checkout
 		$checkout_session = Mage::getSingleton('checkout/session');
-		$quote_id = $checkout_session->getQuote()->getId();
-		$quote = Mage::getModel('mds_shipping/shipping_quote');
+		$shipping_address = $checkout_session->getQuote()->getShippingAddress();
 		
-		$mds_vars = $quote->getByQuote($quote_id);
+		$ship2billing = $shipping_address->getData('same_as_billing');
+		$town = $this->get_code($this->get_towns(),$shipping_address->getRegion());
 		
 		// Skip if no values from Custom Fields recieved
-		if (!isset($mds_vars)||empty($mds_vars)) {
-			return false;
+		if (!isset($town)||$town==""||$town=="NA"){
+			return FALSE;
+		}
+		
+		$quote_id = $checkout_session->getQuote()->getId();
+		$quote = Mage::getModel('mds_shipping/shipping_quote');
+		$mds_vars = $quote->getByQuote($quote_id);
+		
+		if ($ship2billing){
+			$cptypes = $mds_vars['billing_cptypes'];
+		} else {
+			$cptypes = $mds_vars['shipping_cptypes'];
 		}
 
 		// Get cart items and put them in an Array or quit
@@ -75,7 +85,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		$services = $this->get_available_services();
 		foreach ($services['results'] as $key => $value) {
 			// Get Shipping Estimate for current service
-			$i=$this->get_shipping_estimate('PTA', $mds_vars['billing_cptype'], $key, $cart['max_weight']);
+			$i=$this->get_shipping_estimate($town, $cptypes, $key, $cart['max_weight']);
 			// Create Response Array
 			$response[] =
 					Array(
