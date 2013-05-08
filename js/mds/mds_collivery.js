@@ -4,6 +4,7 @@ $j(document).ready(function() {
 
 	var isZA_B;
 	var isZA_S;
+	var setShipping = false;
 
 	function setFields (shipto) {
 		$j("label[for='" + shipto + "\\:region_id']").addClass('required');
@@ -61,7 +62,7 @@ $j(document).ready(function() {
 		};
 		jQuery.ajax({
 			type : 'POST',
-			url : "http://localhost/magento/index.php/collivery/ajax/suburb",
+			url : "../../collivery/ajax/suburb",
 			data : data,
 			complete : function(response){
 				$j("#mds\\:" + shipto + "_suburb").empty();
@@ -78,7 +79,7 @@ $j(document).ready(function() {
 		$j("#mds\\:" + shipto + "_cptypes").append('<option value="">Loading...</option>');
 		
 		jQuery.ajax({
-			url : "http://localhost/magento/index.php/collivery/ajax/cptypes",
+			url : "../../collivery/ajax/cptypes",
 			complete : function(response){
 				$j("#mds\\:" + shipto + "_cptypes").empty();
 				$j("#mds\\:" + shipto + "_cptypes").append(response['responseText']);
@@ -104,6 +105,11 @@ $j(document).ready(function() {
 		if ($j("#billing\\:country_id").val() == "ZA") {
 			setZA('billing');
 			isZA_B = true;
+			if (!setShipping){
+				setZA('shipping');
+				$j("#shipping\\:country_id").val('ZA')
+				isZA_S = true;
+			}
 		} else {
 			if (isZA_B){
 				unSetZA('billing');
@@ -116,10 +122,12 @@ $j(document).ready(function() {
 		if ($j("#shipping\\:country_id").val() == "ZA") {
 			setZA('shipping');
 			isZA_S = true;
+			setShipping = true;
 		} else {
 			if (isZA_S){
 				unSetZA('shipping');
 				isZA_S = false;
+				setShipping = true;
 			}
 		}
 	});
@@ -140,20 +148,38 @@ $j(document).ready(function() {
 
 	jQuery('select#mds\\:billing_suburb').live('change', function() {
 		$j("#billing\\:city").val($j("#mds\\:billing_suburb option:selected").text());
+		if (!setShipping){
+			$j("#shipping\\:city").val($j("#mds\\:billing_suburb option:selected").text());
+			$j("#mds\\:shipping_suburb").val($j("#mds\\:billing_suburb option:selected").val());
+		}
 	});
 	
 	jQuery('select#mds\\:shipping_suburb').live('change', function() {
 		$j("#shipping\\:city").val($j("#mds\\:shipping_suburb option:selected").text());
 	});
+	
+	jQuery('select#mds\\:billing_cptypes').live('change', function() {
+		$j("#mds\\:shipping_cptypes").val($j("#mds\\:billing_cptypes option:selected").val());
+	});
+	
+	jQuery('#mds\\:billing_building').live('change', function() {
+		$j('#mds\\:shipping_building').val($j('#mds\\:billing_building').val())
+		
+	});
 
 	if ($j("#billing\\:country_id").val() == "ZA") {
 		setZA('billing');
 		isZA_B = true;
+		if (!setShipping){
+			setZA('shipping');
+			isZA_S = true;
+		}
 	}
 	
 	if ($j("#shipping\\:country_id").val() == "ZA") {
 		setZA('shipping');
 		isZA_S = true;
+		setShipping = true;
 	}
 
 });
