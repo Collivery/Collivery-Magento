@@ -175,11 +175,5 @@ $j(document).ready(function() {
 			isZA_S = true;
 		}
 	}
-	
-	if ($j("#shipping\\:country_id").val() == "ZA") {
-		setZA('shipping');
-		isZA_S = true;
-		setShipping = true;
-	}
 
 });
