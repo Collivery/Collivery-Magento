@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset=utf-8>
+	<title>MDS Collivery Shipping Module for Magento :: User Manual</title>
+	<link rel="stylesheet" type="text/css" media="screen" href="style.css">
+	<!--[if IE]>
+		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+</head>
+<body>
+	<div class="wrapper">
+		<h1>MDS Collivery Shipping Module User Manual</h1>
+		<h2><a name="toc">Table of Contents</a></h2>
+		<p>
+			<ol>
+				<li>
+					<a href="#overview">Overview</a>
+					<ol>
+						<li><a href="#overview_works">How it works</a></li>
+						<li><a href="#overview_features">Current Features</a></li>
+						<li><a href="#overview_features_implamented">Features being implamented</a></li>
+						<li><a href="#overview_features_considered">Features being considered</a></li>
+					</ol>
+				</li>
+				<li><a href="#install">Installation Instructions</a></li>
+				<li><a name="#usage">Usage Examples</a></li>
+			</ol>
+		</p>
+		<h2><a name="overview">Overview</a></h2>
+		<p>The MDS Collivery Module for Magento adds integration to the MDS Collivery API.</p>
+		<h3><a name="overview_works">How it works</a></h3>
+		<p>This module uses the MDS Collivery API to fetch pricing information for the current checkout. It uses your default address set on your Collivery Account as the <em>'From'</em> address, and uses the clients information filled out on the checkout page as the <em>'To'</em> Address.</p>
+		<h3><a name="overview_features">Current Features</a></h3>
+		<p>
+			<ol>
+				<li>Gets shipping price and adds it to the total on Checkout</li>
+			</ol>
+		</p>
+		<h3><a name="overview_features_implamented">Features being implemented</a></h3>
+		<p>
+			<ol>
+				<li>Saving Address Info for Registered Users</li>
+				<li>Show custom fields in Admin Order</li>
+				<li>Allow Multiple Packages to be shipped together</li>
+				<li>Allow Admin to choose which shipping methods are available</li>
+				<li>Auto-register Collivery</li>
+			</ol>
+		</p>
+		<h3><a name="overview_features_considered">Features being considered</a></h3>
+		<p>
+			<ol>
+				<li>Caching of data to reduce service calls</li>
+			</ol>
+		</p>
+		<h2><a name="install">Installation Instructions</a></h2>
+		<p>
+			<ol>
+				<li>
+					Download the latest version of the MDS Collivery Plugin for Magento from our
+					<a href="https://github.com/Xethron/magento-mds-collivery/archive/master.zip">GitHub Repository.</a>
+					(This will be updated weekly while in development.)
+				</li>
+				<li>Extract the content of the zip file.</li>
+				<li>Copy the two folders ("app" and "js") inside "magento-mds-collivery-master" to the root directory of Magento and replace/merge with the current "app" and "js" folder.</li>
+				<li>If Magento Caching is Enabled: Go to the <em>Magento Admin Panel</em>, select <em>System</em> -&gt; <em>Cache Management</em>, and click on "Flush Magento Cache" to reload the Cache.<img src="img/cache.png"></li>
+				<li>
+					Go to <em>System</em> -&gt; <em>Configuration</em> -&gt; <em>Shipping Methods</em> -&gt; <em>MDS Collivery</em>, and enter all your details there.<br>
+					We highly recommend using the demo account while testing, as any collivery to this account will be ignored so that no accidental colliveries get registered.
+					<img src="img/config.png"> | <img src="img/shipping_methods.png"> <img src="img/shipping_config.png">
+				</li>
+				<ul>
+					<li><strong>Enabled:</strong> Do you want the plugin to be Enabled? (<strong>Default:</strong> <em>Yes</em>)</li>
+					<li><strong>Title:</strong> Name of shipping method displayed to your users. (<strong>Default:</strong> <em>MDS Collivery</em>)</li>
+					<li>
+						<strong>MDS Account Email:</strong> Your MDS Account Email Address.
+						<a href="http://www.collivery.co.za/index.php/register">
+							Register for an MDS Account
+						</a>
+						(<strong>Default:</strong> <em>demo@collivery.co.za</em>)
+					</li>
+					<li>
+						<strong>Password:</strong> The password you chose when you signed up for your MDS Account.
+						<a href="http://quote.collivery.co.za/forgotpass.php">Forgot Password?</a>
+						(<strong>Default:</strong> <em>demo</em>)
+					</li>
+					<li><strong>Percentage Markup:</strong> Add a Markup to increase (or decrease if negative value) the shipping cost you charge your customers. The main reason for this is to allow shop owners to protect themselves from possible changes in price due to incorrect weight/dimension data on the site. This could also be used to make a bit of extra money from shipping. (<strong>Default:</strong> <em>10</em>)</li>
+					<li><strong>Length Attribute Name:</strong> Name of the length Attribute used for products. This should not be changed if you don't know what it is. (<strong>Default:</strong> <em>length</em>)</li>
+					<li><strong>Width Attribute Name:</strong> Name of the width Attribute used for products. This should not be changed if you don't know what it is. (<strong>Default:</strong> <em>width</em>)</li>
+					<li><strong>Height Attribute Name:</strong> Name of the height Attribute used for products. This should not be changed if you don't know what it is. (<strong>Default:</strong> <em>height</em>)</li>
+					<li><strong>Displayed Error Message:</strong> Error message to display incase a problem arises with the plugin. (<strong>Default:</strong> <em>This shipping method is currently unavailable. If you would like to ship using this shipping method, please contact us.)</em></li>
+				</ul>
+			</ol>
+		</p>
+		<h2><a name="usage">Usage</a></h2>
+		<p>Here are some usage examples.</p>
+		<p>
+			<ol>
+				<li>
+					<h3>Cart View</h3>
+					<img src="img/cart.png">
+				</li>
+				<li>
+					<h3>Checkout Client Details</h3>
+					<img src="img/checkout_info.png">
+				</li>
+				<li>
+					<h3>Checkout Shipping Details</h3>
+					<img src="img/checkout_shipping.png">
+				</li>
+			</ol>
+		</p>
+	</div>
+</body>
+</html>
