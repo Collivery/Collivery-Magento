@@ -27,7 +27,7 @@ class MDS_Collivery_Model_Observer {
 			if (!empty($var)) {
 				
 				foreach ($var as $key => $value) {
-					$model = Mage::getModel('mds_shipping/shipping_quote');
+					$model = Mage::getModel('mds_collivery/shipping_quote');
 					$model -> deteleByQuote($quote -> getId(), $key);
 					$model -> setQuoteId($quote -> getId());
 					$model -> setKey($key);
@@ -46,7 +46,7 @@ class MDS_Collivery_Model_Observer {
 	 */
 	public function loadQuoteAfter($evt) {
 		$quote = $evt -> getQuote();
-		$model = Mage::getModel('mds_shipping/shipping_quote');
+		$model = Mage::getModel('mds_collivery/shipping_quote');
 		$data = $model -> getByQuote($quote -> getId());
 		foreach ($data as $key => $value) {
 			$quote -> setData($key, $value);
@@ -66,7 +66,7 @@ class MDS_Collivery_Model_Observer {
 			$var = $quote->getMds();
 			if (!empty($var)) {
 				foreach ($var as $key => $value) {
-					$model = Mage::getModel('mds_shipping/shipping_order');
+					$model = Mage::getModel('mds_collivery/shipping_order');
 					$model -> deleteByOrder($order -> getId(), $key);
 					$model -> setOrderId($order -> getId());
 					$model -> setKey($key);
@@ -86,7 +86,7 @@ class MDS_Collivery_Model_Observer {
 	 */
 	public function loadOrderAfter($evt) {
 		$order = $evt -> getOrder();
-		$model = Mage::getModel('mds_shipping/shipping_order');
+		$model = Mage::getModel('mds_collivery/shipping_order');
 		$data = $model -> getByOrder($order -> getId());
 		foreach ($data as $key => $value) {
 			$order -> setData($key, $value);

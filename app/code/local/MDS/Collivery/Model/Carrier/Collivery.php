@@ -66,7 +66,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		}
 		
 		$quote_id = $checkout_session->getQuote()->getId();
-		$quote = Mage::getModel('mds_shipping/shipping_quote');
+		$quote = Mage::getModel('mds_collivery/shipping_quote');
 		$mds_vars = $quote->getByQuote($quote_id);
 		
 		if ($ship2billing){

@@ -7,10 +7,10 @@
 	</modules>
 	<global>
 		<models>
-			<mds_shipping>
+			<mds_collivery>
 				<class>MDS_Collivery_Model</class>
 				<resourceModel>collivery_mysql4</resourceModel>
-			</mds_shipping>
+			</mds_collivery>
 			<sales>
 				<rewrite>
 					<order>MDS_Collivery_Model_Sales_Order</order>
@@ -112,7 +112,7 @@
 		<carriers>
 			<collivery>
 				<active>1</active>
-				<model>mds_shipping/carrier_collivery</model>
+				<model>mds_collivery/carrier_collivery</model>
 				<title>MDS Collivery</title>
 				<lengthLabel>length</lengthLabel>
 				<widthLabel>width</widthLabel>
