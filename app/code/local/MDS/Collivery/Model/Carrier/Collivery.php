@@ -4,7 +4,7 @@
  * MDS Collivery Shipping Module
  * URL: https://github.com/Xethron/magento-mds-collivery
  */
-class MDS_Shipping_Model_Carrier_Collivery
+class MDS_Collivery_Model_Carrier_Collivery
 extends Mage_Shipping_Model_Carrier_Abstract
 implements Mage_Shipping_Model_Carrier_Interface {
 

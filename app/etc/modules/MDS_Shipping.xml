@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <config>
 	<modules>
-		<MDS_Shipping>
+		<MDS_Collivery>
 			<active>true</active>
 			<codePool>local</codePool>
 			<depends>
 				<Mage_Shipping/>
 			</depends>
-		</MDS_Shipping>
+		</MDS_Collivery>
 	</modules>
 </config>

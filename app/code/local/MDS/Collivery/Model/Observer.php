@@ -1,5 +1,5 @@
 <?php
-class MDS_Shipping_Model_Observer {
+class MDS_Collivery_Model_Observer {
 	/**
 	 * This function is called just before $quote object get stored to database.
 	 * Here, from POST data, we capture our custom field and put it in the quote object

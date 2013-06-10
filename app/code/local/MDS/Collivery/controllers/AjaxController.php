@@ -1,5 +1,5 @@
 <?php
-class MDS_Shipping_AjaxController extends Mage_Core_Controller_Front_Action
+class MDS_Collivery_AjaxController extends Mage_Core_Controller_Front_Action
 {
 	public function suburbAction()
 	{

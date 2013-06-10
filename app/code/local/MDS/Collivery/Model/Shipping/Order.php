@@ -1,5 +1,5 @@
 <?php
-class MDS_Shipping_Model_Shipping_Order extends Mage_Core_Model_Abstract{
+class MDS_Collivery_Model_Shipping_Order extends Mage_Core_Model_Abstract{
 	public function _construct()
 	{
 		parent::_construct();

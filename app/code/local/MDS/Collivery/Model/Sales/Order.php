@@ -1,5 +1,5 @@
 <?php
-class MDS_Shipping_Model_Sales_Order extends Mage_Sales_Model_Order{
+class MDS_Collivery_Model_Sales_Order extends Mage_Sales_Model_Order{
 	public function hasMdsFields(){
 		$var = $this->getMds();
 		if($var && !empty($var)){

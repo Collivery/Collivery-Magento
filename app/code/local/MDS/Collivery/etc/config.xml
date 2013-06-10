@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <config>
 	<modules>
-		<MDS_Shipping>
+		<MDS_Collivery>
 			<version>0.1.0</version>
-		</MDS_Shipping>
+		</MDS_Collivery>
 	</modules>
 	<global>
 		<models>
 			<mds_shipping>
-				<class>MDS_Shipping_Model</class>
+				<class>MDS_Collivery_Model</class>
 				<resourceModel>collivery_mysql4</resourceModel>
 			</mds_shipping>
 			<sales>
 				<rewrite>
-					<order>MDS_Shipping_Model_Sales_Order</order>
+					<order>MDS_Collivery_Model_Sales_Order</order>
 				</rewrite>
 			</sales>
 			<collivery_mysql4>
-				<class>MDS_Shipping_Model_Mysql4</class>
+				<class>MDS_Collivery_Model_Mysql4</class>
 				<entities>
 					<shipping_quote>
 						<table>mds_collivery_quote</table>
@@ -34,7 +34,7 @@
 				<observers>
 					<save_before>
 						<type>singleton</type>
-						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<class>MDS_Collivery_Model_Observer</class><!-- Over Model Class -->
 						<method>saveQuoteBefore</method> <!-- name of function -->
 					</save_before>
 				</observers>
@@ -44,7 +44,7 @@
 				<observers>
 					<save_after>
 						<type>singleton</type>
-						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<class>MDS_Collivery_Model_Observer</class><!-- Over Model Class -->
 						<method>saveQuoteAfter</method> <!-- name of function -->
 					</save_after>
 				</observers>
@@ -53,7 +53,7 @@
 				<observers>
 					<load_after>
 						<type>singleton</type>
-						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<class>MDS_Collivery_Model_Observer</class><!-- Over Model Class -->
 						<method>loadQuoteAfter</method> <!-- name of function -->
 					</load_after>
 				</observers>
@@ -62,7 +62,7 @@
 				<observers>
 					<sales_model_service_quote_submit_after>
 						<type>singleton</type>
-						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<class>MDS_Collivery_Model_Observer</class><!-- Over Model Class -->
 						<method>saveOrderAfter</method> <!-- name of function -->
 					</sales_model_service_quote_submit_after>
 				</observers>
@@ -71,7 +71,7 @@
 				<observers>
 					<sales_order_load_after>
 						<type>singleton</type>
-						<class>MDS_Shipping_Model_Observer</class><!-- Over Model Class -->
+						<class>MDS_Collivery_Model_Observer</class><!-- Over Model Class -->
 						<method>loadOrderAfter</method> <!-- name of function -->
 					</sales_order_load_after>
 				</observers>
@@ -80,7 +80,7 @@
 		<resources>
 			<collivery_setup>
 				<setup>
-					<module>MDS_Shipping</module>
+					<module>MDS_Collivery</module>
 				</setup>
 				<connection>
 					<use>core_setup</use>
@@ -99,12 +99,12 @@
 		</resources>
 		<blocks>
 			<collivery>
-				<class>MDS_Shipping_Block</class>
+				<class>MDS_Collivery_Block</class>
 			</collivery>
 		</blocks>
 		<helpers>
 			<collivery>
-				<class>MDS_Shipping_Helper</class>
+				<class>MDS_Collivery_Helper</class>
 			</collivery>
 		</helpers>
 	</global>
@@ -129,7 +129,7 @@
 			<collivery>
 				<use>standard</use>
 				<args>
-					<module>MDS_Shipping</module>
+					<module>MDS_Collivery</module>
 					<frontName>collivery</frontName>
 				</args>
 			</collivery>
@@ -147,7 +147,7 @@
 			<colliveryadmin>
 				<use>admin</use>
 				<args>
-					<module>MDS_Shipping</module>
+					<module>MDS_Collivery</module>
 					<frontName>colliveryadmin</frontName>
 				</args>
 			</colliveryadmin>

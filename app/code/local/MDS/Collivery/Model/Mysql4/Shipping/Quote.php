@@ -1,5 +1,5 @@
 <?php
-class MDS_Shipping_Model_Mysql4_Shipping_Quote extends Mage_Core_Model_Mysql4_Abstract{
+class MDS_Collivery_Model_Mysql4_Shipping_Quote extends Mage_Core_Model_Mysql4_Abstract{
 	public function _construct()
 	{
 		$this->_init('mds_shipping/shipping_quote', 'id');
