@@ -10,9 +10,4 @@
 	<collivery_ajax_index>
 		<block type="collivery/shipping" name="root" template="mds/template.phtml" />
 	</collivery_ajax_index>
-	<sales_order_view>
-		<reference name="my.account.wrapper">
-			<block type="collivery/collivery_order" name="collivery.order" template="collivery/order.phtml" after='sales.order.info' />
-		</reference>
-	</sales_order_view>
 </layout>
