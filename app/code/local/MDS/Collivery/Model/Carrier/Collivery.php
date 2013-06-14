@@ -178,6 +178,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 				
 				// Get info from product
 				$qty = $item->getQty();
+				if (!isset($qty)) $qty = $item->getQtyOrdered();
+				
 				$weight = $item->getWeight();
 				$width = $productObj->getData($this->getConfigData('widthLabel'));
 				$length = $productObj->getData($this->getConfigData('lengthLabel'));
@@ -304,7 +306,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 			$town_code = $town;
 		}
 		
-		if (!isset($this->suburbs[$town_code]))
+		if (!isset($this->suburbs[$town_code]['results']))
 		{
 			$this->soap_init();
 			$this->suburbs[$town_code] = $this->soap->getSuburbs(null,$town_code,$this->authenticate['token']);
@@ -355,6 +357,20 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		return $this->my_address;
 	}
 	
+	public function my_info()
+	{
+		if (!isset($this->my_info)){
+			$address = $this->my_address();
+			$contact = $this->get_client_contact($address['address_id']);
+			$first_contact_id = each($contact['results']);
+			$contact['contact_id'] = $first_contact_id[0];
+			$my_info = array_merge($address, $contact);
+			$my_info['results'] = array_merge($address['results'], $contact['results'][$first_contact_id[0]]);
+			$this->my_info = $my_info;
+		}
+		return $this->my_info;
+	}
+	
 	/**
 	 * Retrieve Client Address
 	 * 
@@ -369,6 +385,48 @@ implements Mage_Shipping_Model_Carrier_Interface {
 			$this->client_address[$cpid]['address_id']=$this->client_address[$cpid]['results']['colliveryPoint_PK'];
 		}
 		return $this->client_address[$cpid];
+	}
+	
+	public function get_client_contact($ctid)
+	{
+		//if (!isset($this->client_contact[$ctid])){
+			$this->soap_init();
+			//$this->client_contact = 
+			return $this->soap->getCpContacts($ctid,$this->authenticate['token']);
+		//}
+		//return $this->client_contact;
+	}
+	
+	public function addAddress($address)
+	{
+		$this->soap_init();
+		return $this->soap->AddAddress($address,$this->authenticate['token']);
+	}
+	
+	public function addContact($contact)
+	{
+		$this->soap_init();
+		return $ctid = $this->soap->AddContact($contact,$this->authenticate['token']);
+	}
+	
+	public function validate($data)
+	{
+		$this->soap_init();
+		$validation = $this->soap->CheckColliveryData($data,$this->authenticate['token']);
+		$validation['pricing'] = $this->soap->GetPricing($validation['results'],$this->authenticate['token']);
+		return $validation;
+	}
+	
+	public function register_shipping($data)
+	{
+		$this->soap_init();
+		$new_collivery = $this->soap->AddCollivery($data,$this->authenticate['token']);
+		if($new_collivery['results']) {
+			$collivery_id = $new_collivery['results']['collivery_id'];
+			$send_emails = 1;
+			$this->soap->AcceptCollivery($collivery_id,$send_emails,$this->authenticate['token']);
+		}
+		return $new_collivery;
 	}
 
 	/**

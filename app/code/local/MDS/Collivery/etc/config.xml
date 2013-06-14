@@ -172,4 +172,16 @@
 			</updates>
 		</layout>
 	</adminhtml>
+	<admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <!-- Override Adminhtml module here. -->
+                        <MDS_Collivery_Adminhtml before="Mage_Adminhtml">MDS_Collivery_Adminhtml</MDS_Collivery_Adminhtml>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
 </config>

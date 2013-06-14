@@ -10,4 +10,25 @@
 
 		</reference>
 	</adminhtml_sales_order_view>
+	<adminhtml_sales_order_view>
+        <reference name="sales_order_tabs">
+            <action method="addTab">
+                <name>order_mds_collivery</name>
+                <block>collivery/adminhtml_sales_order_view_tab_collivery</block>
+            </action>
+        </reference>
+    </adminhtml_sales_order_view>
+	<adminhtml_sales_order_mds>
+        <reference name="content">
+            <block type="collivery/adminhtml_sales_order_collivery" name="sales_order"></block>
+        </reference>
+        <reference name="left">
+            <block type="adminhtml/sales_order_view_tabs" name="sales_order_tabs">
+            	<!-- action method="addTab">
+                	<name>order_design_details</name>
+	                <block>collivery/adminhtml_sales_order_view_tab_collivery</block>
+	            </action -->
+            </block>
+        </reference>
+	</adminhtml_sales_order_mds>
 </layout>
