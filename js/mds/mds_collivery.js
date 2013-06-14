@@ -13,9 +13,9 @@ $j(document).ready(function() {
 		
 		var suburb_html = 
 		'<div class="mds-' + shipto + ' field">' +
-		'	<label class="required" for="mds:' + shipto + '_suburb"><em>*</em>Suburb</label>' +
+		'	<label class="required" for="' + shipto + ':mds_suburb"><em>*</em>Suburb</label>' +
 		'	<div class="input-box">' +
-		'		<select class="required-entry" title="Suburb" name="mds[' + shipto + '_suburb]" id="mds:' + shipto + '_suburb" defaultvalue="">' +
+		'		<select class="required-entry" title="Suburb" name="' + shipto + '[mds_suburb]" id="' + shipto + ':mds_suburb" defaultvalue="">' +
 		'			<option value="">Please select a Town first</option>' +
 		'		</select>' +
 		'	</div>' +
@@ -25,18 +25,18 @@ $j(document).ready(function() {
 		
 		var building_html = 
 		'<li class="mds-' + shipto + ' wide">' +
-		'	<label for="mds:' + shipto + '_building" class="required"><em>*</em>Building Details</label>' +
+		'	<label for="' + shipto + ':mds_building" class="required"><em>*</em>Building Details</label>' +
 		'	<div class="input-box">' +
-		'		<input title="Building Details" name="mds[' + shipto + '_building]" id="mds:' + shipto + '_building" value="" class="input-text required-entry" type="text">' +
+		'		<input title="Building Details" name="' + shipto + '[mds_building]" id="' + shipto + ':mds_building" value="" class="input-text required-entry" type="text">' +
 		'	</div>' +
 		'</li>';
 		$j("#" + shipto + "\\:street1").parent().parent().before(building_html);
 		
 		var cptypes_html = 
 		'<div class="mds-' + shipto + ' field">' +
-		'	<label class="required" for="mds:' + shipto + '_cptypes"><em>*</em>Location Type</label>' +
+		'	<label class="required" for="' + shipto + ':mds_cptypes"><em>*</em>Location Type</label>' +
 		'	<div class="input-box">' +
-		'		<select class="required-entry" title="Location Type" name="mds[' + shipto + '_cptypes]" id="mds:' + shipto + '_cptypes" defaultvalue="">' +
+		'		<select class="required-entry" title="Location Type" name="' + shipto + '[mds_cptype]" id="' + shipto + ':mds_cptypes" defaultvalue="">' +
 		'			<option value="">Loading...</option>' +
 		'		</select>' +
 		'	</div>' +
@@ -46,7 +46,7 @@ $j(document).ready(function() {
 		var cptypes_html = 
 		'<div class="mds-' + shipto + ' field" style="display: none;">' +
 		'	<div class="input-box">' +
-		'		<input name="mds[' + shipto + '_town]" id="mds:' + shipto + '_town" value="" class="input-text required-entry" type="text">' +
+		'		<input name="' + shipto + '[mds_town]" id="' + shipto + ':mds_town" value="" class="input-text required-entry" type="text">' +
 		'	</div>' +
 		'</div>';
 		$j("#" + shipto + "\\:city").parent().parent().parent().append(cptypes_html);
@@ -54,8 +54,8 @@ $j(document).ready(function() {
 
 	function getSuburbs (shipto) {
 		
-		$j("#mds\\:" + shipto + "_suburb").empty();
-		$j("#mds\\:" + shipto + "_suburb").append('<option value="">Loading...</option>');
+		$j("#" + shipto + "\\:mds_suburb").empty();
+		$j("#" + shipto + "\\:mds_suburb").append('<option value="">Loading...</option>');
 		
 		var data = {
 			town	: $j("#" + shipto + "\\:region_id option:selected").text(),
@@ -65,9 +65,9 @@ $j(document).ready(function() {
 			url : "../../collivery/ajax/suburb",
 			data : data,
 			complete : function(response){
-				$j("#mds\\:" + shipto + "_suburb").empty();
-				$j("#mds\\:" + shipto + "_suburb").append(response['responseText']);
-				$j("#" + shipto + "\\:city").val($j("#mds\\:" + shipto + "_suburb option:selected").text());
+				$j("#" + shipto + "\\:mds_suburb").empty();
+				$j("#" + shipto + "\\:mds_suburb").append(response['responseText']);
+				$j("#" + shipto + "\\:city").val($j("#" + shipto + "\\:mds_suburb option:selected").text());
 			}
 		});
 		
@@ -75,14 +75,14 @@ $j(document).ready(function() {
 
 	function getCPTypes (shipto) {
 		
-		$j("#mds\\:" + shipto + "_cptypes").empty();
-		$j("#mds\\:" + shipto + "_cptypes").append('<option value="">Loading...</option>');
+		$j("#" + shipto + "\\:mds_cptypes").empty();
+		$j("#" + shipto + "\\:mds_cptypes").append('<option value="">Loading...</option>');
 		
 		jQuery.ajax({
 			url : "../../collivery/ajax/cptypes",
 			complete : function(response){
-				$j("#mds\\:" + shipto + "_cptypes").empty();
-				$j("#mds\\:" + shipto + "_cptypes").append(response['responseText']);
+				$j("#" + shipto + "\\:mds_cptypes").empty();
+				$j("#" + shipto + "\\:mds_cptypes").append(response['responseText']);
 			}
 		});
 		

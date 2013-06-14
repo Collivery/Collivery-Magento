@@ -81,6 +81,7 @@
 			<collivery_setup>
 				<setup>
 					<module>MDS_Collivery</module>
+					<class>Mage_Customer_Model_Entity_Setup</class>
 				</setup>
 				<connection>
 					<use>core_setup</use>
@@ -107,6 +108,67 @@
 				<class>MDS_Collivery_Helper</class>
 			</collivery>
 		</helpers>
+	</global>
+	<global>
+		<fieldsets>
+			
+			<sales_copy_order_billing_address>
+				<mds_cptype>
+					<to_order>*</to_order>
+				</mds_cptype>
+				<mds_building>
+					<to_order>*</to_order>
+				</mds_building>
+			</sales_copy_order_billing_address>
+			
+			<sales_copy_order_shipping_address>
+				<mds_cptype>
+					<to_order>*</to_order>
+				</mds_cptype>
+				<mds_building>
+					<to_order>*</to_order>
+				</mds_building>
+			</sales_copy_order_shipping_address>
+			
+			<sales_convert_order_address>
+				<mds_cptype>
+					<to_quote_address>*</to_quote_address>
+				</mds_cptype>
+				<mds_building>
+					<to_quote_address>*</to_quote_address>
+				</mds_building>
+			</sales_convert_order_address>
+			
+			<sales_convert_quote_address>
+				<mds_cptype>
+					<to_order_address>*</to_order_address>
+					<to_customer_address>*</to_customer_address>
+				</mds_cptype>
+				<mds_building>
+					<to_order_address>*</to_order_address>
+					<to_customer_address>*</to_customer_address>
+				</mds_building>
+			</sales_convert_quote_address>
+			
+			<customer_address>
+				<mds_cptype>
+					<to_quote_address>*</to_quote_address>
+				</mds_cptype>
+				<mds_building>
+					<to_quote_address>*</to_quote_address>
+				</mds_building>
+			</customer_address>
+			
+			<checkout_onepage_billing>
+				<mds_cptype>
+					<to_customer>*</to_customer>
+				</mds_cptype>
+				<mds_building>
+					<to_customer>*</to_customer>
+				</mds_building>
+			</checkout_onepage_billing>
+			
+		</fieldsets>
 	</global>
 	<default>
 		<carriers>
@@ -152,6 +214,20 @@
 				</args>
 			</colliveryadmin>
 		</routers>
+	</admin>
+	<admin>
+		<fieldsets>
+			<customer_dataflow>
+				<mds_cptype>
+					<billing>1</billing>
+					<shipping>1</shipping>
+				</mds_cptype>
+				<mds_building>
+					<billing>1</billing>
+					<shipping>1</shipping>
+				</mds_building>
+			</customer_dataflow>
+		</fieldsets>
 	</admin>
 	<adminhtml>
 		<layout>

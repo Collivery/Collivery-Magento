@@ -26,48 +26,79 @@ $setup = new Mage_Eav_Model_Entity_Setup('core_setup');
 
 $installer->startSetup();
 
-$installer->run("
+$dimention_attributes = array(
+	'length'=>'Shipping Length',
+	'width'=>'Shipping Width',
+	'height'=>'Shipping Height'
+);
 
-CREATE TABLE IF NOT EXISTS mds_collivery_order (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `order_id` int(11) unsigned NOT NULL,
-  `key` varchar(255) NOT NULL,
-  `value` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS mds_collivery_quote (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `quote_id` int(11) unsigned NOT NULL,
-  `key` varchar(255) NOT NULL,
-  `value` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DELETE FROM `directory_country_region` WHERE `country_id` = 'ZA';
-
-INSERT INTO `directory_country_region` (`country_id`, `code`, `default_name`) VALUES
-" . $town_sql);
-
-$attributes = array('length'=>'Length','width'=>'Width','height'=>'Height');
-
-foreach ($attributes as $key => $value) {
+foreach ($dimention_attributes as $key => $value) {
 	$setup->addAttribute('catalog_product', $key, array(
 		'group'         => 'General',
 		'input'         => 'text',
 		'type'          => 'decimal',
 		'label'         => $value,
 		'backend'       => '',
-		'visible'       => TRUE,
-		'required'      => TRUE,
-		'user_defined'  => TRUE,
-		'searchable'    => FALSE,
-		'filterable'    => FALSE,
-		'comparable'    => FALSE,
-		'visible_on_front' => FALSE,
-		'visible_in_advanced_search'  => FALSE,
-		'is_html_allowed_on_front' => FALSE,
+		'visible'       => true,
+		'required'      => true,
+		'user_defined'  => true,
+		'searchable'    => false,
+		'filterable'    => false,
+		'comparable'    => false,
+		'visible_on_front' => true,
+		'visible_in_advanced_search'  => false,
+		'is_html_allowed_on_front' => false,
 		'global'        => Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_GLOBAL,
 	));
 }
+
+$address_attributes = array(
+	'mds_building'            => array(
+		'label'           => 'Building Details',
+		'type'            => 'varchar',
+		'input'           => 'text',
+		'user_defined'    => 1,
+		'system'          => 0,
+		'visible'         => 1,
+		'required'        => 0,
+		'validate_rules'  => array(
+			'max_text_length' => 255,
+			'min_text_length' => 1
+		),
+	),
+	'mds_cptype'            => array(
+		'label'           => 'Location Type',
+		'type'            => 'int',
+		'input'           => 'text',
+		'user_defined'    => 1,
+		'system'          => 0,
+		'visible'         => 1,
+		'required'        => 0,
+	),
+);
+ 
+foreach ($address_attributes as $attributeCode => $data) {
+	$installer->addAttribute('customer_address', $attributeCode, array());
+	Mage::getSingleton('eav/config')
+		->getAttribute('customer_address', $attributeCode)
+		->setData('used_in_forms', array(
+					'customer_register_address',
+					'customer_address_edit',
+					'adminhtml_customer_address',
+				))
+		->save();
+}
+
+$installer->run("
+	ALTER TABLE {$this->getTable('sales_flat_quote_address')} ADD COLUMN `mds_building` VARCHAR(255) CHARACTER SET utf8 DEFAULT NULL AFTER `fax`;
+	ALTER TABLE {$this->getTable('sales_flat_order_address')} ADD COLUMN `mds_building` VARCHAR(255) CHARACTER SET utf8 DEFAULT NULL AFTER `fax`;
+	ALTER TABLE {$this->getTable('sales_flat_quote_address')} ADD COLUMN `mds_cptype` INT(11) NULL AFTER `fax`;
+	ALTER TABLE {$this->getTable('sales_flat_order_address')} ADD COLUMN `mds_cptype` INT(11) NULL AFTER `fax`;
+
+	DELETE FROM `directory_country_region` WHERE `country_id` = 'ZA';
+	
+	INSERT INTO `directory_country_region` (`country_id`, `code`, `default_name`) VALUES
+	" . $town_sql
+);
+
 $installer->endSetup();

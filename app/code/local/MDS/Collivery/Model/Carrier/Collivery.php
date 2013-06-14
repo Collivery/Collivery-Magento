@@ -65,15 +65,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 			return FALSE;
 		}
 		
-		$quote_id = $checkout_session->getQuote()->getId();
-		$quote = Mage::getModel('mds_collivery/shipping_quote');
-		$mds_vars = $quote->getByQuote($quote_id);
-		
-		if ($ship2billing){
-			$cptypes = $mds_vars['billing_cptypes'];
-		} else {
-			$cptypes = $mds_vars['shipping_cptypes'];
-		}
+		$cptypes = $shipping_address->getMds_cptype();
 
 		// Get cart items and put them in an Array or quit
 		$items = $request->getAllItems();
