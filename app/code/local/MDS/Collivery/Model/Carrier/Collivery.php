@@ -77,7 +77,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		$services = $this->get_available_services();
 		foreach ($services['results'] as $key => $value) {
 			// Get Shipping Estimate for current service
-			$i=$this->get_shipping_estimate($town, $cptypes, $key, $cart['max_weight']);
+			$i=$this->get_shipping_estimate($town, $cptypes, $key, $cart['weight']);
 			// Create Response Array
 			$response[] =
 					Array(
@@ -127,7 +127,6 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		$cart = array(
 				'count' => 0,
 				'weight' => 0,
-				'max_weight' => 0,
 				'products' => Array()
 			);
 
@@ -188,14 +187,6 @@ implements Mage_Shipping_Model_Carrier_Interface {
 				$cart['count'] += $qty;
 				$cart['weight'] += $weight * $qty;
 				
-				// Work out Volumetric Weight based on MDS's calculations
-				$vol_weight = (($length * $width * $height) / 4000);
-				
-				if ($vol_weight>$weight)
-					$cart['max_weight'] += $vol_weight * $qty;
-				else
-					$cart['max_weight'] += $weight * $qty;
-				
 				for ($i=0; $i<$qty; $i++)
 					$cart['products'][] = array(
 							'length' => $length,
@@ -221,7 +212,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 				'from_town_brief' => $my_address['results']['TownBrief'],
 				'from_town_type' => $my_address['results']['CP_Type'],
 				'to_town_brief' => $town_brief,
-				'service_type' => $service_type,
+				'service' => $service_type,
 				'mds_cover' => true,
 				'weight' => $weight,
 			);
