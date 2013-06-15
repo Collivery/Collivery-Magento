@@ -34,13 +34,26 @@ You can also get in touch with me through my website at
 if you need any additional information.
 
 <h3>To Do</h3>
+
 <h4>Frontend</h4>
+- Allow users to track their orders
 - ~~Add additional fields to checkout page (Location Type, Building Details)~~
 - ~~Validate Address/Add populated fields to Checkout Page~~
+
 <h4>Backend</h4>
-- Start with Admin Backend
+- Add shipment/tracking info to order and mark order as shipped/compleated
+- ~~Start with Admin Backend~~
 - Save Client/Address ID for next time
- - Hash info and check/store hashes in a table.
+ - ~~Save ID's in order~~
+ - Save ID's in clients address
+ - ~~Hash info and check/store hashes in a table.~~
+ 
+<h4>Documentation</h4>
+- Update Documentation for backend usage
+
+<h4>API</h4>
+- Move to MDS Webservice V2
+
 
 <h3>MDS Web Service</h3>
 
