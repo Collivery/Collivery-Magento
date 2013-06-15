@@ -224,7 +224,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		
 		$pricing = $this->soap->GetPricing($data,$_SESSION['token']);
 		
-		return $pricing['results']['Total'];
+		
+		return $pricing['results']['Total'] * 1.14;
 	}
 	
 	/**
