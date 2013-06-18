@@ -5,8 +5,9 @@
  * URL: https://github.com/Xethron/magento-mds-collivery
  */
 class MDS_Collivery_Model_Carrier_Collivery
-extends Mage_Shipping_Model_Carrier_Abstract
-implements Mage_Shipping_Model_Carrier_Interface {
+	extends Mage_Shipping_Model_Carrier_Abstract
+	implements Mage_Shipping_Model_Carrier_Interface
+{
 
 	// Unique internal shipping method identifier
 	protected $_code = 'collivery';
@@ -19,7 +20,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * 
 	 * @return Soap Authentication
 	 */
-	private function soap_init(){
+	private function soap_init()
+	{
 		// Check if soap session exists
 		if (!$this->soap){
 			// Prevent caching of the wsdl
@@ -46,7 +48,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * @param Mage_Shipping_Model_Rate_Request $data
 	 * @return Mage_Shipping_Model_Rate_Result
 	 */
-	public function collectRates(Mage_Shipping_Model_Rate_Request $request) {
+	public function collectRates(Mage_Shipping_Model_Rate_Request $request)
+	{
 
 		// Skip if not enabled
 		if (!$this->getConfigFlag('active')) {
@@ -81,10 +84,10 @@ implements Mage_Shipping_Model_Carrier_Interface {
 			// Create Response Array
 			$response[] =
 					Array(
-						'code' => $key,
-						'title' => $value,
-						'cost' => $i,
-						'price' => $i * (1+($this->getConfigData('markup')/100)),
+						'code'    => $key,
+						'title'   => $value,
+						'cost'    => $i,
+						'price'   => $i * (1+($this->getConfigData('markup')/100)),
 					);
 		}
 
@@ -121,7 +124,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * @param Cart Items
 	 * @return MDS Formatted Array with Cart Info
 	 */
-	function get_cart_content($items){
+	function get_cart_content($items)
+	{
 	
 		// Reset array to defaults
 		$cart = array(
@@ -204,7 +208,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * 
 	 * @return int Estimate
 	 */
-	function get_shipping_estimate($town_brief, $town_type, $service_type, $weight){
+	function get_shipping_estimate($town_brief, $town_type, $service_type, $weight)
+	{
 		// Load default address for current account (Vendor)
 		$my_address = $this->my_address();
 		// Create MDS Data Array
@@ -235,7 +240,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * @param string Label
 	 * @return key|bool
 	 */
-	function get_code($array, $label){
+	function get_code($array, $label)
+	{
 		foreach($array as $key=>$value){
 			if($label == $value){
 				return $key;
@@ -256,7 +262,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * @return Array
 	 */
 	
-	function get_available_services(){
+	function get_available_services()
+	{
 		$this->soap_init();
 		$services = $this->soap->getServices($this->authenticate['token']);
 		return $services;
@@ -267,7 +274,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * 
 	 * @return Array
 	 */
-	public function get_towns($mode = 1){
+	public function get_towns($mode = 1)
+	{
 		if (!isset($this->towns))
 		{
 			$this->soap_init();
@@ -290,7 +298,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * @param int Mode - 0: Return Array, 1: Return result, 2: Get town code and Return Array, 3: Get town code and Return Result
 	 * @return Array
 	 */
-	public function get_suburbs($town, $mode = 1){
+	public function get_suburbs($town, $mode = 1)
+	{
 		if ($mode>1){
 			$town_code = $this->get_code($this->get_towns(),$town);
 			$mode -= 2;
@@ -318,7 +327,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	 * 
 	 * @param Array
 	 */
-	public function get_cptypes($mode = 1){
+	public function get_cptypes($mode = 1)
+	{
 		if (!isset($this->cptypes))
 		{
 			$this->soap_init();
@@ -424,7 +434,8 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	/**
 	 * This method is used when viewing / listing Shipping Methods with Codes programmatically
 	 */
-	public function getAllowedMethods() {
+	public function getAllowedMethods()
+	{
 		return array($this -> _code => 'Collivery');
 	}
 

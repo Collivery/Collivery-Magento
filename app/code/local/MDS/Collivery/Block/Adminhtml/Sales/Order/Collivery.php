@@ -9,8 +9,8 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 	}
 	
 	public function getOrder()
-    {
-        return Mage::registry( 'current_order' );
-    }
+	{
+		return Mage::registry( 'current_order' );
+	}
 
 }

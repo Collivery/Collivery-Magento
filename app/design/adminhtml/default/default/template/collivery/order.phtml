@@ -12,9 +12,7 @@ if (true) {
 			$validation = stripslashes($_POST['validation']);
 			$data=json_decode($validation, TRUE);
 			$new_col = $collivery->register_shipping($data);
-			//$order->update_status('completed', 'MDS Shipping registered successfully.');
-			//update_post_meta( $order->id, '_mds_status', 1 );
-			//update_post_meta( $order->id, 'mds_waybill', $new_col['results']['collivery_id'] );
+			
 			echo "Shipping registered successfully. Waybill Number: ". $new_col['results']['collivery_id'];
 		} else {
 		
@@ -202,7 +200,12 @@ if ( isset( $_POST['mds_add_client'] ) && $_POST['mds_add_client'] ) {
 			$collivery_data['collivery_type']=2;
 			$collivery_data['service']=5;
 			//print_r($collivery_data);
+			//$mds_contact = $collivery->get_client_contact($cpid['results']['contact_id']);
+			//$mds_address = $collivery->get_client_address($cpid['results']['address_id']);
+			//die();
 			$validation = $collivery->validate($collivery_data);
+			//print_r($validation);
+			//die();
 			?>
 			<h2>Validated Information</h2>
 			<table>
