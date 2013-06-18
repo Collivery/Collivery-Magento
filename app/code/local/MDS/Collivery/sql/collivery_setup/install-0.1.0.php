@@ -1,8 +1,9 @@
 <?php
 //******************************** SOAP ********************************
-$soap = new SoapClient("http://www.collivery.co.za/webservice.php?wsdl");
 // Prevent caching of the wsdl
-ini_set("soap.wsdl_cache_enabled", "0");
+$options = array('cache_wsdl' => WSDL_CACHE_NONE);
+// Start Soap Client
+$soap = new SoapClient("http://www.collivery.co.za/webservice_v2.php?wsdl", $options);
 // Authenticate
 $authenticate = $soap->Authenticate('demo@collivery.co.za', 'demo', '');
 
@@ -10,7 +11,7 @@ if(!$authenticate['token']) {
 	exit("Authentication Error : ".$authenticate['access']);
 }
 
-$towns = $soap->getTowns(null,$authenticate['token']);
+$towns = $soap->getTowns($authenticate['token']);
 $town_sql = '';
 
 foreach ($towns['results'] as $key => $value) {

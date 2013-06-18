@@ -22,10 +22,10 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	private function soap_init(){
 		// Check if soap session exists
 		if (!$this->soap){
-			// Start Soap Client
-			$this->soap = new SoapClient("http://www.collivery.co.za/webservice.php?wsdl");
 			// Prevent caching of the wsdl
-			ini_set("soap.wsdl_cache_enabled", "0");
+			$options = array('cache_wsdl' => WSDL_CACHE_NONE);
+			// Start Soap Client
+			$this->soap = new SoapClient("http://www.collivery.co.za/webservice_v2.php?wsdl", $options);
 			// Authenticate
 			$authenticate = $this->soap->Authenticate(Mage::helper('core')->decrypt($this->getConfigData('mds_user')), Mage::helper('core')->decrypt($this->getConfigData('mds_pass')), $_SESSION['token']);
 			// Save Authentication token in session to identify the user again later
@@ -127,7 +127,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		$cart = array(
 				'count' => 0,
 				'weight' => 0,
-				'products' => Array()
+				'parcels' => Array()
 			);
 
 		// Loop through every product in the cart
@@ -162,7 +162,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 							$cart['max_weight'] += $weight * $qty;
 						
 						for ($i=0; $i<$qty; $i++)
-							$cart['products'][] = array(
+							$cart['parcels'][] = array(
 									'length' => $length,
 									'width' => $width,
 									'height' => $height,
@@ -188,7 +188,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 				$cart['weight'] += $weight * $qty;
 				
 				for ($i=0; $i<$qty; $i++)
-					$cart['products'][] = array(
+					$cart['parcels'][] = array(
 							'length' => $length,
 							'width' => $width,
 							'height' => $height,
@@ -209,9 +209,9 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		$my_address = $this->my_address();
 		// Create MDS Data Array
 		$data = array (
-				'from_town_brief' => $my_address['results']['TownBrief'],
+				'from_town_id' => $my_address['results']['town_rec_id'],
 				'from_town_type' => $my_address['results']['CP_Type'],
-				'to_town_brief' => $town_brief,
+				'to_town_id' => $town_brief,
 				'service' => $service_type,
 				'mds_cover' => true,
 				'weight' => $weight,
@@ -271,7 +271,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		if (!isset($this->towns))
 		{
 			$this->soap_init();
-			$this->towns = $this->soap->getTowns(null,$this->authenticate['token']);
+			$this->towns = $this->soap->getTowns($this->authenticate['token']);
 		}
 		if ($mode==1){
 			if (isset($this->towns['results']))
@@ -301,7 +301,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 		if (!isset($this->suburbs[$town_code]['results']))
 		{
 			$this->soap_init();
-			$this->suburbs[$town_code] = $this->soap->getSuburbs(null,$town_code,$this->authenticate['token']);
+			$this->suburbs[$town_code] = $this->soap->getSuburbs($town_code,$this->authenticate['token']);
 		}
 		if ($mode==1){
 			if (isset($this->suburbs[$town_code]['results']))
@@ -373,7 +373,7 @@ implements Mage_Shipping_Model_Carrier_Interface {
 	{
 		if (!isset($this->client_address[$cpid])){
 			$this->soap_init();
-			$this->client_address[$cpid] = $this->soap->getClientAddresses(null,null,$cpid,null,$this->authenticate['token']);
+			$this->client_address[$cpid] = $this->soap->getClientAddresses($cpid, $this->authenticate['token']);
 			$this->client_address[$cpid]['address_id']=$this->client_address[$cpid]['results']['colliveryPoint_PK'];
 		}
 		return $this->client_address[$cpid];
