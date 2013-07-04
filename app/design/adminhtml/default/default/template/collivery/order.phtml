@@ -287,5 +287,31 @@ if ( isset( $_POST['mds_add_client'] ) && $_POST['mds_add_client'] ) {
 	} catch (Exception $e) {
 		throw $e;
 	}
-} else echo "<h1 class=\"red\">Error. Shipping has already been registered with MDS.</h1>
-			<p>The shipping has already been placed with MDS Collivery. You can track the shipping with the following waybill: ";
+} else {
+	$status = $collivery->get_status($mds_waybill);
+	$status_text = $status['results']['status_text'];
+	$status_del_date = $status['results']['DelDate'];
+	$status_del_time = $status['results']['DelTime'];
+	echo "
+		<h1 class=\"red\">Shipping has already been registered with MDS.</h1>
+		<p>
+			<table>
+				<tr>
+					<td>Waybill:</td>
+					<td>$mds_waybill</td>
+				</tr>
+				<tr>
+					<td>Status:</td>
+					<td>$status_text</td>
+				</tr>
+				<tr>
+					<td>Delivery Date:</td>
+					<td>$status_del_date</td>
+				</tr>
+				<tr>
+					<td>Delivery Time:</td>
+					<td>$status_del_time</td>
+				</tr>
+			</table>
+		</p>";
+}
