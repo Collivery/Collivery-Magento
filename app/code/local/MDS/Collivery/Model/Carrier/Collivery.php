@@ -430,6 +430,13 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $new_collivery;
 	}
+	
+	public function get_status($collivery_id)
+	{
+		$this->soap_init();
+		$status = $this->soap->getColliveryStatus($collivery_id, $this->authenticate['token']);
+		return $status;
+	}
 
 	/**
 	 * This method is used when viewing / listing Shipping Methods with Codes programmatically
