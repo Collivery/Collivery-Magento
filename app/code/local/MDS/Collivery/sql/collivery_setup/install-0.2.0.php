@@ -106,6 +106,7 @@ $installer->run("
 	ALTER TABLE {$this->getTable('sales_flat_order_address')} ADD COLUMN `mds_contact_id` INT(11) NULL AFTER `mds_cptype`;
 	ALTER TABLE {$this->getTable('sales_flat_order_address')} ADD COLUMN `mds_address_hash` VARCHAR(255) CHARACTER SET utf8 DEFAULT NULL AFTER `mds_address_id`;
 	ALTER TABLE {$this->getTable('sales_flat_order_address')} ADD COLUMN `mds_contact_hash` VARCHAR(255) CHARACTER SET utf8 DEFAULT NULL AFTER `mds_contact_id`;
+	ALTER TABLE {$this->getTable('sales_flat_order_address')} ADD COLUMN `mds_waybill` INT NULL AFTER `mds_address_hash` 
 ");
 
 $installer->endSetup();

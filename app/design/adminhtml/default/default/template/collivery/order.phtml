@@ -3,17 +3,22 @@
 $_order = $this->getOrder();
 $_address = $_order->getShippingAddress();
 
-$shipment = Mage::getModel('sales/service_order', $_order);
+//$shipment = Mage::getModel('sales/service_order', $_order);
 $collivery = Mage::getModel('mds_collivery/carrier_collivery');
-
-if (true) {
+$mds_waybill = $_address->getMds_waybill();
+if (!isset($mds_waybill)) {
 	try {
 		if ( isset( $_POST['mds_confirm_shipping_info'] ) && $_POST['mds_confirm_shipping_info'] ) {
 			$validation = stripslashes($_POST['validation']);
 			$data=json_decode($validation, TRUE);
 			$new_col = $collivery->register_shipping($data);
+			$waybill = $new_col['results']['collivery_id'];
 			
-			echo "Shipping registered successfully. Waybill Number: ". $new_col['results']['collivery_id'];
+			$_address->setMds_waybill($waybill);
+			$_address->save();
+			
+			$this->completeShipment($waybill);
+			echo "Shipping registered successfully. Waybill Number: ". $waybill;
 		} else {
 		
 		$cptypes = $collivery->get_cptypes();
