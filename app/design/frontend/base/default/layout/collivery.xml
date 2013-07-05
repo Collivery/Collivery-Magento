@@ -7,9 +7,6 @@
 	<checkout_onepage_index>
 		<reference name="head">
 			<action method="addJs">
-				<script>jquery/jquery.min.js</script>
-			</action>
-			<action method="addJs">
 				<script>mds/mds_collivery.js</script>
 			</action>
 		</reference>

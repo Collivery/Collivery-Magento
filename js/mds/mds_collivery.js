@@ -1,27 +1,42 @@
-var $j = jQuery.noConflict();
+var setShipping = false;
 
-$j(document).ready(function() {
+Element.addMethods("SELECT", (function() {
+	function getSelectedOptionHTML(element) {
+		if (!(element = $(element))) return;
+		var index = element.selectedIndex;
+		return index >= 0 ? element.options[index].innerHTML : undefined;
+	}
+	
+	return {
+		getSelectedOptionHTML: getSelectedOptionHTML
+	};
+})());
+
+document.observe('dom:loaded', function() {
 
 	var isZA_B;
 	var isZA_S;
-	var setShipping = false;
 
 	function setFields (shipto) {
-		$j("label[for='" + shipto + "\\:region_id']").addClass('required');
-		$j("label[for='" + shipto + "\\:region_id']").empty();
-		$j("label[for='" + shipto + "\\:region_id']").append('<em>*</em>Town');
+		if (shipto=='billing'){
+			$$("label[for='" + shipto + ":region_id']")[0].addClassName('required');
+			$$("label[for='" + shipto + ":region_id']")[0].update('<em>*</em>Town');
+		} else {
+			$$("label[for='" + shipto + ":region']")[0].addClassName('required');
+			$$("label[for='" + shipto + ":region']")[0].update('<em>*</em>Town');
+		}
 		
 		var suburb_html = 
 		'<div class="mds-' + shipto + ' field">' +
 		'	<label class="required" for="' + shipto + ':mds_suburb"><em>*</em>Suburb</label>' +
 		'	<div class="input-box">' +
-		'		<select class="required-entry" title="Suburb" name="' + shipto + '[mds_suburb]" id="' + shipto + ':mds_suburb" defaultvalue="">' +
+		'		<select onchange="mds_suburb_change (this, \'' + shipto + '\')" class="required-entry" title="Suburb" name="' + shipto + '[mds_suburb]" id="' + shipto + ':mds_suburb" defaultvalue="">' +
 		'			<option value="">Please select a Town first</option>' +
 		'		</select>' +
 		'	</div>' +
 		'</div>';
-		$j("#" + shipto + "\\:city").parent().parent().parent().prepend(suburb_html);
-		$j("#" + shipto + "\\:city").parent().parent().hide();
+		$(shipto + ":city").up(2).insert({top:suburb_html});
+		$(shipto + ":city").up(1).hide();
 		
 		var building_html = 
 		'<li class="mds-' + shipto + ' wide">' +
@@ -30,62 +45,67 @@ $j(document).ready(function() {
 		'		<input title="Building Details" name="' + shipto + '[mds_building]" id="' + shipto + ':mds_building" value="" class="input-text required-entry" type="text">' +
 		'	</div>' +
 		'</li>';
-		$j("#" + shipto + "\\:street1").parent().parent().before(building_html);
+		$(shipto + ":street1").up(1).insert({before:building_html});
 		
 		var cptypes_html = 
 		'<div class="mds-' + shipto + ' field">' +
 		'	<label class="required" for="' + shipto + ':mds_cptypes"><em>*</em>Location Type</label>' +
 		'	<div class="input-box">' +
-		'		<select class="required-entry" title="Location Type" name="' + shipto + '[mds_cptype]" id="' + shipto + ':mds_cptypes" defaultvalue="">' +
+		'		<select onchange="mds_cptypes_change (this, \'' + shipto + '\')" class="required-entry" title="Location Type" name="' + shipto + '[mds_cptype]" id="' + shipto + ':mds_cptypes" defaultvalue="">' +
 		'			<option value="">Loading...</option>' +
 		'		</select>' +
 		'	</div>' +
 		'</div>';
-		$j("#" + shipto + "\\:city").parent().parent().parent().append(cptypes_html);
+		$(shipto + ":city").up(2).insert({bottom:cptypes_html});
 		
-		var cptypes_html = 
+		var towns_html = 
 		'<div class="mds-' + shipto + ' field" style="display: none;">' +
 		'	<div class="input-box">' +
 		'		<input name="' + shipto + '[mds_town]" id="' + shipto + ':mds_town" value="" class="input-text required-entry" type="text">' +
 		'	</div>' +
 		'</div>';
-		$j("#" + shipto + "\\:city").parent().parent().parent().append(cptypes_html);
+		$(shipto + ":city").up(2).insert({bottom:towns_html});
 	}
 
 	function getSuburbs (shipto) {
 		
-		$j("#" + shipto + "\\:mds_suburb").empty();
-		$j("#" + shipto + "\\:mds_suburb").append('<option value="">Loading...</option>');
+		var shipto_r = shipto;
+		
+		if (shipto=='billship'){
+			shipto = 'shipping';
+			shipto_r = 'billing';
+		}
+		$(shipto + ":mds_suburb").update("<option value=\"\">Loading...</option>");
 		
 		var data = {
-			town	: $j("#" + shipto + "\\:region_id option:selected").text(),
+			town : $(shipto_r + ":region_id").getSelectedOptionHTML(),
 		};
-		jQuery.ajax({
-			type : 'POST',
-			url : "../../collivery/ajax/suburb",
-			data : data,
-			complete : function(response){
-				$j("#" + shipto + "\\:mds_suburb").empty();
-				$j("#" + shipto + "\\:mds_suburb").append(response['responseText']);
-				$j("#" + shipto + "\\:city").val($j("#" + shipto + "\\:mds_suburb option:selected").text());
-			}
+		
+		new Ajax.Request('../../collivery/ajax/suburb', {
+			method: 'post',
+			parameters: data,
+			onSuccess: function(transport) {
+				var response = transport.responseText || "<option>Error, Please try again</option>";
+				$(shipto + ":mds_suburb").update(response);
+				mds_suburb_change ($(shipto + ":mds_suburb"), shipto)
+			},
+			onFailure: function() { $(shipto + ":mds_suburb").update("<option>Error, Please try again</option>"); }
 		});
 		
 	}
 
 	function getCPTypes (shipto) {
 		
-		$j("#" + shipto + "\\:mds_cptypes").empty();
-		$j("#" + shipto + "\\:mds_cptypes").append('<option value="">Loading...</option>');
+		$(shipto + ":mds_cptypes").update("<option value=\"\">Loading...</option>");
 		
-		jQuery.ajax({
-			url : "../../collivery/ajax/cptypes",
-			complete : function(response){
-				$j("#" + shipto + "\\:mds_cptypes").empty();
-				$j("#" + shipto + "\\:mds_cptypes").append(response['responseText']);
-			}
+		new Ajax.Request('../../collivery/ajax/cptypes', {
+			method: 'get',
+			onSuccess: function(transport) {
+				var response = transport.responseText || "<option value=\"\">Error, Please try again</option>";
+				$(shipto + ":mds_cptypes").update(response);
+			},
+			onFailure: function() { $(shipto + ":mds_cptypes").update("<option value=\"\">Error, Please try again</option>"); }
 		});
-		
 	}
 
 	function setZA (shipto) {
@@ -94,20 +114,19 @@ $j(document).ready(function() {
 	}
 
 	function unSetZA (shipto) {
-		$j('.mds-' + shipto).remove();
-		$j("#" + shipto + "\\:city").parent().parent().show();
-		$j("label[for='" + shipto + "\\:region_id']").removeClass('required');
-		$j("label[for='" + shipto + "\\:region_id']").empty();
-		$j("label[for='" + shipto + "\\:region_id']").append('<em style="display: none;">*</em>State/Province');
+		$$('.mds-' + shipto).invoke('remove');
+		$(shipto + ":city").up(1).show();
+		$$("label[for='" + shipto + ":region_id']")[0].removeClassName('required');
+		$$("label[for='" + shipto + ":region_id']")[0].update('<em style="display: none;">*</em>State/Province');
 	}
 
-	jQuery('select#billing\\:country_id').live('change', function() {
-		if ($j("#billing\\:country_id").val() == "ZA") {
+	$("billing:country_id").observe('change', function(){
+		if ($F("billing:country_id") == "ZA") {
 			setZA('billing');
 			isZA_B = true;
 			if (!setShipping){
 				setZA('shipping');
-				$j("#shipping\\:country_id").val('ZA')
+				Form.Element.setValue("shipping:country_id", 'ZA');
 				isZA_S = true;
 			}
 		} else {
@@ -118,8 +137,8 @@ $j(document).ready(function() {
 		}
 	});
 	
-	jQuery('select#shipping\\:country_id').live('change', function() {
-		if ($j("#shipping\\:country_id").val() == "ZA") {
+	$("shipping:country_id").observe('change', function(){
+		if ($F("shipping:country_id") == "ZA") {
 			setZA('shipping');
 			isZA_S = true;
 			setShipping = true;
@@ -132,42 +151,23 @@ $j(document).ready(function() {
 		}
 	});
 
-	jQuery('select#billing\\:region_id').live('change', function() {
-		if ($j("#billing\\:country_id").val() == "ZA") {
-			$j("#mds\\:billing_town").val($j("#billing\\:region_id option:selected").text());
+	$("billing:region_id").observe('change', function(){
+		if ($F("billing:country_id") == "ZA") {
 			getSuburbs('billing');
+			if (!setShipping){
+				getSuburbs('billship');
+			}
 		}
 	});
 	
-	jQuery('select#shipping\\:region_id').live('change', function() {
-		if ($j("#shipping\\:country_id").val() == "ZA") {
-			$j("#mds\\:shipping_town").val($j("#shipping\\:region_id option:selected").text());
+	$("shipping:region_id").observe('change', function(){
+		if ($F("shipping:country_id") == "ZA") {
 			getSuburbs('shipping');
+			setShipping = true;
 		}
 	});
 
-	jQuery('select#mds\\:billing_suburb').live('change', function() {
-		$j("#billing\\:city").val($j("#mds\\:billing_suburb option:selected").text());
-		if (!setShipping){
-			$j("#shipping\\:city").val($j("#mds\\:billing_suburb option:selected").text());
-			$j("#mds\\:shipping_suburb").val($j("#mds\\:billing_suburb option:selected").val());
-		}
-	});
-	
-	jQuery('select#mds\\:shipping_suburb').live('change', function() {
-		$j("#shipping\\:city").val($j("#mds\\:shipping_suburb option:selected").text());
-	});
-	
-	jQuery('select#mds\\:billing_cptypes').live('change', function() {
-		$j("#mds\\:shipping_cptypes").val($j("#mds\\:billing_cptypes option:selected").val());
-	});
-	
-	jQuery('#mds\\:billing_building').live('change', function() {
-		$j('#mds\\:shipping_building').val($j('#mds\\:billing_building').val())
-		
-	});
-
-	if ($j("#billing\\:country_id").val() == "ZA") {
+	if ($F("shipping:country_id") == "ZA") {
 		setZA('billing');
 		isZA_B = true;
 		if (!setShipping){
@@ -177,3 +177,18 @@ $j(document).ready(function() {
 	}
 
 });
+
+function mds_suburb_change (sel, shipto) {
+	var suburb = $(sel).getSelectedOptionHTML();
+	Form.Element.setValue(shipto + ":city", suburb);
+	if (shipto=='billing' && !setShipping){
+		Form.Element.setValue("shipping:city", suburb);
+		Form.Element.setValue("shipping:mds_suburb", $F(sel));
+	}
+}
+
+function mds_cptypes_change (sel, shipto) {
+	if (shipto=='billing' && !setShipping){
+		Form.Element.setValue("shipping:mds_cptypes", $F(sel));
+	}
+}
