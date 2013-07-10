@@ -22,7 +22,6 @@ if (!isset($mds_waybill)) {
 			$town = $this->collivery->get_code($towns, $this->address->getRegion());
 			$suburbs = $this->collivery->get_suburbs($town);
 			$my_info=$this->collivery->my_info();
-			//$street = $this->address->getStreet();
 			
 			if ( isset( $_POST['mds_add_client'] ) && $_POST['mds_add_client'] ) {
 				$client_info = $this->addClient($address, $contact);
@@ -133,7 +132,13 @@ if (!isset($mds_waybill)) {
 					</tr>
 				</table>
 			</div>
-			<?php if(isset($validation)): ?>
+			<?php 
+			
+			foreach ($client_info['message'] as $message) {
+				echo $message;
+			}
+			
+			if(isset($validation)): ?>
 				<h2>Validated Information</h2>
 				<table>
 					<tr>

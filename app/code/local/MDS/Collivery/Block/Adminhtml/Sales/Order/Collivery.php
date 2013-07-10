@@ -24,7 +24,12 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 	public function validate($client_info, $my_info)
 	{
 		$shipping_method = $this->order->shipping_method;
-		$service = substr($shipping_method, -1);
+		if (preg_match("/^collivery_/", $this->order->shipping_method))
+			$service = substr($shipping_method, -1);
+		else {
+			$service = 5;
+			echo "<strong class=\"red\">Warning: Service type not set. Using \"Road Freight Express\".</strong>";
+		}
 		$collivery_data = $this->collivery->get_cart_content($this->order->getAllItems());
 		$collivery_data['collivery_from']=$my_info['address_id'];
 		$collivery_data['contact_from']=$my_info['contact_id'];
@@ -57,6 +62,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 				$this->address->setMds_address_hash(md5(implode(',', $address)));
 				$contact_text = "";
 				if (isset($address_id['results']['contact_id'])){
+					$contact['cpid'] = $address_id['results']['address_id'];
 					$this->address->setMds_contact_id($address_id['results']['contact_id']);
 					$this->address->setMds_contact_hash(md5(implode(',', $contact)));
 					$contact_text = "and Contact";
@@ -129,18 +135,14 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 	
 	public function getAddress()
 	{
-		//$cptypes = $this->collivery->get_cptypes();
 		$cptype = $this->address->getMds_cptype();
 		
-		$towns = $this->collivery->get_towns();
-		$town = $this->collivery->get_code($towns, $this->address->getRegion());
+		$town = $this->collivery->get_code($this->collivery->get_towns(), $this->address->getRegion());
 		
-		$suburbs = $this->collivery->get_suburbs($town);
-		$suburb = $this->collivery->get_code($suburbs, $this->address->getCity());
-		
-		//$my_info=$this->collivery->my_info();
+		$suburb = $this->collivery->get_code($this->collivery->get_suburbs($town), $this->address->getCity());
 		
 		$street = $this->address->getStreet();
+		
 		return array(
 			'company_name'=>$this->address->getCompany(),
 			'address_type'=>$cptype,
