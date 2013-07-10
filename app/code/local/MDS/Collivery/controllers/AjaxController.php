@@ -18,5 +18,10 @@ class MDS_Collivery_AjaxController extends Mage_Core_Controller_Front_Action
 			echo '<option value="'. $key .'">'. $value .'</option>';
 		}
 	}
+	
+	public function baseAction()
+	{
+		echo "var BASE_URL = \"". Mage::getBaseUrl() ."\";";
+	}
 
 }

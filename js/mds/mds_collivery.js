@@ -81,7 +81,7 @@ document.observe('dom:loaded', function() {
 			town : $(shipto_r + ":region_id").getSelectedOptionHTML(),
 		};
 		
-		new Ajax.Request('../../collivery/ajax/suburb', {
+		new Ajax.Request(BASE_URL + 'collivery/ajax/suburb', {
 			method: 'post',
 			parameters: data,
 			onSuccess: function(transport) {
@@ -98,7 +98,7 @@ document.observe('dom:loaded', function() {
 		
 		$(shipto + ":mds_cptypes").update("<option value=\"\">Loading...</option>");
 		
-		new Ajax.Request('../../collivery/ajax/cptypes', {
+		new Ajax.Request(BASE_URL + 'collivery/ajax/cptypes', {
 			method: 'get',
 			onSuccess: function(transport) {
 				var response = transport.responseText || "<option value=\"\">Error, Please try again</option>";

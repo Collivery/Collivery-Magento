@@ -9,6 +9,9 @@
 			<action method="addJs">
 				<script>mds/mds_collivery.js</script>
 			</action>
+			<action method="addJs">
+				<script>../collivery/ajax/base</script>
+			</action>
 		</reference>
 	</checkout_onepage_index>
 </layout>
