@@ -1,294 +1,214 @@
 <?php
-
-$_order = $this->getOrder();
-$_address = $_order->getShippingAddress();
-
-//$shipment = Mage::getModel('sales/service_order', $_order);
-$collivery = Mage::getModel('mds_collivery/carrier_collivery');
-$mds_waybill = $_address->getMds_waybill();
+$mds_waybill = $this->address->getMds_waybill();
 if (!isset($mds_waybill)) {
 	try {
 		if ( isset( $_POST['mds_confirm_shipping_info'] ) && $_POST['mds_confirm_shipping_info'] ) {
 			$validation = stripslashes($_POST['validation']);
 			$data=json_decode($validation, TRUE);
-			$new_col = $collivery->register_shipping($data);
+			$new_col = $this->collivery->register_shipping($data);
 			$waybill = $new_col['results']['collivery_id'];
 			
-			$_address->setMds_waybill($waybill);
-			$_address->save();
+			$this->address->setMds_waybill($waybill);
+			$this->address->save();
 			
 			$this->completeShipment($waybill);
 			echo "Shipping registered successfully. Waybill Number: ". $waybill;
 		} else {
-		
-		$cptypes = $collivery->get_cptypes();
-		$cptype = $_address->getMds_cptype();
-		
-		$towns = $collivery->get_towns();
-		$town = $collivery->get_code($towns, $_address->getRegion());
-		
-		$suburbs = $collivery->get_suburbs($town);
-		$suburb = $collivery->get_code($suburbs, $_address->getCity());
-		
-		$my_info=$collivery->my_info();
-		
-		$street = $_address->getStreet();
-		$address=array(
-			'company_name'=>$_address->getCompany(),
-			'address_type'=>$cptype,
-			'town_id'=>$town,
-			'TownBrief'=>$town,
-			'suburb_id'=>$suburb,
-			'building'=>$_address->getMds_building(),
-			'street'=>implode(', ', $street),
-			'full_name'=>$_address->getName(),
-			'phone'=>$_address->getTelephone(),
-			'email'=>$_address->getEmail(),
-			);
-		$contact=array(
-			'fname'=>$_address->getName(),
-			'cellNo'=>$_address->getTelephone(),
-			'emailAddr'=>$_address->getEmail(),
-			);
-?>
-
-<style>
-	.green {
-		color: green;
-	}
-	.red {
-		color: red;
-	}
-</style>
-<h1>Confirm Shipping Information</h1>
-<div style="float:left; width: 50%">
-	<h2>Client Information</h2>
-	<table>
-		<tr>
-			<td>Name</td>
-			<td><?php echo $contact['fname']; ?></td>
-		</tr>
-		<tr>
-			<td>Number</td>
-			<td><?php echo $contact['cellNo']; ?></td>
-		</tr>
-		<tr>
-			<td>Email Address</td>
-			<td><?php echo $contact['emailAddr']; ?></td>
-		</tr>
-		<tr>
-			<td>Company Name</td>
-			<td><?php echo $address['company_name']; ?></td>
-		</tr>
-		<tr>
-			<td>Location Type</td>
-			<td><?php echo @$cptypes[$address['address_type']]; ?></td>
-		</tr>
-		<tr>
-			<td>Town</td>
-			<td><?php echo $towns[$address['town_id']]; ?></td>
-		</tr>
-		<tr>
-			<td>Suburb</td>
-			<td><?php echo $suburbs[$address['suburb_id']]; ?></td>
-		</tr>
-		<tr>
-			<td>Building Details</td>
-			<td><?php echo $address['building']; ?></td>
-		</tr>
-		<tr>
-			<td>Street Address</td>
-			<td><?php echo $address['street']; ?></td>
-		</tr>
-	</table>
-	<?php
-		if (!isset( $_POST['mds_confirm_shipping_info'])&&!isset( $_POST['mds_add_client'])){ ?>
-			<form method="post">
-				<input type="hidden" name="form_key" value="<? echo $this->getFormKey(); ?>" />
-				<input type="submit" class="button tips" name="mds_add_client" value="<?php echo __('Confirm Address'); ?>" data-tip="<?php echo __('Add client to MDS database.'); ?>" />
-			</form>
-		<?php }
-	?>
-</div>
-<div style="float:right;  width: 50%">
-	<h2>My Information</h2>
-	<table>
-		<tr>
-			<td>Name</td>
-			<td><?php echo $my_info['results']['fname']; ?></td>
-		</tr>
-		<tr>
-			<td>Number</td>
-			<td><?php echo $my_info['results']['cellNo']; ?></td>
-		</tr>
-		<tr>
-			<td>Email Address</td>
-			<td><?php echo $my_info['results']['emailAddr']; ?></td>
-		</tr>
-		<tr>
-			<td>Company Name</td>
-			<td><?php echo $my_info['results']['companyName']; ?></td>
-		</tr>
-		<tr>
-			<td>Location Type</td>
-			<td><?php echo $cptypes[$my_info['results']['CP_Type']]; ?></td>
-		</tr>
-		<tr>
-			<td>Town</td>
-			<td><?php echo $my_info['results']['TownName']; ?></td>
-		</tr>
-		<tr>
-			<td>Suburb</td>
-			<td><?php echo $my_info['results']['Suburb']; ?></td>
-		</tr>
-		<tr>
-			<td>Building Details</td>
-			<td><?php echo $my_info['results']['Address1']; ?></td>
-		</tr>
-		<tr>
-			<td>Street Number</td>
-			<td><?php echo $my_info['results']['Address3']; ?></td>
-		</tr>
-		<tr>
-			<td>Street Name</td>
-			<td><?php echo $my_info['results']['Address2']; ?></td>
-		</tr>
-	</table>
-</div>
-<?php
-if ( isset( $_POST['mds_add_client'] ) && $_POST['mds_add_client'] ) {
-	$client_address_id = $_address->getMds_address_id();
-	$client_address_hash = $_address->getMds_address_hash();
-	if (isset($client_address_id)&&$client_address_hash==md5(implode(',', $address)))
-	{
-		$cpid['results']['address_id']=$client_address_id;
-		echo "<p class=\"green\"><strong>Address already added, using previous ID</strong></p>";
-	} else {
-		$cpid = $collivery->addAddress($address);
-	}
-	
-	if(isset($cpid['error_message'])) {
-		print("Error - ".$cpid['error_message']);
-		die();
-	} else {
-		$contact['cpid'] = $cpid['results']['address_id'];
-		$_address->setMds_address_id($cpid['results']['address_id']);
-		$_address->setMds_address_hash(md5(implode(',', $address)));
-		if (isset($cpid['results']['contact_id'])){
-			$_address->setMds_contact_id($cpid['results']['contact_id']);
-			$_address->setMds_contact_hash(md5(implode(',', $contact)));
-		}
-		$_address->save();
-		
-		$client_contact_id = $_address->getMds_contact_id();
-		$client_contact_hash = $_address->getMds_contact_hash();
-		if (isset($client_contact_id)&&$client_contact_hash==md5(implode(',', $contact)))
-		{
-			$ctid['results']['contact_id'] = $client_contact_id;
-			echo "<p class=\"green\"><strong>Contact already added, using previous ID</strong></p>";
-		} else {
-			$ctid = $collivery->addContact($contact);
-		}
-		if(isset($ctid['error_message']))
-			print("Error - ".$ctid['error_message']);
-		else{
-			$_address->setMds_contact_id($ctid['results']['contact_id']);
-			$_address->setMds_contact_hash(md5(implode(',', $contact)));
-			$_address->save();
-			print("</strong></p><p class=\"green\"><strong>Address and Contact added succesfully!</strong></p>");
+			$address = $this->getAddress();
+			$contact = $this->getContact();
 			
-			$collivery_data = $collivery->get_cart_content($_order->getAllItems());
-			$collivery_data['collivery_from']=$my_info['address_id'];
-			$collivery_data['contact_from']=$my_info['contact_id'];
-			$collivery_data['collivery_to']=$cpid['results']['address_id'];
-			$collivery_data['contact_to']=$ctid['results']['contact_id'];
-			$collivery_data['collivery_type']=2;
-			$collivery_data['service']=5;
-			//print_r($collivery_data);
-			//$mds_contact = $collivery->get_client_contact($cpid['results']['contact_id']);
-			//$mds_address = $collivery->get_client_address($cpid['results']['address_id']);
-			//die();
-			$validation = $collivery->validate($collivery_data);
-			//print_r($validation);
-			//die();
-			?>
-			<h2>Validated Information</h2>
-			<table>
-				<tr>
-					<th>Description</th>
-					<th>Data</th>
-				</tr>
-				<tr>
-					<td>From (Address)</td>
-					<td style="text-align: right;"><?php echo $validation['results']['collivery_from']; ?></td>
-				</tr>
-				<tr>
-					<td>From (Contact)</td>
-					<td style="text-align: right;"><?php echo $validation['results']['contact_from']; ?></td>
-				</tr>
-				<tr>
-					<td>To (Address)</td>
-					<td style="text-align: right;"><?php echo $validation['results']['collivery_to']; ?></td>
-				</tr>
-				<tr>
-					<td>To (Contact)</td>
-					<td style="text-align: right;"><?php echo $validation['results']['contact_to']; ?></td>
-				</tr>
-				<tr>
-					<td>Collivery Type</td>
-					<td style="text-align: right;"><?php echo $validation['results']['collivery_type']; ?></td>
-				</tr>
-				<tr>
-					<td>Number of Packages</td>
-					<td style="text-align: right;"><?php echo @$validation['results']['num_package']; ?></td>
-				</tr>
-				<tr>
-					<td>Weight</td>
-					<td style="text-align: right;"><?php echo $validation['results']['weight']; ?> Kg</td>
-				</tr>
-				<tr>
-					<td>Volumetric Weight</td>
-					<td style="text-align: right;"><?php echo @$validation['results']['vol_weight']; ?> Kg</td>
-				</tr>
-				<tr>
-					<td>Service</td>
-					<td style="text-align: right;"><?php echo $validation['results']['service']; ?></td>
-				</tr>
-				<tr>
-					<td>MDS Cover</td>
-					<td style="text-align: right;"><?php echo (isset($validation['results']['mdscover'])&&$validation['results']['mdscover']==1) ? "Yes" : "No"; ?></td>
-				</tr>
-				<tr>
-					<td>Collection Time</td>
-					<td style="text-align: right;"><?php echo date("H\:i \- D\, d F Y",$validation['results']['collection_time']); ?></td>
-				</tr>
-				<tr>
-					<td>Delivery Time</td>
-					<td style="text-align: right;"><?php echo date("H\:i \- D\, d F Y",$validation['results']['delivery_time']); ?></td>
-				</tr>
-			</table>
-			<p>Client Charged: <strong>R<?php //echo $order->order_shipping; ?></strong><br>Actual Price: <strong>R<?php echo $validation['pricing']['results']['Total']; ?></strong></p>
-						<?php
-						if($validation['results']['REJECTED']){
-							$reason = $validation['results']['REJECTED_REASON'];
-							echo "<p class=\"red\"><strong>$reason</strong></p>";
-						}else{ ?>
-							<form method="post">
-								<input type="hidden" name="form_key" value="<? echo $this->getFormKey(); ?>" />
-								<input type="hidden" name="validation" value="<?php echo htmlentities(json_encode($validation['results'])); ?>">
-								<input type="submit" class="button tips" name="mds_confirm_shipping_info" value="<?php echo __('Accept Collivery'); ?>" data-tip="<?php echo __('Accept the Collivery and send someone to pickup shipping.'); ?>" />
-							</form>
-						<?php
-						}
-					}
-				}
+			$cptypes = $this->collivery->get_cptypes();
+			$towns = $this->collivery->get_towns();
+			$town = $this->collivery->get_code($towns, $this->address->getRegion());
+			$suburbs = $this->collivery->get_suburbs($town);
+			$my_info=$this->collivery->my_info();
+			//$street = $this->address->getStreet();
+			
+			if ( isset( $_POST['mds_add_client'] ) && $_POST['mds_add_client'] ) {
+				$client_info = $this->addClient($address, $contact);
+				$validation = $this->validate($client_info, $my_info);
 			}
+			?>
+			
+			<style>
+				.green {
+					color: green;
+				}
+				.red {
+					color: red;
+				}
+			</style>
+			<h1>Confirm Shipping Information</h1>
+			<div style="float:left; width: 50%">
+				<h2>Client Information</h2>
+				<table>
+					<tr>
+						<td>Name</td>
+						<td><?php echo $contact['fname']; ?></td>
+					</tr>
+					<tr>
+						<td>Number</td>
+						<td><?php echo $contact['cellNo']; ?></td>
+					</tr>
+					<tr>
+						<td>Email Address</td>
+						<td><?php echo $contact['emailAddr']; ?></td>
+					</tr>
+					<tr>
+						<td>Company Name</td>
+						<td><?php echo $address['company_name']; ?></td>
+					</tr>
+					<tr>
+						<td>Location Type</td>
+						<td><?php echo @$cptypes[$address['address_type']]; ?></td>
+					</tr>
+					<tr>
+						<td>Town</td>
+						<td><?php echo $towns[$address['town_id']]; ?></td>
+					</tr>
+					<tr>
+						<td>Suburb</td>
+						<td><?php echo $suburbs[$address['suburb_id']]; ?></td>
+					</tr>
+					<tr>
+						<td>Building Details</td>
+						<td><?php echo $address['building']; ?></td>
+					</tr>
+					<tr>
+						<td>Street Address</td>
+						<td><?php echo $address['street']; ?></td>
+					</tr>
+				</table>
+				<?php
+					if (!isset( $_POST['mds_confirm_shipping_info'])&&!isset( $_POST['mds_add_client'])){ ?>
+						<form method="post">
+							<input type="hidden" name="form_key" value="<? echo $this->getFormKey(); ?>" />
+							<input type="submit" class="button tips" name="mds_add_client" value="<?php echo __('Confirm Address'); ?>" data-tip="<?php echo __('Add client to MDS database.'); ?>" />
+						</form>
+					<?php }
+				?>
+			</div>
+			<div style="float:right;  width: 50%">
+				<h2>My Information</h2>
+				<table>
+					<tr>
+						<td>Name</td>
+						<td><?php echo $my_info['results']['fname']; ?></td>
+					</tr>
+					<tr>
+						<td>Number</td>
+						<td><?php echo $my_info['results']['cellNo']; ?></td>
+					</tr>
+					<tr>
+						<td>Email Address</td>
+						<td><?php echo $my_info['results']['emailAddr']; ?></td>
+					</tr>
+					<tr>
+						<td>Company Name</td>
+						<td><?php echo $my_info['results']['companyName']; ?></td>
+					</tr>
+					<tr>
+						<td>Location Type</td>
+						<td><?php echo $cptypes[$my_info['results']['CP_Type']]; ?></td>
+					</tr>
+					<tr>
+						<td>Town</td>
+						<td><?php echo $my_info['results']['TownName']; ?></td>
+					</tr>
+					<tr>
+						<td>Suburb</td>
+						<td><?php echo $my_info['results']['Suburb']; ?></td>
+					</tr>
+					<tr>
+						<td>Building Details</td>
+						<td><?php echo $my_info['results']['Address1']; ?></td>
+					</tr>
+					<tr>
+						<td>Street Number</td>
+						<td><?php echo $my_info['results']['Address3']; ?></td>
+					</tr>
+					<tr>
+						<td>Street Name</td>
+						<td><?php echo $my_info['results']['Address2']; ?></td>
+					</tr>
+				</table>
+			</div>
+			<?php if(isset($validation)): ?>
+				<h2>Validated Information</h2>
+				<table>
+					<tr>
+						<th>Description</th>
+						<th>Data</th>
+					</tr>
+					<tr>
+						<td>From (Address)</td>
+						<td style="text-align: right;"><?php echo $validation['results']['collivery_from']; ?></td>
+					</tr>
+					<tr>
+						<td>From (Contact)</td>
+						<td style="text-align: right;"><?php echo $validation['results']['contact_from']; ?></td>
+					</tr>
+					<tr>
+						<td>To (Address)</td>
+						<td style="text-align: right;"><?php echo $validation['results']['collivery_to']; ?></td>
+					</tr>
+					<tr>
+						<td>To (Contact)</td>
+						<td style="text-align: right;"><?php echo $validation['results']['contact_to']; ?></td>
+					</tr>
+					<tr>
+						<td>Collivery Type</td>
+						<td style="text-align: right;"><?php echo $validation['results']['collivery_type']; ?></td>
+					</tr>
+					<tr>
+						<td>Number of Packages</td>
+						<td style="text-align: right;"><?php echo @$validation['results']['num_package']; ?></td>
+					</tr>
+					<tr>
+						<td>Weight</td>
+						<td style="text-align: right;"><?php echo $validation['results']['weight']; ?> Kg</td>
+					</tr>
+					<tr>
+						<td>Volumetric Weight</td>
+						<td style="text-align: right;"><?php echo @$validation['results']['vol_weight']; ?> Kg</td>
+					</tr>
+					<tr>
+						<td>Service</td>
+						<td style="text-align: right;"><?php echo $validation['results']['service']; ?></td>
+					</tr>
+					<tr>
+						<td>MDS Cover</td>
+						<td style="text-align: right;"><?php echo (isset($validation['results']['mdscover'])&&$validation['results']['mdscover']==1) ? "Yes" : "No"; ?></td>
+					</tr>
+					<tr>
+						<td>Collection Time</td>
+						<td style="text-align: right;"><?php echo date("H\:i \- D\, d F Y",$validation['results']['collection_time']); ?></td>
+					</tr>
+					<tr>
+						<td>Delivery Time</td>
+						<td style="text-align: right;"><?php echo date("H\:i \- D\, d F Y",$validation['results']['delivery_time']); ?></td>
+					</tr>
+				</table>
+				<p>Client Charged: <strong>R<?php //echo $order->order_shipping; ?></strong><br>Actual Price: <strong>R<?php echo $validation['pricing']['results']['Total']; ?></strong></p>
+				<?php
+				if($validation['results']['REJECTED']){
+					$reason = $validation['results']['REJECTED_REASON'];
+					echo "<p class=\"red\"><strong>$reason</strong></p>";
+				}else{ ?>
+					<form method="post">
+						<input type="hidden" name="form_key" value="<? echo $this->getFormKey(); ?>" />
+						<input type="hidden" name="validation" value="<?php echo htmlentities(json_encode($validation['results'])); ?>">
+						<input type="submit" class="button tips" name="mds_confirm_shipping_info" value="<?php echo __('Accept Collivery'); ?>" data-tip="<?php echo __('Accept the Collivery and send someone to pickup shipping.'); ?>" />
+					</form>
+				<?php
+				}
+			endif;
 		}
 	} catch (Exception $e) {
 		throw $e;
 	}
 } else {
-	$status = $collivery->get_status($mds_waybill);
+	$status = $this->collivery->get_status($mds_waybill);
 	$status_text = $status['results']['status_text'];
 	$status_del_date = $status['results']['DelDate'];
 	$status_del_time = $status['results']['DelTime'];
@@ -315,3 +235,4 @@ if ( isset( $_POST['mds_add_client'] ) && $_POST['mds_add_client'] ) {
 			</table>
 		</p>";
 }
+?>
