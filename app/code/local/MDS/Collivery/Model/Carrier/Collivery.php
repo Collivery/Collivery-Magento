@@ -157,14 +157,6 @@ class MDS_Collivery_Model_Carrier_Collivery
 						$cart['count'] += $qty;
 						$cart['weight'] += $weight * $qty;
 						
-						// Work out Volumetric Weight based on MDS's calculations
-						$vol_weight = (($length * $width * $height) / 4000);
-						
-						if ($vol_weight>$weight)
-							$cart['max_weight'] += $vol_weight * $qty;
-						else
-							$cart['max_weight'] += $weight * $qty;
-						
 						for ($i=0; $i<$qty; $i++)
 							$cart['parcels'][] = array(
 									'length' => $length,
