@@ -2,7 +2,7 @@
 $mds_waybill = $this->address->getMds_waybill();
 if (!isset($mds_waybill)) {
 	try {
-		if ( isset( $_POST['mds_confirm_shipping_info'] ) && $_POST['mds_confirm_shipping_info'] ) {
+		if ( isset( $_POST['validation'] ) && !(isset( $_POST['override_num_packages']) && $_POST['override_num_packages'] )) {
 			$validation = stripslashes($_POST['validation']);
 			$data=json_decode($validation, TRUE);
 			$new_col = $this->collivery->register_shipping($data);
@@ -27,8 +27,18 @@ if (!isset($mds_waybill)) {
 				$client_info = $this->addClient($address, $contact);
 				$validation = $this->validate($client_info, $my_info);
 			}
-			?>
 			
+			if(isset($_POST['override_num_packages']) && $_POST['override_num_packages']){
+				$raw_data = stripslashes($_POST['validation']);
+				$data=json_decode($raw_data, TRUE);
+				unset($data['num_package']);
+				foreach ( $data['parcels'] as $key => $value ){
+					unset($data['parcels'][$key]['qty']);
+				}
+				$validation = $this->collivery->validate($data);
+			}
+			?>
+			<script src="http://localhost/magento/js/mds/modalbox.js" type="text/javascript"></script>
 			<style>
 				.green {
 					color: green;
@@ -36,6 +46,42 @@ if (!isset($mds_waybill)) {
 				.red {
 					color: red;
 				}
+				
+				.button:disabled{
+					background: #555555;
+				}
+				
+				.modalbox {
+					color: #333;
+					display: none;
+					position: absolute;
+					top: 25%;
+					left: 25%;
+					width: 50%;
+					height: 50%;
+					padding: 1em;
+					border: 1px solid #FFAC47;
+					background-color: white;
+					text-align: left;
+					z-index:1001;
+					overflow: auto;
+				}
+				
+				#overlay{
+					display:none;
+					position:absolute;
+					top:0;
+					left:0;
+					width:100%;
+					height:100%;
+					z-index:1000;
+					background-color:#333;
+					-moz-opacity: 0.8;
+					opacity:.80;
+					filter: alpha(opacity=80);
+				}
+				
+				.modalbox[id]{ /* IE6 and below Can't See This */    position:fixed;    }#overlay[id]{ /* IE6 and below Can't See This */    position:fixed;    }
 			</style>
 			<h1>Confirm Shipping Information</h1>
 			<div style="float:left; width: 50%">
@@ -79,7 +125,7 @@ if (!isset($mds_waybill)) {
 					</tr>
 				</table>
 				<?php
-					if (!isset( $_POST['mds_confirm_shipping_info'])&&!isset( $_POST['mds_add_client'])){ ?>
+					if (!isset( $validation )&&!isset( $_POST['mds_add_client'] )){ ?>
 						<form method="post">
 							<input type="hidden" name="form_key" value="<? echo $this->getFormKey(); ?>" />
 							<input type="submit" class="button tips" name="mds_add_client" value="<?php echo __('Confirm Address'); ?>" data-tip="<?php echo __('Add client to MDS database.'); ?>" />
@@ -134,9 +180,10 @@ if (!isset($mds_waybill)) {
 			</div>
 			<?php 
 			
-			foreach ($client_info['message'] as $message) {
-				echo $message;
-			}
+			if (isset($client_info['message']))
+				foreach ($client_info['message'] as $message) {
+					echo $message;
+				}
 			
 			if(isset($validation)): ?>
 				<h2>Validated Information</h2>
@@ -160,10 +207,6 @@ if (!isset($mds_waybill)) {
 					<tr>
 						<td>To (Contact)</td>
 						<td style="text-align: right;"><?php echo $validation['results']['contact_to']; ?></td>
-					</tr>
-					<tr>
-						<td>Collivery Type</td>
-						<td style="text-align: right;"><?php echo $validation['results']['collivery_type']; ?></td>
 					</tr>
 					<tr>
 						<td>Number of Packages</td>
@@ -194,17 +237,173 @@ if (!isset($mds_waybill)) {
 						<td style="text-align: right;"><?php echo date("H\:i \- D\, d F Y",$validation['results']['delivery_time']); ?></td>
 					</tr>
 				</table>
-				<p>Client Charged: <strong>R<?php //echo $order->order_shipping; ?></strong><br>Actual Price: <strong>R<?php echo $validation['pricing']['results']['Total']; ?></strong></p>
+				<p><!-- Client Charged: <strong>R<?php //echo $order->order_shipping; ?></strong><br>Actual --></br>Price: <strong>R<?php echo $validation['pricing']['results']['Total']; ?></strong></p>
 				<?php
 				if($validation['results']['REJECTED']){
 					$reason = $validation['results']['REJECTED_REASON'];
 					echo "<p class=\"red\"><strong>$reason</strong></p>";
 				}else{ ?>
-					<form method="post">
+					<form method="post" id="validateForm">
 						<input type="hidden" name="form_key" value="<? echo $this->getFormKey(); ?>" />
-						<input type="hidden" name="validation" value="<?php echo htmlentities(json_encode($validation['results'])); ?>">
-						<input type="submit" class="button tips" name="mds_confirm_shipping_info" value="<?php echo __('Accept Collivery'); ?>" data-tip="<?php echo __('Accept the Collivery and send someone to pickup shipping.'); ?>" />
+						<input type="hidden" name="validation" id="hiddenValidation" value="<?php echo htmlentities(json_encode($validation['results'])); ?>">
+						<label for="override_num_packages">Override Number of Packages</label>
+						<input type="checkbox" name="override_num_packages" id="override_num_packages">
 					</form>
+					<br>
+					<button onclick="CheckForm();" class="button" name="mds_confirm_shipping_info"><?php echo __('Accept Collivery'); ?></button>
+					<div id="modalbox" class="modalbox">
+						<h1>Product Information</h1>
+						<table style="width: 99%" id="parcels">
+							<tr>
+								<th>Length (cm)</th>
+								<th>Width (cm)</th>
+								<th>Height (cm)</th>
+								<th>Weight (Kg)</th>
+								<th>Qty</th>
+								<th></th>
+							</tr>
+							<tr>
+								<td><input type="text" id="length" name="length" style="width: 90%"></td>
+								<td><input type="text" id="width" name="width" style="width: 90%"></td>
+								<td><input type="text" id="height" name="height" style="width: 90%"></td>
+								<td><input type="text" id="weight" name="weight" style="width: 90%"></td>
+								<td><input type="text" id="qty" name="qty" style="width: 90%"></td>
+								<td><button onclick="addParcel();" class="button">Add</button></td>
+							</tr>
+							<tr>
+								<td></td>
+								<td></td>
+								<td>Total:</td>
+								<td id="total_weight">0 Kg</td>
+								<td id="total_qty">0</td>
+								<td></td>
+							</tr>
+						</table>
+						<p>
+							<button onclick="modalClose();" class="button">Close</button>
+							<button onclick="reValidate();" class="button" id="reValidateBtn">Re-Validate</button>
+						</p>
+					</div>
+					
+					<script>
+						var mylightbox;
+						var validation = <?php echo json_encode($validation['results']); ?>;
+						var parcels = {};
+						
+						var parcelAI = 0;
+						for(parcelAI; parcelAI < validation.parcels.length; parcelAI++){
+							parcels['parcel_' + parcelAI] = validation.parcels[parcelAI];
+							addParcelToTable (
+									validation.parcels[parcelAI]['length'],
+									validation.parcels[parcelAI]['width'],
+									validation.parcels[parcelAI]['height'],
+									validation.parcels[parcelAI]['weight'],
+									1
+								);
+						}
+						
+						function CheckForm(){
+							
+							if (!document.getElementById('override_num_packages').checked){
+								if (confirm('Confirm Collivery without any changes?')) { 
+									document.getElementById('validateForm').submit();
+								}
+							} else {
+								mylightbox = new lightbox('modalbox');
+								mylightbox.activate();
+								mylightbox.displayLightbox();
+							}
+						}
+						
+						function reValidate(){
+							delete validation.parcels;
+							var newArray = [];
+							for(var key in parcels){
+								if(typeof parcels[key].qty === "undefined" || parcels[key].qty == 1)
+									newArray.push(parcels[key]);
+								else {
+									var parcelQty = parcels[key].qty;
+									for (var i = 0; i < parcelQty; i++){
+										newArray.push(parcels[key]);
+									}
+								}
+							}
+							validation.parcels = newArray;
+							Form.Element.setValue("hiddenValidation", Object.toJSON(validation));
+							document.getElementById('validateForm').submit();
+							document.getElementById('reValidateBtn').disabled = "disabled";
+						}
+						
+						function modalClose(){
+							mylightbox.deactivate();
+						}
+						function deleteParcel (parcel) {
+							delete parcels[parcel.up(1).id];
+							parcel.up(1).remove();
+							updateTotals();
+						}
+						function updateTotals () {
+							var total_weight = 0;
+							var total_qty = 0;
+							$$('#parcels tr.parcel').each(function(em){
+								total_weight += parseFloat($(em).select('td:nth-child(4)').first().innerHTML);
+								total_qty += parseInt($(em).select('td:nth-child(5)').first().innerHTML);
+							});
+							$("total_weight").update(total_weight);
+							$("total_qty").update(total_qty);
+						}
+						
+						function isNumber(n) {
+							return !isNaN(parseFloat(n)) && isFinite(n);
+						}
+						
+						function addParcel () {
+							var length, width, height, weight, qty;
+							if (isNumber($('length').value))
+								length = $('length').value;
+							else
+								length = 0;
+								
+							if (isNumber($('width').value))
+								width = $('width').value;
+							else
+								width = 0;
+							
+							if (isNumber($('height').value))
+								height = $('height').value;
+							else
+								height = 0;
+							
+							if (isNumber($('weight').value))
+								weight = $('weight').value;
+							else
+								weight = 0;
+							
+							if (isNumber($('qty').value))
+								qty = $('qty').value;
+							else
+								qty = 0;
+							
+							parcelAI++;
+							parcels['parcel_' + parcelAI] = {length: length, width: width, height: height, weight: weight, qty: qty}
+							addParcelToTable (length, width, height, weight, qty);
+						}
+						
+						function addParcelToTable (length, width, height, weight, qty) {
+							$$('#parcels tr:nth-last-child(2)').first().insert({after:'<tr class="parcel" id="parcel_' + parcelAI +'"><td>' + 
+								length + 
+								'</td><td>' + 
+								width + 
+								'</td><td>' + 
+								height + 
+								'</td><td>' + 
+								weight + 
+								'</td><td>' + 
+								qty + 
+								'</td><td><button onclick=\"deleteParcel(this);\" class=\"button\">Delete</button></td></tr>'});
+							updateTotals();
+						}
+					</script>
 				<?php
 				}
 			endif;
