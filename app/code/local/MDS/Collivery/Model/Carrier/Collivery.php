@@ -256,6 +256,21 @@ class MDS_Collivery_Model_Carrier_Collivery
 	
 	function get_available_services()
 	{
+		/* Uncomment the following lines of code if you'd like to edit/remove any services.
+		 * 
+		 * 1: Overnight Before 10:00
+		 * 2: Overnight Before 16:00
+		 * 5: Road Freight Express
+		 * 3: Road Freight
+		 */
+		
+		/*return array(
+				1 => "Overnight Before 10:00", // 1: Overnight Before 10:00
+				2 => "Overnight before 16:00", // 2: Overnight Before 16:00
+				5 => "Road Freight Express", //   5: Road Freight Express
+				3 => "Road Freight" //            3: Road Freight
+			);
+		*/
 		$this->soap_init();
 		$services = $this->soap->getServices($this->authenticate['token']);
 		return $services;
