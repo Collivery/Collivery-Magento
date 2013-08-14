@@ -14,7 +14,7 @@ class MDS_Collivery_AjaxController extends Mage_Core_Controller_Front_Action
 	{
 		$model = Mage::getModel('mds_collivery/carrier_collivery');
 		
-		foreach ($model->get_cptypes() as $key => $value) {
+		foreach ($model->get_location_types() as $key => $value) {
 			echo '<option value="'. $key .'">'. $value .'</option>';
 		}
 	}

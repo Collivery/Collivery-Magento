@@ -38,7 +38,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 		$collivery_data['collivery_type']=2;
 		$collivery_data['service']=$service;
 
-		return $this->collivery->validate($collivery_data);
+		return $this->collivery->validate_collivery($collivery_data);
 	}
 	
 	public function getAddressId($address, $contact)
@@ -53,24 +53,24 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 			$results['address_id'] = $client_address_id;
 			$results['message'] = "<p class=\"green\"><strong>Address already added, using previous ID</strong></p>";
 		} else {
-			$address_id = $this->collivery->addAddress($address);
+			$address_id = $this->collivery->add_address($address);
 			if(isset($address_id['error_message'])) {
 				$error['error'] = "Error - ".$address_id['error_message'];
 				return $error;
 			} else {
-				$this->address->setMds_address_id($address_id['results']['address_id']);
+				$this->address->setMds_address_id($address_id['address_id']);
 				$this->address->setMds_address_hash(md5(implode(',', $address)));
 				$contact_text = "";
-				if (isset($address_id['results']['contact_id'])){
-					$contact['cpid'] = $address_id['results']['address_id'];
-					$this->address->setMds_contact_id($address_id['results']['contact_id']);
+				if (isset($address_id['contact_id'])){
+					$contact['address_id'] = $address_id['address_id'];
+					$this->address->setMds_contact_id($address_id['contact_id']);
 					$this->address->setMds_contact_hash(md5(implode(',', $contact)));
 					$contact_text = "and Contact";
-					$results['contact_id'] = $address_id['results']['contact_id'];
+					$results['contact_id'] = $address_id['contact_id'];
 				}
 				$this->address->save();
 				
-				$results['address_id'] = $address_id['results']['address_id'];
+				$results['address_id'] = $address_id['address_id'];
 				$results['message'] = "<p class=\"green\"><strong>Address $contact_text Successfully added to Collivery</strong></p>";
 			}
 		}
@@ -88,15 +88,15 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 			$results['contact_id'] = $client_contact_id;
 			$results['message'] = "<p class=\"green\"><strong>Contact already added, using previous ID</strong></p>";
 		} else {
-			$client_id = $this->collivery->addContact($contact);
-			if(isset($client_id['error_message'])){
-				$error['error'] = "Error - ".$client_id['error_message'];
+			$client_id = $this->collivery->add_contact($contact);
+			if($client_id===false){
+				$error['error'] = "Error adding contact!";
 				return $error;
 			} else {
-				$this->address->setMds_contact_id($client_id['results']['contact_id']);
+				$this->address->setMds_contact_id($client_id);
 				$this->address->setMds_contact_hash(md5(implode(',', $contact)));
 				$this->address->save();
-				$results['contact_id'] = $client_id['results']['contact_id'];
+				$results['contact_id'] = $client_id;
 				$results['message'] = "</strong></p><p class=\"green\"><strong>Address and Contact added succesfully!</strong></p>";
 			}
 		}
@@ -113,7 +113,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 			$error['error'] = $address_id['error'];
 			return $error;
 		} else {
-			$contact['cpid'] = $address_id['address_id'];
+			$contact['address_id'] = $address_id['address_id'];
 			$results['address_id'] = $address_id['address_id'];
 			$results['message'][]=$address_id['message'];
 			
@@ -121,8 +121,8 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 				$results['contact_id'] = $address_id['contact_id'];
 			} else {
 				$contact_id = $this->getContactId($contact);
-				if(isset($contact_id['error'])) {
-					$error['error'] = $contact_id['error'];
+				if($contact_id === false) {
+					$error['error'] = "Error retrieving collivery";
 					return $error;
 				} else {
 					$results['contact_id'] = $contact_id['contact_id'];
@@ -145,11 +145,10 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 		
 		return array(
 			'company_name'=>$this->address->getCompany(),
-			'address_type'=>$cptype,
+			'location_type'=>$cptype,
 			'town_id'=>$town,
-			'TownBrief'=>$town,
 			'suburb_id'=>$suburb,
-			'building'=>$this->address->getMds_building(),
+			'building_details'=>$this->address->getMds_building(),
 			'street'=>implode(', ', $street),
 			'full_name'=>$this->address->getName(),
 			'phone'=>$this->address->getTelephone(),
@@ -160,9 +159,9 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 	public function getContact()
 	{
 		return array(
-			'fname'=>$this->address->getName(),
-			'cellNo'=>$this->address->getTelephone(),
-			'emailAddr'=>$this->address->getEmail(),
+			'full_name'=>$this->address->getName(),
+			'phone'=>$this->address->getTelephone(),
+			'email'=>$this->address->getEmail(),
 			);
 	}
 	

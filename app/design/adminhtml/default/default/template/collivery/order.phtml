@@ -6,7 +6,7 @@ if (!isset($mds_waybill)) {
 			$validation = stripslashes($_POST['validation']);
 			$data=json_decode($validation, TRUE);
 			$new_col = $this->collivery->register_shipping($data);
-			$waybill = $new_col['results']['collivery_id'];
+			$waybill = $new_col['collivery_id'];
 			
 			$this->address->setMds_waybill($waybill);
 			$this->address->save();
@@ -17,11 +17,11 @@ if (!isset($mds_waybill)) {
 			$address = $this->getAddress();
 			$contact = $this->getContact();
 			
-			$cptypes = $this->collivery->get_cptypes();
+			$cptypes = $this->collivery->get_location_types();
 			$towns = $this->collivery->get_towns();
 			$town = $this->collivery->get_code($towns, $this->address->getRegion());
 			$suburbs = $this->collivery->get_suburbs($town);
-			$my_info=$this->collivery->my_info();
+			$my_info=$this->collivery->get_my_info();
 			
 			if ( isset( $_POST['mds_add_client'] ) && $_POST['mds_add_client'] ) {
 				$client_info = $this->addClient($address, $contact);
@@ -35,7 +35,7 @@ if (!isset($mds_waybill)) {
 				foreach ( $data['parcels'] as $key => $value ){
 					unset($data['parcels'][$key]['qty']);
 				}
-				$validation = $this->collivery->validate($data);
+				$validation = $this->collivery->validate_collivery($data);
 			}
 			?>
 			<script src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS); ?>mds/modalbox.js" type="text/javascript"></script>
@@ -89,15 +89,15 @@ if (!isset($mds_waybill)) {
 				<table>
 					<tr>
 						<td>Name</td>
-						<td><?php echo $contact['fname']; ?></td>
+						<td><?php echo $contact['full_name']; ?></td>
 					</tr>
 					<tr>
 						<td>Number</td>
-						<td><?php echo $contact['cellNo']; ?></td>
+						<td><?php echo $contact['phone']; ?></td>
 					</tr>
 					<tr>
 						<td>Email Address</td>
-						<td><?php echo $contact['emailAddr']; ?></td>
+						<td><?php echo $contact['email']; ?></td>
 					</tr>
 					<tr>
 						<td>Company Name</td>
@@ -117,7 +117,7 @@ if (!isset($mds_waybill)) {
 					</tr>
 					<tr>
 						<td>Building Details</td>
-						<td><?php echo $address['building']; ?></td>
+						<td><?php echo $address['building_details']; ?></td>
 					</tr>
 					<tr>
 						<td>Street Address</td>
@@ -138,43 +138,39 @@ if (!isset($mds_waybill)) {
 				<table>
 					<tr>
 						<td>Name</td>
-						<td><?php echo $my_info['results']['fname']; ?></td>
+						<td><?php echo $my_info['full_name']; ?></td>
 					</tr>
 					<tr>
 						<td>Number</td>
-						<td><?php echo $my_info['results']['cellNo']; ?></td>
+						<td><?php echo $my_info['cellphone']; ?></td>
 					</tr>
 					<tr>
 						<td>Email Address</td>
-						<td><?php echo $my_info['results']['emailAddr']; ?></td>
+						<td><?php echo $my_info['email']; ?></td>
 					</tr>
 					<tr>
 						<td>Company Name</td>
-						<td><?php echo $my_info['results']['companyName']; ?></td>
+						<td><?php echo $my_info['company_name']; ?></td>
 					</tr>
 					<tr>
 						<td>Location Type</td>
-						<td><?php echo $cptypes[$my_info['results']['CP_Type']]; ?></td>
+						<td><?php echo $cptypes[$my_info['location_type']]; ?></td>
 					</tr>
 					<tr>
 						<td>Town</td>
-						<td><?php echo $my_info['results']['TownName']; ?></td>
+						<td><?php echo $my_info['town_name']; ?></td>
 					</tr>
 					<tr>
 						<td>Suburb</td>
-						<td><?php echo $my_info['results']['Suburb']; ?></td>
+						<td><?php echo $my_info['suburb_name']; ?></td>
 					</tr>
 					<tr>
 						<td>Building Details</td>
-						<td><?php echo $my_info['results']['Address1']; ?></td>
+						<td><?php echo $my_info['building_details']; ?></td>
 					</tr>
 					<tr>
-						<td>Street Number</td>
-						<td><?php echo $my_info['results']['Address3']; ?></td>
-					</tr>
-					<tr>
-						<td>Street Name</td>
-						<td><?php echo $my_info['results']['Address2']; ?></td>
+						<td>Street</td>
+						<td><?php echo $my_info['street']; ?></td>
 					</tr>
 				</table>
 			</div>
@@ -194,58 +190,58 @@ if (!isset($mds_waybill)) {
 					</tr>
 					<tr>
 						<td>From (Address)</td>
-						<td style="text-align: right;"><?php echo $validation['results']['collivery_from']; ?></td>
+						<td style="text-align: right;"><?php echo $validation['collivery_from']; ?></td>
 					</tr>
 					<tr>
 						<td>From (Contact)</td>
-						<td style="text-align: right;"><?php echo $validation['results']['contact_from']; ?></td>
+						<td style="text-align: right;"><?php echo $validation['contact_from']; ?></td>
 					</tr>
 					<tr>
 						<td>To (Address)</td>
-						<td style="text-align: right;"><?php echo $validation['results']['collivery_to']; ?></td>
+						<td style="text-align: right;"><?php echo $validation['collivery_to']; ?></td>
 					</tr>
 					<tr>
 						<td>To (Contact)</td>
-						<td style="text-align: right;"><?php echo $validation['results']['contact_to']; ?></td>
+						<td style="text-align: right;"><?php echo $validation['contact_to']; ?></td>
 					</tr>
 					<tr>
 						<td>Number of Packages</td>
-						<td style="text-align: right;"><?php echo @$validation['results']['num_package']; ?></td>
+						<td style="text-align: right;"><?php echo @$validation['parcel_count']; ?></td>
 					</tr>
 					<tr>
 						<td>Weight</td>
-						<td style="text-align: right;"><?php echo $validation['results']['weight']; ?> Kg</td>
+						<td style="text-align: right;"><?php echo $validation['weight']; ?> Kg</td>
 					</tr>
 					<tr>
 						<td>Volumetric Weight</td>
-						<td style="text-align: right;"><?php echo @$validation['results']['vol_weight']; ?> Kg</td>
+						<td style="text-align: right;"><?php echo @$validation['vol_weight']; ?> Kg</td>
 					</tr>
 					<tr>
 						<td>Service</td>
-						<td style="text-align: right;"><?php echo $validation['results']['service']; ?></td>
+						<td style="text-align: right;"><?php echo $validation['service']; ?></td>
 					</tr>
 					<tr>
 						<td>MDS Cover</td>
-						<td style="text-align: right;"><?php echo (isset($validation['results']['mdscover'])&&$validation['results']['mdscover']==1) ? "Yes" : "No"; ?></td>
+						<td style="text-align: right;"><?php echo (isset($validation['cover'])&&$validation['cover']==1) ? "Yes" : "No"; ?></td>
 					</tr>
 					<tr>
 						<td>Collection Time</td>
-						<td style="text-align: right;"><?php echo date("H\:i \- D\, d F Y",$validation['results']['collection_time']); ?></td>
+						<td style="text-align: right;"><?php echo date("H\:i \- D\, d F Y",$validation['collection_time']); ?></td>
 					</tr>
 					<tr>
 						<td>Delivery Time</td>
-						<td style="text-align: right;"><?php echo date("H\:i \- D\, d F Y",$validation['results']['delivery_time']); ?></td>
+						<td style="text-align: right;"><?php echo date("H\:i \- D\, d F Y",$validation['delivery_time']); ?></td>
 					</tr>
 				</table>
-				<p><!-- Client Charged: <strong>R<?php //echo $order->order_shipping; ?></strong><br>Actual --></br>Price: <strong>R<?php echo $validation['pricing']['results']['Total']; ?></strong></p>
+				<p><!-- Client Charged: <strong>R<?php //echo $order->order_shipping; ?></strong><br>Actual --></br>Price: <strong>R<?php echo $validation['price']['inc_vat']; ?></strong></p>
 				<?php
-				if($validation['results']['REJECTED']){
-					$reason = $validation['results']['REJECTED_REASON'];
+				if(isset($validation['error'])){
+					$reason = $validation['error'];
 					echo "<p class=\"red\"><strong>$reason</strong></p>";
 				}else{ ?>
 					<form method="post" id="validateForm">
 						<input type="hidden" name="form_key" value="<? echo $this->getFormKey(); ?>" />
-						<input type="hidden" name="validation" id="hiddenValidation" value="<?php echo htmlentities(json_encode($validation['results'])); ?>">
+						<input type="hidden" name="validation" id="hiddenValidation" value="<?php echo htmlentities(json_encode($validation)); ?>">
 						<label for="override_num_packages">Override Number of Packages</label>
 						<input type="checkbox" name="override_num_packages" id="override_num_packages">
 					</form>
@@ -285,7 +281,7 @@ if (!isset($mds_waybill)) {
 						</p>
 					</div>
 					<script>
-						var validation = <?php echo json_encode($validation['results']); ?>;
+						var validation = <?php echo json_encode($validation); ?>;
 					</script>
 					<script src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS); ?>mds/admin.js" type="text/javascript"></script>
 				<?php
@@ -297,9 +293,9 @@ if (!isset($mds_waybill)) {
 	}
 } else {
 	$status = $this->collivery->get_status($mds_waybill);
-	$status_text = $status['results']['status_text'];
-	$status_del_date = $status['results']['DelDate'];
-	$status_del_time = $status['results']['DelTime'];
+	$status_text = $status['status_text'];
+	$status_del_date = $status['delivery_date'];
+	$status_del_time = $status['delivery_time'];
 	echo "
 		<h1 class=\"red\">Shipping has already been registered with MDS.</h1>
 		<p>

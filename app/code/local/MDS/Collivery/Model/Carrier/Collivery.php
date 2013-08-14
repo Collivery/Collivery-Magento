@@ -13,7 +13,8 @@ class MDS_Collivery_Model_Carrier_Collivery
 	protected $_code = 'collivery';
 
 	// Protected Cached MDS Variables
-	protected $soap, $authenticate, $towns, $suburbs, $cptypes, $client_address, $my_address;
+	protected $soap, $authenticate, $towns, $suburbs, $location_types,
+	$client_address, $my_address, $addresses, $address_contact;
 	
 	/**
 	 * Setup Soap Connection if not already active
@@ -24,12 +25,12 @@ class MDS_Collivery_Model_Carrier_Collivery
 	{
 		// Check if soap session exists
 		if (!$this->soap){
-			// Prevent caching of the wsdl
-			$options = array('cache_wsdl' => WSDL_CACHE_NONE);
 			// Start Soap Client
-			$this->soap = new SoapClient("http://www.collivery.co.za/webservice_v2.php?wsdl", $options);
+			$this->soap = new SoapClient("http://www.collivery.co.za/wsdl/v2");
+			// Plugin and Host information
+			$info = array('name' => 'Magento Shipping Module by MDS Collivery', 'version'=> (string) Mage::getConfig()->getNode()->modules->MDS_Collivery->version, 'host'=> 'Magento '. (string) Mage::getVersion());
 			// Authenticate
-			$authenticate = $this->soap->Authenticate(Mage::helper('core')->decrypt($this->getConfigData('mds_user')), Mage::helper('core')->decrypt($this->getConfigData('mds_pass')), $_SESSION['token']);
+			$authenticate = $this->soap->authenticate(Mage::helper('core')->decrypt($this->getConfigData('mds_user')), Mage::helper('core')->decrypt($this->getConfigData('mds_pass')), @$_SESSION['token'], $info);
 			// Save Authentication token in session to identify the user again later
 			$_SESSION['token'] = $authenticate['token'];
 		
@@ -50,7 +51,6 @@ class MDS_Collivery_Model_Carrier_Collivery
 	 */
 	public function collectRates(Mage_Shipping_Model_Rate_Request $request)
 	{
-
 		// Skip if not enabled
 		if (!$this->getConfigFlag('active')) {
 			return false;
@@ -77,18 +77,21 @@ class MDS_Collivery_Model_Carrier_Collivery
 		else return false;
 		
 		// Get Available services from MDS
-		$services = $this->get_available_services();
-		foreach ($services['results'] as $key => $value) {
+		$services = $this->get_services();
+		
+		foreach ($services as $key => $value) {
 			// Get Shipping Estimate for current service
 			$i=$this->get_shipping_estimate($town, $cptypes, $key, $cart['weight']);
-			// Create Response Array
-			$response[] =
+			if ($i>1){
+				// Create Response Array
+				$response[] =
 					Array(
 						'code'    => $key,
 						'title'   => $value,
 						'cost'    => $i,
 						'price'   => $i * (1+($this->getConfigData('markup')/100)),
 					);
+			}
 		}
 
 		// Result Object Returned
@@ -114,7 +117,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 			// Add this rate to the result
 			$result -> append($method);
 		}
-
+		
 		return $result;
 	}
 
@@ -202,27 +205,25 @@ class MDS_Collivery_Model_Carrier_Collivery
 	 */
 	function get_shipping_estimate($town_brief, $town_type, $service_type, $weight)
 	{
-		// Load default address for current account (Vendor)
-		$my_address = $this->my_address();
 		// Create MDS Data Array
 		$data = array (
-				'from_town_id' => $my_address['results']['town_rec_id'],
-				'from_town_type' => $my_address['results']['CP_Type'],
+				//'from_town_id' => $my_address['address']['town_id'],
+				//'from_town_type' => $my_address['address']['location_type'],
+				'collivery_from' => $this->authenticate['default_address_id'],
 				'to_town_id' => $town_brief,
 				'service' => $service_type,
-				'mds_cover' => true,
+				'cover' => 1,
 				'weight' => $weight,
 			);
 		// If Location Type is set, add it to the array
 		if ((isset($town_type)) && ($town_type!="NA"))
 			$data['to_town_type'] = $town_type;
 		
-		$this->soap_init();
-		
-		$pricing = $this->soap->GetPricing($data,$_SESSION['token']);
-		
-		
-		return $pricing['results']['Total'] * 1.14;
+		$price = $this->get_price($data);
+		if (is_array($price))
+			return $price['inc_vat'];
+		else
+			return false;
 	}
 	
 	/**
@@ -254,7 +255,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 	 * @return Array
 	 */
 	
-	function get_available_services()
+	function get_services()
 	{
 		/* Uncomment the following lines of code if you'd like to edit/remove any services.
 		 * 
@@ -271,9 +272,24 @@ class MDS_Collivery_Model_Carrier_Collivery
 				3 => "Road Freight" //            3: Road Freight
 			);
 		*/
-		$this->soap_init();
-		$services = $this->soap->getServices($this->authenticate['token']);
-		return $services;
+		
+		if (!isset($this->services))
+		{
+			try{
+				$this->soap_init();
+				$services = $this->soap->get_services($this->authenticate['token']);
+				if (is_array($services['services'])&&!isset($services['error'])){
+					$this->services = $services['services'];
+				} else {
+					$this->log("Error returning services! Recieved: ". $services, 3);
+					return false;
+				}
+			} catch (SoapFault $e){
+				$this->log("Error returning services! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
+				return false;
+			}
+		}
+		return $this->services;
 	}
 	
 	/**
@@ -281,21 +297,48 @@ class MDS_Collivery_Model_Carrier_Collivery
 	 * 
 	 * @return Array
 	 */
-	public function get_towns($mode = 1)
+	public function get_price($data)
+	{
+		try{
+			$this->soap_init();
+			$price = $this->soap->get_price($data,$_SESSION['token']);
+			if (is_array($price['price'])&&!isset($price['error'])){
+				return $price['price'];
+			} else {
+				$this->log("Error getting price! Recieved: ". $price, 3);
+				return false;
+			}
+		} catch (SoapFault $e){
+			$this->log("Error getting price! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
+			return false;
+		}
+		return $this->towns;
+	}
+	
+	/**
+	 * Retrieve list of Towns from MDS
+	 * 
+	 * @return Array
+	 */
+	public function get_towns()
 	{
 		if (!isset($this->towns))
 		{
-			$this->soap_init();
-			$this->towns = $this->soap->getTowns($this->authenticate['token']);
-		}
-		if ($mode==1){
-			if (isset($this->towns['results']))
-				return $this->towns['results'];
-			else
+			try{
+				$this->soap_init();
+				$towns = $this->soap->get_towns($this->authenticate['token']);
+				if (is_array($towns['towns'])&&!isset($towns['error'])){
+					$this->towns = $towns['towns'];
+				} else {
+					$this->log("Error returning towns! Recieved: ". $towns, 3);
+					return false;
+				}
+			} catch (SoapFault $e){
+				$this->log("Error returning towns! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
 				return false;
-		} else{
-			return $this->towns;
+			}
 		}
+		return $this->towns;
 	}
 	
 	/**
@@ -309,24 +352,27 @@ class MDS_Collivery_Model_Carrier_Collivery
 	{
 		if ($mode>1){
 			$town_code = $this->get_code($this->get_towns(),$town);
-			$mode -= 2;
 		} else {
 			$town_code = $town;
 		}
 		
-		if (!isset($this->suburbs[$town_code]['results']))
+		if (!isset($this->suburbs[$town_code]))
 		{
-			$this->soap_init();
-			$this->suburbs[$town_code] = $this->soap->getSuburbs($town_code,$this->authenticate['token']);
-		}
-		if ($mode==1){
-			if (isset($this->suburbs[$town_code]['results']))
-				return $this->suburbs[$town_code]['results'];
-			else
+			try{
+				$this->soap_init();
+				$suburbs = $this->soap->get_suburbs($town_code,$this->authenticate['token']);
+				if (is_array($suburbs['suburbs'])&&!isset($suburbs['error'])){
+					$this->suburbs[$town_code] = $suburbs['suburbs'];
+				} else {
+					$this->log("Error returning suburbs! Recieved: ". $suburbs, 3);
+					return false;
+				}
+			} catch (SoapFault $e){
+				$this->log("Error returning suburbs! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
 				return false;
-		} else{
-			return $this->suburbs[$town_code];
+			}
 		}
+		return $this->suburbs[$town_code];
 	}
 	
 	/**
@@ -334,21 +380,25 @@ class MDS_Collivery_Model_Carrier_Collivery
 	 * 
 	 * @param Array
 	 */
-	public function get_cptypes($mode = 1)
+	public function get_location_types()
 	{
-		if (!isset($this->cptypes))
+		if (!isset($this->location_types))
 		{
-			$this->soap_init();
-			$this->cptypes = $this->soap->getCPTypes($this->authenticate['token']);
-		}
-		if ($mode==1){
-			if (isset($this->cptypes['results']))
-				return $this->cptypes['results'];
-			else
+			try{
+				$this->soap_init();
+				$location_types = $this->soap->get_location_types($this->authenticate['token']);
+				if (isset($location_types['results'])){
+					$this->location_types = $location_types['results'];
+				} else {
+					$this->log("Error returning location types! Recieved: ". $location_types, 3);
+					return false;
+				}
+			} catch (SoapFault $e){
+				$this->log("Error returning location types! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
 				return false;
-		} else{
-			return $this->cptypes;
+			}
 		}
+		return $this->location_types;
 	}
 	
 	/**
@@ -356,26 +406,27 @@ class MDS_Collivery_Model_Carrier_Collivery
 	 * 
 	 * @return Array
 	 */
-	public function my_address()
+	public function get_my_address()
 	{
 		if (!isset($this->my_address)){
-			$default_address_id = $this->authenticate['DefaultAddressID'];
-			$this->my_address = $this->get_client_address($default_address_id);
-			$this->my_address['address_id'] = $default_address_id;
+			$default_address_id = $this->authenticate['default_address_id'];
+			$this->my_address = $this->get_address($default_address_id);
 		}
 		return $this->my_address;
 	}
 	
-	public function my_info()
+	public function get_my_info()
 	{
 		if (!isset($this->my_info)){
-			$address = $this->my_address();
-			$contact = $this->get_client_contact($address['address_id']);
-			$first_contact_id = each($contact['results']);
-			$contact['contact_id'] = $first_contact_id[0];
-			$my_info = array_merge($address, $contact);
-			$my_info['results'] = array_merge($address['results'], $contact['results'][$first_contact_id[0]]);
-			$this->my_info = $my_info;
+			$address = $this->get_my_address();
+			if (is_array($address)){
+				$contacts = $this->get_address_contacts($address['address_id']);
+				if (is_array($contacts)){
+					$first_contact_id = each($contacts);
+					$my_info = array_merge($address, $contacts[$first_contact_id[0]]);
+					$this->my_info = $my_info;
+				} else return false;
+			} else return false;
 		}
 		return $this->my_info;
 	}
@@ -386,63 +437,142 @@ class MDS_Collivery_Model_Carrier_Collivery
 	 * @param string Client ID
 	 * @return Array
 	 */
-	public function get_client_address($cpid)
+	public function get_address($address_id)
 	{
-		if (!isset($this->client_address[$cpid])){
-			$this->soap_init();
-			$this->client_address[$cpid] = $this->soap->getClientAddresses($cpid, $this->authenticate['token']);
-			$this->client_address[$cpid]['address_id']=$this->client_address[$cpid]['results']['colliveryPoint_PK'];
+		if (!isset($this->addresses[$address_id])){
+			try{
+				$this->soap_init();
+				$address = $this->soap->get_address($address_id, $this->authenticate['token']);
+				if (is_array($address))
+					$this->addresses[$address_id] = $address['address'];
+				else {
+					$this->log("Error returning address ". $address_id ."! Array expected, recieved: ". $address, 3);
+					return false;
+				}
+			} catch (SoapFault $e){
+				$this->log("Error returning address ". $address_id ."! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
+				return false;
+			}
 		}
-		return $this->client_address[$cpid];
+		return $this->addresses[$address_id];
 	}
 	
-	public function get_client_contact($ctid)
+	/**
+	 * Retrieve all the contacts for a given address
+	 */
+	public function get_address_contacts($address_id)
 	{
-		//if (!isset($this->client_contact[$ctid])){
+		if (!isset($this->address_contact[$address_id])){
+			try{
+				$this->soap_init();
+				$contacts = $this->soap->get_contacts($address_id, $this->authenticate['token']);
+				if (is_array($contacts['contacts']))
+					$this->address_contact[$address_id] = $contacts['contacts'];
+				else {
+					$this->log("Error returning contacts for address ". $address_id ."! Array expected, recieved: ". $address, 3);
+					return false;
+				}
+			} catch (SoapFault $e){
+				$this->log("Error returning contacts for address ". $address_id ."! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
+				return false;
+			}
+		}
+		return $this->address_contact[$address_id];
+	}
+	
+	/**
+	 * Create a new address
+	 */
+	public function add_address($address_data)
+	{
+		try{
 			$this->soap_init();
-			//$this->client_contact = 
-			return $this->soap->getCpContacts($ctid,$this->authenticate['token']);
-		//}
-		//return $this->client_contact;
+			$address_id = $this->soap->add_address($address_data,$this->authenticate['token']);
+			if (isset($address_id['address_id'])&&isset($address_id['contact_id']))
+				return $address_id;
+			else {
+				$this->log("Error creating new address! Recieved: ". print_r($address_id, true), 3);
+				return false;
+			}
+		} catch (SoapFault $e){
+			$this->log("Error creating new address address! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
+			return false;
+		}
 	}
 	
-	public function addAddress($address)
+	public function add_contact($contact_data)
 	{
-		$this->soap_init();
-		return $this->soap->AddAddress($address,$this->authenticate['token']);
+		try{
+			$this->soap_init();
+			$contact_id = $this->soap->add_contact($contact_data,$this->authenticate['token']);
+			if (isset($contact_id['contact_id']))
+				return $contact_id['contact_id'];
+			else {
+				$this->log("Error creating new address contact! Recieved: ". $address, 3);
+				return false;
+			}
+		} catch (SoapFault $e){
+			$this->log("Error creating new address contact! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
+			return false;
+		}
 	}
 	
-	public function addContact($contact)
+	public function validate_collivery($data)
 	{
-		$this->soap_init();
-		return $ctid = $this->soap->AddContact($contact,$this->authenticate['token']);
-	}
-	
-	public function validate($data)
-	{
-		$this->soap_init();
-		$validation = $this->soap->CheckColliveryData($data,$this->authenticate['token']);
-		$validation['pricing'] = $this->soap->GetPricing($validation['results'],$this->authenticate['token']);
-		return $validation;
+		try{
+			$this->soap_init();
+			$validation = $this->soap->validate_collivery($data,$this->authenticate['token']);
+			if (!isset($validation['error'])||!isset($validation['error_id']))
+				return $validation;
+			else {
+				$this->log("Error validating collivery! Recieved: ". $validation, 3);
+				return false;
+			}
+		} catch (SoapFault $e){
+			$this->log("Error validating collivery! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
+			return false;
+		}
 	}
 	
 	public function register_shipping($data)
 	{
-		$this->soap_init();
-		$new_collivery = $this->soap->AddCollivery($data,$this->authenticate['token']);
-		if($new_collivery['results']) {
-			$collivery_id = $new_collivery['results']['collivery_id'];
-			$send_emails = 1;
-			$this->soap->AcceptCollivery($collivery_id,$send_emails,$this->authenticate['token']);
+		try{
+			$this->soap_init();
+			$collivery = $this->soap->add_collivery($data,$this->authenticate['token']);
+			if($collivery['collivery_id']) {
+				$collivery_id = $collivery['collivery_id'];
+				//$send_emails = 1;
+				$accepted = $this->soap->accept_collivery($collivery_id, $this->authenticate['token']);
+				if ($accepted['result'] != "Accepted"){
+					$this->log("Error accepting new collivery! Recieved: ". $accepted, 3);
+					$collivery['error'] = 'Error accepting collivery!';
+				}
+			} else {
+				$this->log("Error adding new collivery! Recieved: ". $collivery, 3);
+				return false;
+			}
+		} catch (SoapFault $e){
+			$this->log("Error creating new collivery! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
+			return false;
 		}
-		return $new_collivery;
+		return $collivery;
 	}
 	
 	public function get_status($collivery_id)
 	{
-		$this->soap_init();
-		$status = $this->soap->getColliveryStatus($collivery_id, $this->authenticate['token']);
-		return $status;
+		try{
+			$this->soap_init();
+			$status = $this->soap->get_collivery_status($collivery_id, $this->authenticate['token']);
+			if (!isset($status['error'])||!isset($status['error_id']))
+				return $status;
+			else {
+				$this->log("Error fetching collivery status! Recieved: ". $status, 3);
+				return false;
+			}
+		} catch (SoapFault $e){
+			$this->log("Error fetching collivery status! SoapFault: ". $e->faultcode ." - ". $e->getMessage(), 2);
+			return false;
+		}
 	}
 
 	/**
@@ -451,6 +581,10 @@ class MDS_Collivery_Model_Carrier_Collivery
 	public function getAllowedMethods()
 	{
 		return array($this -> _code => 'Collivery');
+	}
+	
+	private function log($text, $level = null) {
+		Mage::log($text, $level, 'mds_collivery.log');
 	}
 
 }
