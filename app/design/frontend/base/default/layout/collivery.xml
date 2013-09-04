@@ -14,4 +14,14 @@
 			</action>
 		</reference>
 	</checkout_onepage_index>
+	<customer_address_form>
+		<reference name="head">
+			<action method="addJs">
+				<script>mds/customer_address_form.js</script>
+			</action>
+			<action method="addJs">
+				<script>../collivery/ajax/base</script>
+			</action>
+		</reference>
+	</customer_address_form>
 </layout>
