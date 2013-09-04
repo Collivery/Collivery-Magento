@@ -67,29 +67,32 @@ document.observe('dom:loaded', function() {
 
     function getSuburbs(shipto) {
 
-        var shipto_r = shipto;
+        if ($("region_id").value == ''){
+            $("mds_suburb").update("<option value=\"\">Please select a Town first</option>");
+        } else {
+            var shipto_r = shipto;
 
-        if (shipto === 'billship') {
-            shipto = 'shipping';
-            shipto_r = 'billing';
+            if (shipto === 'billship') {
+                shipto = 'shipping';
+                shipto_r = 'billing';
+            }
+            $(shipto + ":mds_suburb").update("<option value=\"\">Loading...</option>");
+
+            var data = {
+                town : $(shipto_r + ":region_id").getSelectedOptionHTML(),
+            };
+
+            new Ajax.Request(BASE_URL + 'collivery/ajax/suburb', {
+                method: 'post',
+                parameters: data,
+                onSuccess: function (transport) {
+                    var response = transport.responseText || "<option>Error, Please try again</option>";
+                    $(shipto + ":mds_suburb").update(response);
+                    mds_suburb_change($(shipto + ":mds_suburb"), shipto);
+                },
+                onFailure: function () { $(shipto + ":mds_suburb").update("<option>Error, Please try again</option>"); }
+            });
         }
-        $(shipto + ":mds_suburb").update("<option value=\"\">Loading...</option>");
-
-        var data = {
-            town : $(shipto_r + ":region_id").getSelectedOptionHTML(),
-        };
-
-        new Ajax.Request(BASE_URL + 'collivery/ajax/suburb', {
-            method: 'post',
-            parameters: data,
-            onSuccess: function (transport) {
-                var response = transport.responseText || "<option>Error, Please try again</option>";
-                $(shipto + ":mds_suburb").update(response);
-                mds_suburb_change($(shipto + ":mds_suburb"), shipto);
-            },
-            onFailure: function () { $(shipto + ":mds_suburb").update("<option>Error, Please try again</option>"); }
-        });
-
     }
 
     function getCPTypes(shipto) {
@@ -108,6 +111,7 @@ document.observe('dom:loaded', function() {
 
     function setZA(shipto) {
         setFields(shipto);
+        getSuburbs(shipto);
         getCPTypes(shipto);
     }
 
