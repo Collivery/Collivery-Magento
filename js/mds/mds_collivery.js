@@ -67,15 +67,16 @@ document.observe('dom:loaded', function() {
 
     function getSuburbs(shipto) {
 
-        if ($("region_id").value == ''){
-            $("mds_suburb").update("<option value=\"\">Please select a Town first</option>");
-        } else {
-            var shipto_r = shipto;
+        var shipto_r = shipto;
 
-            if (shipto === 'billship') {
-                shipto = 'shipping';
-                shipto_r = 'billing';
-            }
+        if (shipto === 'billship') {
+            shipto = 'shipping';
+            shipto_r = 'billing';
+        }
+
+        if ($(shipto_r + ":region_id").value == ''){
+            $(shipto + ":mds_suburb").update("<option value=\"\">Please select a Town first</option>");
+        } else {
             $(shipto + ":mds_suburb").update("<option value=\"\">Loading...</option>");
 
             var data = {
