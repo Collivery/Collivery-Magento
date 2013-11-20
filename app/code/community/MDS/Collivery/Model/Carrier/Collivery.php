@@ -81,7 +81,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 		
 		foreach ($services as $key => $value) {
 			// Get Shipping Estimate for current service
-			$i=$this->get_shipping_estimate($town, $cptypes, $key, $cart['weight']);
+			$i=$this->get_shipping_estimate($town, $cptypes, $key, $cart);
 			if ($i>1){
 				// Create Response Array
 				$response[] =
@@ -203,7 +203,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 	 * 
 	 * @return int Estimate
 	 */
-	function get_shipping_estimate($town_brief, $town_type, $service_type, $weight)
+	function get_shipping_estimate($town_brief, $town_type, $service_type, $cart)
 	{
 		// Create MDS Data Array
 		$data = array (
@@ -213,7 +213,9 @@ class MDS_Collivery_Model_Carrier_Collivery
 				'to_town_id' => $town_brief,
 				'service' => $service_type,
 				'cover' => 1,
-				'weight' => $weight,
+				'parcel_count' => $cart['count'],
+				'weight' => $cart['weight'],
+				'parcels' => $cart['parcels'],
 			);
 		// If Location Type is set, add it to the array
 		if ((isset($town_type)) && ($town_type!="NA"))
