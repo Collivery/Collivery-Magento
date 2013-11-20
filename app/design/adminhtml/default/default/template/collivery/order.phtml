@@ -7,27 +7,27 @@ if (!isset($mds_waybill)) {
 			$data=json_decode($validation, TRUE);
 			$new_col = $this->collivery->register_shipping($data);
 			$waybill = $new_col['collivery_id'];
-			
+
 			$this->address->setMds_waybill($waybill);
 			$this->address->save();
-			
+
 			$this->completeShipment($waybill);
 			echo "Shipping registered successfully. Waybill Number: ". $waybill;
 		} else {
 			$address = $this->getAddress();
 			$contact = $this->getContact();
-			
+
 			$cptypes = $this->collivery->get_location_types();
 			$towns = $this->collivery->get_towns();
 			$town = $this->collivery->get_code($towns, $this->address->getRegion());
 			$suburbs = $this->collivery->get_suburbs($town);
 			$my_info=$this->collivery->get_my_info();
-			
+
 			if ( isset( $_POST['mds_add_client'] ) && $_POST['mds_add_client'] ) {
 				$client_info = $this->addClient($address, $contact);
 				$validation = $this->validate($client_info, $my_info);
 			}
-			
+
 			if(isset($_POST['override_num_packages']) && $_POST['override_num_packages']){
 				$raw_data = stripslashes($_POST['validation']);
 				$data=json_decode($raw_data, TRUE);
@@ -46,11 +46,11 @@ if (!isset($mds_waybill)) {
 				.red {
 					color: red;
 				}
-				
+
 				.button:disabled{
 					background: #555555;
 				}
-				
+
 				.modalbox {
 					color: #333;
 					display: none;
@@ -66,7 +66,7 @@ if (!isset($mds_waybill)) {
 					z-index:1001;
 					overflow: auto;
 				}
-				
+
 				#overlay{
 					display:none;
 					position:absolute;
@@ -80,7 +80,7 @@ if (!isset($mds_waybill)) {
 					opacity:.80;
 					filter: alpha(opacity=80);
 				}
-				
+
 				.modalbox[id]{ /* IE6 and below Can't See This */    position:fixed;    }#overlay[id]{ /* IE6 and below Can't See This */    position:fixed;    }
 			</style>
 			<h1>Confirm Shipping Information</h1>
@@ -174,13 +174,13 @@ if (!isset($mds_waybill)) {
 					</tr>
 				</table>
 			</div>
-			<?php 
-			
+			<?php
+
 			if (isset($client_info['message']))
 				foreach ($client_info['message'] as $message) {
 					echo $message;
 				}
-			
+
 			if(isset($validation)): ?>
 				<h2>Validated Information</h2>
 				<table>

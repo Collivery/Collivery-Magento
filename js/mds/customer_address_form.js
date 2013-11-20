@@ -38,7 +38,7 @@ document.observe('dom:loaded', function() {
         '</li>';
         $("street_1").up(1).insert({before: building_html});
 
-        var cptypes_html = 
+        var cptypes_html =
         '<div class="mds field">' +
         '	<label class="required" for="mds_cptypes"><em>*</em>Location Type</label>' +
         '	<div class="input-box">' +
@@ -49,7 +49,7 @@ document.observe('dom:loaded', function() {
         '</div>';
         $("city").up(2).insert({bottom: cptypes_html});
 
-        var towns_html = 
+        var towns_html =
         '<div class="mds field" style="display: none;">' +
         '	<div class="input-box">' +
         '		<input name="mds_town" id="mds_town" value="" class="input-text required-entry" type="text">' +
@@ -59,11 +59,11 @@ document.observe('dom:loaded', function() {
     }
 
     function getSuburbs() {
-        
+
         if ($("region_id").value == ''){
             $("mds_suburb").update("<option value=\"\">Please select a Town first</option>");
         } else {
-        
+
             $("mds_suburb").update("<option value=\"\">Loading...</option>");
 
             var data = {

@@ -45,7 +45,7 @@
 	</global>
 	<global>
 		<fieldsets>
-			
+
 			<sales_copy_order_billing_address>
 				<mds_cptype>
 					<to_order>*</to_order>
@@ -54,7 +54,7 @@
 					<to_order>*</to_order>
 				</mds_building>
 			</sales_copy_order_billing_address>
-			
+
 			<sales_copy_order_shipping_address>
 				<mds_cptype>
 					<to_order>*</to_order>
@@ -63,7 +63,7 @@
 					<to_order>*</to_order>
 				</mds_building>
 			</sales_copy_order_shipping_address>
-			
+
 			<sales_convert_order_address>
 				<mds_cptype>
 					<to_quote_address>*</to_quote_address>
@@ -72,7 +72,7 @@
 					<to_quote_address>*</to_quote_address>
 				</mds_building>
 			</sales_convert_order_address>
-			
+
 			<sales_convert_quote_address>
 				<mds_cptype>
 					<to_order_address>*</to_order_address>
@@ -83,7 +83,7 @@
 					<to_customer_address>*</to_customer_address>
 				</mds_building>
 			</sales_convert_quote_address>
-			
+
 			<customer_address>
 				<mds_cptype>
 					<to_quote_address>*</to_quote_address>
@@ -92,7 +92,7 @@
 					<to_quote_address>*</to_quote_address>
 				</mds_building>
 			</customer_address>
-			
+
 			<checkout_onepage_billing>
 				<mds_cptype>
 					<to_customer>*</to_customer>
@@ -101,7 +101,7 @@
 					<to_customer>*</to_customer>
 				</mds_building>
 			</checkout_onepage_billing>
-			
+
 		</fieldsets>
 	</global>
 	<default>

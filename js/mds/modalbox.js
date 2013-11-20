@@ -71,11 +71,11 @@ lightbox.prototype = {
 
 	yPos : 0,
 	xPos : 0,
-	
+
 	initialize: function(id) {
 		this.content = id;
 	},
-	
+
 	// Turn everything on - mainly the IE fixes
 	activate: function(){
 		if (browser == 'Internet Explorer'){
@@ -86,18 +86,18 @@ lightbox.prototype = {
 		}
 		this.displayLightbox("block");
 	},
-	
+
 	// Ie requires height to 100% and overflow hidden or else you can scroll down past the lightbox
 	prepareIE: function(height, overflow){
 		bod = document.getElementsByTagName('body')[0];
 		bod.style.height = height;
 		bod.style.overflow = overflow;
-  
+
 		htm = document.getElementsByTagName('html')[0];
 		htm.style.height = height;
-		htm.style.overflow = overflow; 
+		htm.style.overflow = overflow;
 	},
-	
+
 	// In IE, select elements hover on top of the lightbox
 	hideSelects: function(visibility){
 		selects = document.getElementsByTagName('select');
@@ -105,27 +105,27 @@ lightbox.prototype = {
 			selects[i].style.visibility = visibility;
 		}
 	},
-	
+
 	// Taken from lightbox implementation found at http://www.huddletogether.com/projects/lightbox/
 	getScroll: function(){
 		if (self.pageYOffset) {
 			this.yPos = self.pageYOffset;
 		} else if (document.documentElement && document.documentElement.scrollTop){
-			this.yPos = document.documentElement.scrollTop; 
+			this.yPos = document.documentElement.scrollTop;
 		} else if (document.body) {
 			this.yPos = document.body.scrollTop;
 		}
 	},
-	
+
 	setScroll: function(x, y){
-		window.scrollTo(x, y); 
+		window.scrollTo(x, y);
 	},
-	
+
 	displayLightbox: function(display){
 		$('overlay').style.display = display;
 		$(this.content).style.display = display;
 	},
-	
+
 	// Example of creating your own functionality once lightbox is initiated
 	deactivate: function(){
 		if (browser == "Internet Explorer"){
@@ -133,7 +133,7 @@ lightbox.prototype = {
 			this.prepareIE("auto", "auto");
 			this.hideSelects("visible");
 		}
-		
+
 		this.displayLightbox("none");
 	}
 }

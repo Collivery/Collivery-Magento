@@ -47,7 +47,7 @@ if you need any additional information.
  - ~~Save ID's in order~~
  - Save ID's in clients address
  - ~~Hash info and check/store hashes in a table.~~
- 
+
 <h4>Documentation</h4>
 - Update Documentation for backend usage
 
@@ -57,7 +57,7 @@ if you need any additional information.
 
 <h3>MDS Web Service</h3>
 
-This plugin makes use of MDS Collivery WSDL. 
+This plugin makes use of MDS Collivery WSDL.
 Please refer to the following document for more information on their API:
 [http://www.collivery.co.za/images/stories/webservice/ColliveryWSDL.pdf](http://www.collivery.co.za/images/stories/webservice/ColliveryWSDL.pdf "Web Service Development Guide")
 

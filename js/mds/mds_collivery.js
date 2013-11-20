@@ -45,7 +45,7 @@ document.observe('dom:loaded', function() {
         '</li>';
         $(shipto + ":street1").up(1).insert({before: building_html});
 
-        var cptypes_html = 
+        var cptypes_html =
         '<div class="mds-' + shipto + ' field">' +
         '	<label class="required" for="' + shipto + ':mds_cptypes"><em>*</em>Location Type</label>' +
         '	<div class="input-box">' +
@@ -56,7 +56,7 @@ document.observe('dom:loaded', function() {
         '</div>';
         $(shipto + ":city").up(2).insert({bottom: cptypes_html});
 
-        var towns_html = 
+        var towns_html =
         '<div class="mds-' + shipto + ' field" style="display: none;">' +
         '	<div class="input-box">' +
         '		<input name="' + shipto + '[mds_town]" id="' + shipto + ':mds_town" value="" class="input-text required-entry" type="text">' +

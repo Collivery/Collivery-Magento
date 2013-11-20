@@ -72,43 +72,43 @@ function addParcel() {
         length = $('length').value;
     else
         length = 0;
-        
+
     if (isNumber($('width').value))
         width = $('width').value;
     else
         width = 0;
-    
+
     if (isNumber($('height').value))
         height = $('height').value;
     else
         height = 0;
-    
+
     if (isNumber($('weight').value))
         weight = $('weight').value;
     else
         weight = 0;
-    
+
     if (isNumber($('qty').value))
         qty = $('qty').value;
     else
         qty = 0;
-    
+
     parcelAI++;
     parcels['parcel_' + parcelAI] = {length: length, width: width, height: height, weight: weight, qty: qty};
     addParcelToTable (length, width, height, weight, qty);
 }
 
 function addParcelToTable(length, width, height, weight, qty) {
-    $$('#parcels tr:nth-last-child(2)').first().insert({after:'<tr class="parcel" id="parcel_' + parcelAI +'"><td>' + 
-        length + 
-        '</td><td>' + 
-        width + 
-        '</td><td>' + 
-        height + 
-        '</td><td>' + 
-        weight + 
-        '</td><td>' + 
-        qty + 
+    $$('#parcels tr:nth-last-child(2)').first().insert({after:'<tr class="parcel" id="parcel_' + parcelAI +'"><td>' +
+        length +
+        '</td><td>' +
+        width +
+        '</td><td>' +
+        height +
+        '</td><td>' +
+        weight +
+        '</td><td>' +
+        qty +
         '</td><td><button onclick=\"deleteParcel(this);\" class=\"button\">Delete</button></td></tr>'});
     updateTotals();
 }

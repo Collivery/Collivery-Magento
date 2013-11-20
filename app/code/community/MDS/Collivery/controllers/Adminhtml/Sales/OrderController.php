@@ -9,7 +9,7 @@ class MDS_Collivery_Adminhtml_Sales_OrderController extends Mage_Adminhtml_Sales
 		$this->_title($this->__('Sales'))->_title($this->__('Orders'))->_title($this->__('MDS Collivery'));
 		if ($order = $this->_initOrder()) {
 			$this->_initAction();
-			
+
 			$this->renderLayout();
 		}
 	}

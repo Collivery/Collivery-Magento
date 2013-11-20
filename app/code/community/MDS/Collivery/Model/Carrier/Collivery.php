@@ -15,10 +15,10 @@ class MDS_Collivery_Model_Carrier_Collivery
 	// Protected Cached MDS Variables
 	protected $soap, $authenticate, $towns, $suburbs, $location_types,
 	$client_address, $my_address, $addresses, $address_contact;
-	
+
 	/**
 	 * Setup Soap Connection if not already active
-	 * 
+	 *
 	 * @return Soap Authentication
 	 */
 	private function soap_init()
@@ -33,7 +33,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 			$authenticate = $this->soap->authenticate(Mage::helper('core')->decrypt($this->getConfigData('mds_user')), Mage::helper('core')->decrypt($this->getConfigData('mds_pass')), @$_SESSION['token'], $info);
 			// Save Authentication token in session to identify the user again later
 			$_SESSION['token'] = $authenticate['token'];
-		
+
 			if(!$authenticate['token']) {
 				exit("Authentication Error : ".$authenticate['access']);
 			}
@@ -59,15 +59,15 @@ class MDS_Collivery_Model_Carrier_Collivery
 		// Get custom MDS fields from Checkout
 		$checkout_session = Mage::getSingleton('checkout/session');
 		$shipping_address = $checkout_session->getQuote()->getShippingAddress();
-		
+
 		$ship2billing = $shipping_address->getData('same_as_billing');
 		$town = $this->get_code($this->get_towns(),$shipping_address->getRegion());
-		
+
 		// Skip if no values from Custom Fields recieved
 		if (!isset($town)||$town==""||$town=="NA"){
 			return FALSE;
 		}
-		
+
 		$cptypes = $shipping_address->getMds_cptype();
 
 		// Get cart items and put them in an Array or quit
@@ -75,10 +75,10 @@ class MDS_Collivery_Model_Carrier_Collivery
 		if ($items)
 			$cart = $this->get_cart_content($items);
 		else return false;
-		
+
 		// Get Available services from MDS
 		$services = $this->get_services();
-		
+
 		foreach ($services as $key => $value) {
 			// Get Shipping Estimate for current service
 			$i=$this->get_shipping_estimate($town, $cptypes, $key, $cart);
@@ -117,19 +117,19 @@ class MDS_Collivery_Model_Carrier_Collivery
 			// Add this rate to the result
 			$result -> append($method);
 		}
-		
+
 		return $result;
 	}
 
 	/**
 	 * Create array with cart content for MDS
-	 * 
+	 *
 	 * @param Cart Items
 	 * @return MDS Formatted Array with Cart Info
 	 */
 	function get_cart_content($items)
 	{
-	
+
 		// Reset array to defaults
 		$cart = array(
 				'count' => 0,
@@ -149,17 +149,17 @@ class MDS_Collivery_Model_Carrier_Collivery
 					if ($child->getFreeShipping() && !$child->getProduct()->isVirtual()) {
 						$product_id = $child->getProductId();
 						$productObj = Mage::getModel('catalog/product')->load($product_id);
-						
+
 						// Get info from product
 						$qty = $child->getQty();
 						$weight = $child->getWeight();
 						$width = $productObj->getData($this->getConfigData('widthLabel'));
 						$length = $productObj->getData($this->getConfigData('lengthLabel'));
 						$height = $productObj->getData($this->getConfigData('heightLabel'));
-						
+
 						$cart['count'] += $qty;
 						$cart['weight'] += $weight * $qty;
-						
+
 						for ($i=0; $i<$qty; $i++)
 							$cart['parcels'][] = array(
 									'length' => $length,
@@ -173,19 +173,19 @@ class MDS_Collivery_Model_Carrier_Collivery
 			} else {
 				$product_id = $item->getProductId();
 				$productObj = Mage::getModel('catalog/product')->load($product_id);
-				
+
 				// Get info from product
 				$qty = $item->getQty();
 				if (!isset($qty)) $qty = $item->getQtyOrdered();
-				
+
 				$weight = $item->getWeight();
 				$width = $productObj->getData($this->getConfigData('widthLabel'));
 				$length = $productObj->getData($this->getConfigData('lengthLabel'));
 				$height = $productObj->getData($this->getConfigData('heightLabel'));
-				
+
 				$cart['count'] += $qty;
 				$cart['weight'] += $weight * $qty;
-				
+
 				for ($i=0; $i<$qty; $i++)
 					$cart['parcels'][] = array(
 							'length' => $length,
@@ -200,7 +200,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 
 	/**
 	 * Get a shipping cost estimate from MDS based on current data.
-	 * 
+	 *
 	 * @return int Estimate
 	 */
 	function get_shipping_estimate($town_brief, $town_type, $service_type, $cart)
@@ -220,17 +220,17 @@ class MDS_Collivery_Model_Carrier_Collivery
 		// If Location Type is set, add it to the array
 		if ((isset($town_type)) && ($town_type!="NA"))
 			$data['to_town_type'] = $town_type;
-		
+
 		$price = $this->get_price($data);
 		if (is_array($price))
 			return $price['inc_vat'];
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Find key in Array with label as value
-	 * 
+	 *
 	 * @param array
 	 * @param string Label
 	 * @return key|bool
@@ -244,29 +244,29 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return false;
 	}
-	
+
 	/****************************
-	 * 
+	 *
 	 * MDS Specific functions
-	 * 
+	 *
 	 ****************************/
-	
+
 	/**
 	 * Retrieve list of available Services from MDS
-	 * 
+	 *
 	 * @return Array
 	 */
-	
+
 	function get_services()
 	{
 		/* Uncomment the following lines of code if you'd like to edit/remove any services.
-		 * 
+		 *
 		 * 1: Overnight Before 10:00
 		 * 2: Overnight Before 16:00
 		 * 5: Road Freight Express
 		 * 3: Road Freight
 		 */
-		
+
 		/*return array(
 				1 => "Overnight Before 10:00", // 1: Overnight Before 10:00
 				2 => "Overnight before 16:00", // 2: Overnight Before 16:00
@@ -274,7 +274,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 				3 => "Road Freight" //            3: Road Freight
 			);
 		*/
-		
+
 		if (!isset($this->services))
 		{
 			try{
@@ -293,10 +293,10 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $this->services;
 	}
-	
+
 	/**
 	 * Retrieve list of Towns from MDS
-	 * 
+	 *
 	 * @return Array
 	 */
 	public function get_price($data)
@@ -316,10 +316,10 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $this->towns;
 	}
-	
+
 	/**
 	 * Retrieve list of Towns from MDS
-	 * 
+	 *
 	 * @return Array
 	 */
 	public function get_towns()
@@ -342,10 +342,10 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $this->towns;
 	}
-	
+
 	/**
 	 * Retrieve list of Suburbs from MDS
-	 * 
+	 *
 	 * @param string Town Name
 	 * @param int Mode - 0: Return Array, 1: Return result, 2: Get town code and Return Array, 3: Get town code and Return Result
 	 * @return Array
@@ -357,7 +357,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 		} else {
 			$town_code = $town;
 		}
-		
+
 		if (!isset($this->suburbs[$town_code]))
 		{
 			try{
@@ -376,10 +376,10 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $this->suburbs[$town_code];
 	}
-	
+
 	/**
 	 * Retrieve list of CPTypes (Building types) from MDS
-	 * 
+	 *
 	 * @param Array
 	 */
 	public function get_location_types()
@@ -402,10 +402,10 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $this->location_types;
 	}
-	
+
 	/**
 	 * Retrieve default address for authenticated account
-	 * 
+	 *
 	 * @return Array
 	 */
 	public function get_my_address()
@@ -416,7 +416,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $this->my_address;
 	}
-	
+
 	public function get_my_info()
 	{
 		if (!isset($this->my_info)){
@@ -432,10 +432,10 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $this->my_info;
 	}
-	
+
 	/**
 	 * Retrieve Client Address
-	 * 
+	 *
 	 * @param string Client ID
 	 * @return Array
 	 */
@@ -458,7 +458,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $this->addresses[$address_id];
 	}
-	
+
 	/**
 	 * Retrieve all the contacts for a given address
 	 */
@@ -481,7 +481,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $this->address_contact[$address_id];
 	}
-	
+
 	/**
 	 * Create a new address
 	 */
@@ -501,7 +501,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 			return false;
 		}
 	}
-	
+
 	public function add_contact($contact_data)
 	{
 		try{
@@ -518,7 +518,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 			return false;
 		}
 	}
-	
+
 	public function validate_collivery($data)
 	{
 		try{
@@ -535,7 +535,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 			return false;
 		}
 	}
-	
+
 	public function register_shipping($data)
 	{
 		try{
@@ -559,7 +559,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 		}
 		return $collivery;
 	}
-	
+
 	public function get_status($collivery_id)
 	{
 		try{
@@ -584,7 +584,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 	{
 		return array($this -> _code => 'Collivery');
 	}
-	
+
 	private function log($text, $level = null) {
 		Mage::log($text, $level, 'mds_collivery.log');
 	}

@@ -5,22 +5,22 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 	public $order;
 	public $address;
 	public $collivery;
-	
+
 	protected function _construct()
 	{
 		parent::_construct();
 		$this->setTemplate( 'collivery/order.phtml' );
-		
+
 		$this->order = $this->getOrder();
 		$this->address = $this->order->getShippingAddress();
 		$this->collivery = Mage::getModel('mds_collivery/carrier_collivery');
 	}
-	
+
 	public function getOrder()
 	{
 		return Mage::registry( 'current_order' );
 	}
-	
+
 	public function validate($client_info, $my_info)
 	{
 		$shipping_method = $this->order->shipping_method;
@@ -40,16 +40,16 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 
 		return $this->collivery->validate_collivery($collivery_data);
 	}
-	
+
 	public function getAddressId($address, $contact)
 	{
 		$results = array();
-		
+
 		$client_address_id = $this->address->getMds_address_id();
 		$client_address_hash = $this->address->getMds_address_hash();
 		if (isset($client_address_id)&&$client_address_hash==md5(implode(',', $address)))
 		{
-			
+
 			$results['address_id'] = $client_address_id;
 			$results['message'] = "<p class=\"green\"><strong>Address already added, using previous ID</strong></p>";
 		} else {
@@ -69,7 +69,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 					$results['contact_id'] = $address_id['contact_id'];
 				}
 				$this->address->save();
-				
+
 				$results['address_id'] = $address_id['address_id'];
 				$results['message'] = "<p class=\"green\"><strong>Address $contact_text Successfully added to Collivery</strong></p>";
 			}
@@ -80,7 +80,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 	public function getContactId($contact)
 	{
 		$results = array();
-		
+
 		$client_contact_id = $this->address->getMds_contact_id();
 		$client_contact_hash = $this->address->getMds_contact_hash();
 		if (isset($client_contact_id)&&$client_contact_hash==md5(implode(',', $contact)))
@@ -102,13 +102,13 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 		}
 		return $results;
 	}
-	
+
 	public function addClient($address, $contact)
 	{
 		$results = array();
-		
+
 		$address_id = $this->getAddressId($address, $contact);
-		
+
 		if(isset($address_id['error'])) {
 			$error['error'] = $address_id['error'];
 			return $error;
@@ -116,7 +116,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 			$contact['address_id'] = $address_id['address_id'];
 			$results['address_id'] = $address_id['address_id'];
 			$results['message'][]=$address_id['message'];
-			
+
 			if(isset($address_id['contact_id'])){
 				$results['contact_id'] = $address_id['contact_id'];
 			} else {
@@ -132,17 +132,17 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 			return $results;
 		}
 	}
-	
+
 	public function getAddress()
 	{
 		$cptype = $this->address->getMds_cptype();
-		
+
 		$town = $this->collivery->get_code($this->collivery->get_towns(), $this->address->getRegion());
-		
+
 		$suburb = $this->collivery->get_code($this->collivery->get_suburbs($town), $this->address->getCity());
-		
+
 		$street = $this->address->getStreet();
-		
+
 		return array(
 			'company_name'=>$this->address->getCompany(),
 			'location_type'=>$cptype,
@@ -155,7 +155,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 			'email'=>$this->address->getEmail(),
 			);
 	}
-	
+
 	public function getContact()
 	{
 		return array(
@@ -164,7 +164,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 			'email'=>$this->address->getEmail(),
 			);
 	}
-	
+
 	/**
 	 * Completes the Shipment, followed by completing the Order life-cycle
 	 * It is assumed that the Invoice has already been generated
@@ -177,23 +177,23 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 		 * which will be sent out by any warehouse to Magento
 		 */
 		$shipmentTrackingNumber = $waybill;
-	
+
 		/**
 		 * This can be blank also.
 		 */
 		$customerEmailComments = '';
-		
+
 		$order = $this->getOrder();
-	
+
 		if (!$order->getId()) {
 			Mage::throwException("Error loading Order.");
 		}
-	
+
 		if ($order->canShip()) {
 			try {
 				$shipment = Mage::getModel('sales/service_order', $order)
 								->prepareShipment($this->_getItemQtys($order));
-	
+
 				/**
 				 * Carrier Codes can be like "ups" / "fedex" / "custom",
 				 * but they need to be active from the System Configuration area.
@@ -202,22 +202,22 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 				 */
 				$shipmentCarrierCode = 'Collivery';
 				$shipmentCarrierTitle = 'MDS Collivery';
-	
+
 				$arrTracking = array(
 					'carrier_code' => isset($shipmentCarrierCode) ? $shipmentCarrierCode : $order->getShippingCarrier()->getCarrierCode(),
 					'title' => isset($shipmentCarrierTitle) ? $shipmentCarrierTitle : $order->getShippingCarrier()->getConfigData('title'),
 					'number' => $shipmentTrackingNumber,
 				);
-	
+
 				$track = Mage::getModel('sales/order_shipment_track')->addData($arrTracking);
 				$shipment->addTrack($track);
-	
+
 				// Register Shipment
 				$shipment->register();
-	
+
 				// Save the Shipment
 				$this->_saveShipment($shipment, $order, $customerEmailComments);
-	
+
 				// Finally, Save the Order
 				$this->_saveOrder($order);
 			} catch (Exception $e) {
@@ -225,7 +225,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 			}
 		}
 	}
-	
+
 	/**
 	 * Get the Quantities shipped for the Order, based on an item-level
 	 * This method can also be modified, to have the Partial Shipment functionality in place
@@ -236,7 +236,7 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 	protected function _getItemQtys(Mage_Sales_Model_Order $order)
 	{
 		$qty = array();
-	
+
 		foreach ($order->getAllItems() as $_eachItem) {
 			if ($_eachItem->getParentItemId()) {
 				$qty[$_eachItem->getParentItemId()] = $_eachItem->getQtyOrdered();
@@ -244,10 +244,10 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 				$qty[$_eachItem->getId()] = $_eachItem->getQtyOrdered();
 			}
 		}
-	
+
 		return $qty;
 	}
-	
+
 	/**
 	 * Saves the Shipment changes in the Order
 	 *
@@ -262,16 +262,16 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 							   ->addObject($shipment)
 							   ->addObject($order)
 							   ->save();
-	
+
 		$emailSentStatus = $shipment->getData('email_sent');
 		if (!is_null($emailSentStatus) && !$emailSentStatus) {
 			$shipment->sendEmail(true, $customerEmailComments);
 			$shipment->setEmailSent(true);
 		}
-	
+
 		return $this;
 	}
-	
+
 	/**
 	 * Saves the Order, to complete the full life-cycle of the Order
 	 * Order status will now show as Complete
@@ -282,9 +282,9 @@ class MDS_Collivery_Block_Adminhtml_Sales_Order_Collivery extends Mage_Adminhtml
 	{
 		$order->setData('state', Mage_Sales_Model_Order::STATE_COMPLETE);
 		$order->setData('status', Mage_Sales_Model_Order::STATE_COMPLETE);
-	
+
 		$order->save();
-	
+
 		return $this;
 	}
 }
