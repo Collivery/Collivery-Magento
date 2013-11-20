@@ -59,7 +59,7 @@ if you need any additional information.
 
 This plugin makes use of MDS Collivery WSDL.
 Please refer to the following document for more information on their API:
-[http://www.collivery.co.za/images/stories/webservice/ColliveryWSDL.pdf](http://www.collivery.co.za/images/stories/webservice/ColliveryWSDL.pdf "Web Service Development Guide")
+[http://www.collivery.co.za/wsdocs](http://www.collivery.co.za/wsdocs "MDS Collivery API Developers Manual")
 
 License
 --------
