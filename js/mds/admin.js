@@ -94,7 +94,7 @@ function addParcel() {
         qty = 0;
     
     parcelAI++;
-    parcels['parcel_' + parcelAI] = {length: length, width: width, height: height, weight: weight, qty: qty}
+    parcels['parcel_' + parcelAI] = {length: length, width: width, height: height, weight: weight, qty: qty};
     addParcelToTable (length, width, height, weight, qty);
 }
 
