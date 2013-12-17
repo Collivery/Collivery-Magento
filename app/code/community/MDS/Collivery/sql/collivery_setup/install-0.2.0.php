@@ -3,18 +3,27 @@
 // Prevent caching of the wsdl
 $options = array('cache_wsdl' => WSDL_CACHE_NONE);
 // Start Soap Client
-$soap = new SoapClient("http://www.collivery.co.za/webservice_v2.php?wsdl", $options);
+try{
+	$soap = new SoapClient("http://www.collivery.co.za/wsdl/v2");
+} catch (SoapFault $e) {
+	exit('Error starting soap client!');
+}
+// Plugin and Host information
+$info = array('name' => 'Magento Shipping Module Installer by MDS Collivery', 'version'=> (string) Mage::getConfig()->getNode()->modules->MDS_Collivery->version, 'host'=> 'Magento '. (string) Mage::getVersion());
 // Authenticate
-$authenticate = $soap->Authenticate('demo@collivery.co.za', 'demo', '');
-
+try{
+	$authenticate = $soap->authenticate('demo@collivery.co.za', 'demo', '', $info);
+} catch (SoapFault $e) {
+	exit('Error authenticating to MDS Webserver!');
+}
 if(!$authenticate['token']) {
 	exit("Authentication Error : ".$authenticate['access']);
 }
 
-$towns = $soap->getTowns($authenticate['token']);
+$towns = $soap->get_towns($authenticate['token']);
 $town_sql = '';
 
-foreach ($towns['results'] as $key => $value) {
+foreach ($towns['towns'] as $key => $value) {
 	$town_sql .= "('ZA', '". addslashes($key) ."', '". addslashes($value) ."'),";
 }
 // Replace last ',' with ';'
