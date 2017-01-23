@@ -46,11 +46,20 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</mds_pass>
+						<risk_cover translate="label">
+							<label>Risk Cover</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>5</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>1</show_in_store>
+						</risk_cover>
 						<markup translate="label">
 							<label>Percentage Markup</label>
 							<frontend_type>text</frontend_type>
 							<validate>validate-number</validate>
-							<sort_order>5</sort_order>
+							<sort_order>6</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
