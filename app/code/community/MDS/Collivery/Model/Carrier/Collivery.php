@@ -2,7 +2,7 @@
 
 /**
  * MDS Collivery Shipping Module
- * URL: https://github.com/Xethron/magento-mds-collivery
+ * URL: https://github.com/Collivery/Collivery-Magento
  */
 class MDS_Collivery_Model_Carrier_Collivery
 	extends Mage_Shipping_Model_Carrier_Abstract
@@ -212,7 +212,7 @@ class MDS_Collivery_Model_Carrier_Collivery
 				'collivery_from' => $this->authenticate['default_address_id'],
 				'to_town_id' => $town_brief,
 				'service' => $service_type,
-				'cover' => 1,
+				'cover' => $this->getConfigData('risk_cover'),
 				'parcel_count' => $cart['count'],
 				'weight' => $cart['weight'],
 				'parcels' => $cart['parcels'],
