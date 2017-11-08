@@ -51,7 +51,7 @@ if you need any additional information.
 - [ ] Update Documentation for backend usage
 
 <h4>API</h4>
-- [ ] Move to MDS Webservice V2
+- [x] Move to MDS Webservice V2
 
 <h3>MDS Web Service</h3>
 
