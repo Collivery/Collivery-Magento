@@ -29,7 +29,7 @@ Development Information
 This plugin is still in development.
 If you are a developer, you are most welcome to contribute to its development or check back at a later stage.
 You can also get in touch with us through email at 
-[support@collivery.co.za](mailto:support@collivery.co.za)
+[integration@collivery.co.za](mailto:integration@collivery.co.za)
 if you need any additional information.
 
 <h3>To Do</h3>
