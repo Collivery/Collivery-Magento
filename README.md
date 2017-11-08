@@ -35,11 +35,13 @@ if you need any additional information.
 <h3>To Do</h3>
 
 <h4>Frontend</h4>
+
 - [ ] Allow users to track their orders
 - [x] Add additional fields to checkout page (Location Type, Building Details)
 - [x] Validate Address/Add populated fields to Checkout Page
 
 <h4>Backend</h4>
+
 - [ ] Add shipment/tracking info to order and mark order as shipped/completed
 - [x] Start with Admin Backend
 - [ ] Save Client/Address ID for next time
@@ -48,9 +50,11 @@ if you need any additional information.
 - [x] Hash info and check/store hashes in a table.
 
 <h4>Documentation</h4>
+
 - [ ] Update Documentation for backend usage
 
 <h4>API</h4>
+
 - [x] Move to MDS Webservice V2
 
 <h3>MDS Web Service</h3>
