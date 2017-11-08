@@ -18,7 +18,7 @@ Shipping won't be available for products without dimensions.
 
 <h3>For Developers</h3>
 If you are a developer and need the install file to run a second time without changing the version,
-in your Magento Database, just delete code `collivery_setup` from table `core_resource` or excecute:
+in your Magento Database, just delete code `collivery_setup` from table `core_resource` or execute:
 
 ``DELETE FROM `core_resource` WHERE `code` = 'collivery_setup';``
 
@@ -26,40 +26,38 @@ Remember to Refresh your cache to run the install!
 
 Development Information
 -----------------------
-
-This plugin is still in development and nearing completion.
+This plugin is still in development.
 If you are a developer, you are most welcome to contribute to its development or check back at a later stage.
-You can also get in touch with me through my website at
-[http://www.xethron.co.za/feedback](http://www.xethron.co.za/feedback/ "Xethron's Blog")
+You can also get in touch with us through email at 
+[support@collivery.co.za](mailto:support@collivery.co.za)
 if you need any additional information.
 
 <h3>To Do</h3>
 
 <h4>Frontend</h4>
-- Allow users to track their orders
-- ~~Add additional fields to checkout page (Location Type, Building Details)~~
-- ~~Validate Address/Add populated fields to Checkout Page~~
+- [ ] Allow users to track their orders
+- [x] Add additional fields to checkout page (Location Type, Building Details)
+- [x] Validate Address/Add populated fields to Checkout Page
 
 <h4>Backend</h4>
-- Add shipment/tracking info to order and mark order as shipped/compleated
-- ~~Start with Admin Backend~~
-- Save Client/Address ID for next time
- - ~~Save ID's in order~~
- - Save ID's in clients address
- - ~~Hash info and check/store hashes in a table.~~
+- [ ] Add shipment/tracking info to order and mark order as shipped/completed
+- [x] Start with Admin Backend
+- [ ] Save Client/Address ID for next time
+- [x] Save IDs in order
+- [ ] Save IDs in clients address
+- [x] Hash info and check/store hashes in a table.
 
 <h4>Documentation</h4>
-- Update Documentation for backend usage
+- [ ] Update Documentation for backend usage
 
 <h4>API</h4>
-- Move to MDS Webservice V2
-
+- [ ] Move to MDS Webservice V2
 
 <h3>MDS Web Service</h3>
 
 This plugin makes use of MDS Collivery WSDL.
-Please refer to the following document for more information on their API:
-[http://www.collivery.co.za/wsdocs](http://www.collivery.co.za/wsdocs "MDS Collivery API Developers Manual")
+Please refer to the following document for more information on our API:
+[http://collivery.net/integration/api/soap](http://collivery.net/integration/api/soap "MDS Collivery API Developers Manual")
 
 License
 --------
