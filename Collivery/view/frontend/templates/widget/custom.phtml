@@ -1,0 +1,79 @@
+<?php /** @var \MDS\Collivery\Block\Customer\Widget\Custom $block */ ?>
+<div class="field custom">
+  <label class="label" for="<?php echo $block->escapeHtml($block->getFieldId('location')) ?>">
+    <span><?php echo $block->escapeHtml($block->getFieldLabel('location')) ?></span>
+  </label>
+  <div class="control">
+    <select name="<?php echo $block->escapeHtml($block->getFieldName('location'));?>"
+            id="<?php echo $block->escapeHtml($block->getFieldId('location'));?>">
+        <?php /* @escapeNotVerified  */ echo $block->getFieldParams()?>
+      <option value="">Select location type</option>
+      <?php
+      $locations = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Location())->getAllOptions(true, false);
+      foreach ($locations as $location) {
+          $selected =  $location['value'] == $block->escapeHtml($block->getValue('location')) ? 'selected="selected"' : '';
+          echo '<option value="' . $location['value'] . '" ' . $selected . '>' . $location['label'] . '</option>';
+      }
+      ?>
+    </select>
+  </div>
+</div>
+<div class="field custom">
+  <label class="label" for="<?php echo $block->escapeHtml($block->getFieldId('town')) ?>">
+    <span><?php echo $block->escapeHtml($block->getFieldLabel('Town')) ?></span>
+  </label>
+  <div class="control">
+    <select name="<?php echo $block->escapeHtml($block->getFieldName('town'));?>"
+            id="<?php echo $block->escapeHtml($block->getFieldId('town'));?>">
+        <?php /* @escapeNotVerified  */ echo $block->getFieldParams()?>
+      <option value="">Select Town</option>
+        <?php
+        $towns = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Town())->getAllOptions(true, false);
+        foreach ($towns as $town) {
+            $selected =  $town['value'] == $block->escapeHtml($block->getValue('town')) ? 'selected="selected"' : '';
+            echo '<option value="' . $town['value'] . '" ' . $selected . ' >' . $town['label'] . '</option>';
+        }
+        ?>
+    </select>
+  </div>
+</div>
+<div class="field custom">
+  <label class="label" for="<?php echo $block->escapeHtml($block->getFieldId('suburb')) ?>">
+    <span><?php echo $block->escapeHtml($block->getFieldLabel('Suburb')) ?></span>
+  </label>
+  <div class="control">
+    <select name="<?php echo $block->escapeHtml($block->getFieldName('suburb'));?>"
+            id="<?php echo $block->escapeHtml($block->getFieldId('suburb'));?>">
+        <?php /* @escapeNotVerified  */ echo $block->getFieldParams()?>
+        <?php
+        $suburbs = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Suburb($block->escapeHtml($block->getValue('town'))))
+            ->getAllOptions(true, false);
+        foreach ($suburbs as $suburb) {
+            $selected =  $suburb['value'] == $block->escapeHtml($block->getValue('suburb')) ? 'selected="selected"' : '';
+            echo '<option value="' . $suburb['value'] . '" ' . $selected . '>' . $suburb['label'] . '</option>';
+        }
+        ?>
+    </select>
+  </div>
+</div>
+
+<script type="text/javascript">
+  require(['jquery','mage/url','domReady!'], function ($,url) {
+    $('select[name="town"]').change(function () {
+      $.ajax({
+        url: url.build('rest/V1/mds-collivery/suburbs'),
+        type: "GET",
+        data: { param: $(this).val() },
+        dataType: 'json',
+        showLoader: true,
+        success : function(result) {
+          var suburbField = $('select[name="suburb"]');
+          suburbField.empty();
+          $.each(result, function( index) {
+            suburbField.append("<option value="+result[index].value+">"+result[index].label+"</option>");
+          });
+        }
+      });
+    });
+  });
+</script>
