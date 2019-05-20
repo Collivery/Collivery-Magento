@@ -42,6 +42,7 @@ class InstallData implements InstallDataInterface
         $installer->startSetup();
 
         $customFields = ['location', 'town', 'suburb'];
+        $position = 333;
         foreach ($customFields as $field) {
             $source = 'MDS\Collivery\Model\Customer\Address\Attribute\Source\\' . ucfirst($field);
             $this->eavSetup->addAttribute(
@@ -52,8 +53,8 @@ class InstallData implements InstallDataInterface
                     'input' => 'select',
                     'source' => $source,
                     'visible' => true,
-                    'required' => false,
-                    'position' => 150,
+                    'required' => true,
+                    'position' => $position,
                     'sort_order' => 150,
                     'system' => false
                 ]
@@ -70,6 +71,7 @@ class InstallData implements InstallDataInterface
 
             $customerTables = ['quote_address', 'sales_order_address', 'customer_address_entity'];
 
+            $position += 1;
             foreach ($customerTables as $table) {
                 $installer->getConnection()->addColumn(
                     $installer->getTable($table),
