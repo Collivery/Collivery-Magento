@@ -2,6 +2,7 @@
 
 namespace MDS\Collivery\Model\Carrier;
 
+use Magento\Checkout\Model\Cart;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Quote\Model\Quote\Address\RateRequest;
@@ -32,6 +33,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
     private $_session;
     private $_customer;
     private $_rateRequest;
+    private $_cart;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -40,12 +42,14 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         ResultFactory $rateResultFactory,
         MethodFactory $rateMethodFactory,
         Session $session,
+        Cart $cart,
         $data = []
     ) {
         $this->_rateResultFactory = $rateResultFactory;
         $this->_rateMethodFactory = $rateMethodFactory;
         $this->_scopeConfig = $scopeConfig;
         $this->_session = $session;
+        $this->_cart = $cart;
         $this->_customer = $this->getCustomer();
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
@@ -66,8 +70,18 @@ class Collivery extends AbstractCarrier implements CarrierInterface
     public function getAllowedMethods()
     {
         $customerAddress = [];
-        foreach ($this->_customer->getAddresses() as $address) {
-            $customerAddress[] = $address->toArray();
+        if ($this->_session->isLoggedIn()) {
+            foreach ($this->_customer->getAddresses() as $address) {
+                $customerAddress[] = $address->toArray();
+            }
+        } else {
+            $quote = $this->_cart->getQuote();
+            $address = $quote->getShippingAddress();
+            $data = [
+                'town' => $address->getTown(),
+                'location' => $address->getLocation()
+            ];
+            array_push($customerAddress, $data);
         }
 
         if (empty($customerAddress[0])) {
@@ -148,7 +162,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
             }
         }
 
-        return $response;
+        return $response ?? [];
     }
 
     private function getCustomer()
