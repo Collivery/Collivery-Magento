@@ -69,20 +69,17 @@ class InstallData implements InstallDataInterface
             );
             $customAttribute->save();
 
-            $customerTables = ['quote_address', 'sales_order_address', 'customer_address_entity'];
+            $installer->getConnection()->addColumn(
+                $installer->getTable('quote_address'),
+                $field,
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'length' => 100,
+                    'comment' => 'custom field ' . $field,
+                ]
+            );
 
             $position += 1;
-            foreach ($customerTables as $table) {
-                $installer->getConnection()->addColumn(
-                    $installer->getTable($table),
-                    $field,
-                    [
-                        'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                        'length' => 100,
-                        'comment' => 'custom field ' . $field,
-                    ]
-                );
-            }
         }
 
         $installer->endSetup();
