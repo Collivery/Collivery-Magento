@@ -6,7 +6,6 @@ use MDS\Collivery\Model\MdsCollivery;
 
 class Town extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
 {
-
     public $_collivery;
 
     public function __construct()
@@ -49,11 +48,6 @@ class Town extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
                     'label' => $town,
                 ];
         }
-
-        //echo "<br>orange<br>";
-        //var_dump([$towns_field]);
-        //print_r([$towns_field]);
-        //die();
 
         return $towns_field;
     }

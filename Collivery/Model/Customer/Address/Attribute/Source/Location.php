@@ -6,13 +6,10 @@ use MDS\Collivery\Model\MdsCollivery;
 
 class Location extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
 {
-
     public $_collivery;
-    public $_town;
 
-    public function __construct($town=null)
+    public function __construct()
     {
-        $this->_town = 360;
 
         $config = [
             'app_name'      => 'Default App Name', // Application Name
@@ -42,18 +39,13 @@ class Location extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
         $locations = $this->_collivery->getLocationTypes();
 
         foreach ($locations as $key => $location) {
-            $suburb_field[] =
+            $locations_types[] =
                 [
                     'value' => $key,
                     'label' => $location,
                 ];
         }
 
-        //echo "<br>orange<br>";
-        //var_dump([$suburb_field]);
-        //print_r([$suburb_field]);
-        //die();
-
-        return $suburb_field;
+        return $locations_types;
     }
 }

@@ -1019,6 +1019,9 @@ class MdsCollivery
      */
     protected function catchSoapFault($e)
     {
+        //echo "<br>e<br><pre>";
+        //var_dump($e->faultcode);
+        //die();
         $this->setError($e->faultcode, $e->faultstring);
     }
 
