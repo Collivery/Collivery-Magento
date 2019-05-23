@@ -34,6 +34,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
     private $_customer;
     private $_rateRequest;
     private $_cart;
+    private $_objectManager;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -51,6 +52,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         $this->_session = $session;
         $this->_cart = $cart;
         $this->_customer = $this->getCustomer();
+        $this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
@@ -168,17 +170,14 @@ class Collivery extends AbstractCarrier implements CarrierInterface
     private function getCustomer()
     {
         $customerId = $this->_session->getCustomerId();
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
-        return $objectManager->create('Magento\Customer\Model\Customer')->load($customerId);
+        return $this->_objectManager->create('Magento\Customer\Model\Customer')->load($customerId);
     }
 
     public function getProductDimensions($items)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
         foreach ($items as $item) {
-            $product = $objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
+            $product = $this->_objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
             for ($x = 1; $x <= $item->getQty(); $x++) {
                 $parcels[] = [
                     'weight' => $item->getWeight(),
