@@ -87,15 +87,9 @@ class CheckOrderStatus implements ObserverInterface
 
             //add contact address
             $addedContact = $this->_processOrder->addContactAddress($addContactdata);
-            if (!$addedContact) {
-                $this->messageManager->addErrorMessage($rateLimitExceededMessage);
-            }
 
             //validate collivery
             $client = $this->_processOrder->getShopperOwnerDetails();
-            if (!$client) {
-                $this->messageManager->addErrorMessage($rateLimitExceededMessage);
-            }
             $client = reset($client);
 
             $validateData = [
@@ -112,26 +106,14 @@ class CheckOrderStatus implements ObserverInterface
 
             $validatedCollivery = $this->_processOrder->validateCollivery($validateData);
 
-            if (!$validatedCollivery) {
-                $this->messageManager->addErrorMessage($rateLimitExceededMessage);
-            }
-
             //add collivery
             $waybill = $this->_processOrder->addCollivery($validatedCollivery);
-
-            if (!$waybill) {
-                $this->messageManager->addErrorMessage($rateLimitExceededMessage);
-            }
 
             //accept collivery
             $acceptCollivery = $this->_processOrder->acceptWaybill($waybill);
 
-            if (!$acceptCollivery) {
-                $this->messageManager->addErrorMessage($rateLimitExceededMessage);
-            }
-
             if ($acceptCollivery['result'] == 'Accepted') {
-                $this->messageManager->addSuccessMessage(__('waybill: ' . $waybill . ' created successfully'));
+                $this->messageManager->addSuccess(__('waybill: ' . $waybill . ' created successfully'));
             }
         }
     }
