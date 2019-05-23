@@ -126,23 +126,27 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
     public function shippingPrice($customerAddress, $service)
     {
-        $items = $this->_rateRequest->getAllItems();
-        $parcelDimensions = $this->getProductDimensions($items);
-        $data = [
-            'collivery_from' => $this->_collivery->getDefaultAddressId(),
-            'to_town_id' => (int) $customerAddress['town'],
-            'to_location_type' => (int) $customerAddress['location'],
-            'service' => $service,
-            'parcels' => $parcelDimensions
-        ];
+        $state =  $this->_objectManager->get('Magento\Framework\App\State');
 
-        $prices = $this->_collivery->getPrice($data);
+        if ($state->getAreaCode() !== 'adminhtml') {
+            $items = $this->_rateRequest->getAllItems();
+            $parcelDimensions = $this->getProductDimensions($items);
+            $data = [
+                'collivery_from' => $this->_collivery->getDefaultAddressId(),
+                'to_town_id' => (int) $customerAddress['town'],
+                'to_location_type' => (int) $customerAddress['location'],
+                'service' => $service,
+                'parcels' => $parcelDimensions
+            ];
 
-        if (!is_array($prices)) {
-            return false;
+            $prices = $this->_collivery->getPrice($data);
+
+            if (!is_array($prices)) {
+                return false;
+            }
+
+            return $prices['price']['inc_vat'];
         }
-
-        return $prices['price']['inc_vat'];
     }
 
     public function getServices($customerAddress)
