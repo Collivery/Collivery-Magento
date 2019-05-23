@@ -34,6 +34,10 @@
                 <field id="specificerrmsg" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label" type="textarea">
                     <label>Displayed Error Message</label>
                 </field>
+                <field id="markup" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Mark up %</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
             </group>
         </section>
     </system>

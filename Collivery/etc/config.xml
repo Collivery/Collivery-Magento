@@ -4,12 +4,13 @@
         <carriers>
             <collivery>
                 <model>MDS\Collivery\Model\Carrier\Collivery</model>
-                <active>0</active>
+                <active>1</active>
                 <title>collivery</title>
                 <name>collivery</name>
-                <price>0.00</price>
+                <markup>10</markup>
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
-                <sallowspecific>0</sallowspecific>
+                <sallowspecific>1</sallowspecific>
+                <specificcountry>ZA</specificcountry>
             </collivery>
         </carriers>
     </default>
