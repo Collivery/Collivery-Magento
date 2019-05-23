@@ -131,7 +131,7 @@ class CheckOrderStatus implements ObserverInterface
             }
 
             if ($acceptCollivery['result'] == 'Accepted') {
-                $this->messageManager->addSuccess(__('waybill: ' . $waybill . ' created successfully'));
+                $this->messageManager->addSuccessMessage(__('waybill: ' . $waybill . ' created successfully'));
             }
         }
     }
