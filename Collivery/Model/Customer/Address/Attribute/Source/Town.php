@@ -40,6 +40,9 @@ class Town extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
     public function getTowns()
     {
         $towns = $this->_collivery->getTowns();
+        if (!$towns) {
+            return false;
+        }
 
         foreach ($towns as $key => $town) {
             $towns_field[] =

@@ -37,6 +37,9 @@ class Location extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
     public function getLocations()
     {
         $locations = $this->_collivery->getLocationTypes();
+        if (!$locations) {
+            return false;
+        }
 
         foreach ($locations as $key => $location) {
             $locations_types[] =

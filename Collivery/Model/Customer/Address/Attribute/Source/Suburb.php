@@ -39,6 +39,9 @@ class Suburb extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
     public function getSuburbs()
     {
         $suburbs = $this->_collivery->getSuburbs($this->_town);
+        if (!$suburbs) {
+            return false;
+        }
 
         foreach ($suburbs as $key => $suburb) {
             $suburb_field[] =
