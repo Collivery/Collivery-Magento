@@ -34,7 +34,6 @@ class Collivery extends AbstractCarrier implements CarrierInterface
     private $_customer;
     private $_rateRequest;
     private $_cart;
-    private $_objectManager;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -52,7 +51,6 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         $this->_session = $session;
         $this->_cart = $cart;
         $this->_customer = $this->getCustomer();
-        $this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
@@ -113,6 +111,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
             $test->setPrice($service['price'] ?? 0);
             $test->setCost($service['cost'] ?? 0);
+
             $result->append($test);
         }
 
@@ -126,17 +125,18 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
     public function shippingPrice($customerAddress, $service)
     {
-        $state =  $this->_objectManager->get('Magento\Framework\App\State');
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $state = $objectManager->get('Magento\Framework\App\State');
 
         if ($state->getAreaCode() !== 'adminhtml') {
             $items = $this->_rateRequest->getAllItems();
             $parcelDimensions = $this->getProductDimensions($items);
             $data = [
-                'collivery_from' => $this->_collivery->getDefaultAddressId(),
-                'to_town_id' => (int) $customerAddress['town'],
-                'to_location_type' => (int) $customerAddress['location'],
-                'service' => $service,
-                'parcels' => $parcelDimensions
+                'collivery_from'   => $this->_collivery->getDefaultAddressId(),
+                'to_town_id'       => (int)$customerAddress['town'],
+                'to_location_type' => (int)$customerAddress['location'],
+                'service'          => $service,
+                'parcels'          => $parcelDimensions
             ];
 
             $prices = $this->_collivery->getPrice($data);
@@ -145,17 +145,18 @@ class Collivery extends AbstractCarrier implements CarrierInterface
                 return false;
             }
 
-            return $prices['price']['inc_vat'];
+            return $prices['price']['ex_vat'];
         }
     }
 
     public function getServices($customerAddress)
     {
         $services = $this->_collivery->getServices();
-
+        $response = [];
         foreach ($services as $key => $value) {
             // Get Shipping Estimate for current service
             $i = $this->shippingPrice($customerAddress, $key);
+
             if ($i>1) {
                 // Create Response Array
                 $response[] =
@@ -168,20 +169,23 @@ class Collivery extends AbstractCarrier implements CarrierInterface
             }
         }
 
-        return $response ?? [];
+        return $response;
     }
 
     private function getCustomer()
     {
         $customerId = $this->_session->getCustomerId();
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
-        return $this->_objectManager->create('Magento\Customer\Model\Customer')->load($customerId);
+        return $objectManager->create('Magento\Customer\Model\Customer')->load($customerId);
     }
 
     public function getProductDimensions($items)
     {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
         foreach ($items as $item) {
-            $product = $this->_objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
+            $product = $objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
             for ($x = 1; $x <= $item->getQty(); $x++) {
                 $parcels[] = [
                     'weight' => $item->getWeight(),
