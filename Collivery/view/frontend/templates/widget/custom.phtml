@@ -48,10 +48,13 @@
         <?php
         $suburbs = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Suburb($block->escapeHtml($block->getValue('town'))))
             ->getAllOptions(true, false);
-        foreach ($suburbs as $suburb) {
-            $selected =  $suburb['value'] == $block->escapeHtml($block->getValue('suburb')) ? 'selected="selected"' : '';
-            echo '<option value="' . $suburb['value'] . '" ' . $selected . '>' . $suburb['label'] . '</option>';
+        if ($suburbs) {
+            foreach ($suburbs as $suburb) {
+                $selected =  $suburb['value'] == $block->escapeHtml($block->getValue('suburb')) ? 'selected="selected"' : '';
+                echo '<option value="' . $suburb['value'] . '" ' . $selected . '>' . $suburb['label'] . '</option>';
+            }
         }
+
         ?>
     </select>
   </div>
