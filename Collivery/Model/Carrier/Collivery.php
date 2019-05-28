@@ -54,13 +54,16 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
+        $username = $this->getConfigData('username');
+        $password = $this->getConfigData('password');
+
         $config = [
-            'app_name'      => 'Default App Name', // Application Name
-            'app_version'   => '0.0.1',            // Application Version
-            'app_host'      => '', // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / 'Joomla! 2.5.17 VirtueMart 2.0.26d'
+            'app_name'      => 'Magento', // Application Name
+            'app_version'   => '2.3.1',            // Application Version
+            'app_host'      => 'Magento ver. 2.3.1', // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / 'Joomla! 2.5.17 VirtueMart 2.0.26d'
             'app_url'       => '', // URL your site is hosted on
-            'user_email'    => 'api@collivery.co.za',
-            'user_password' => 'api123',
+            'user_email'    => $username,
+            'user_password' => $password,
             'demo'          => false,
         ];
 
