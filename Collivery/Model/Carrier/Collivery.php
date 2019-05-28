@@ -11,7 +11,7 @@ use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
 use Magento\Shipping\Model\Carrier\AbstractCarrier;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Shipping\Model\Rate\ResultFactory;
-use MDS\Collivery\Model\MdsCollivery;
+use MDS\Collivery\Model\Connection;
 use Psr\Log\LoggerInterface;
 
 class Collivery extends AbstractCarrier implements CarrierInterface
@@ -56,18 +56,8 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
         $username = $this->getConfigData('username');
         $password = $this->getConfigData('password');
-
-        $config = [
-            'app_name'      => 'Magento', // Application Name
-            'app_version'   => '2.3.1',            // Application Version
-            'app_host'      => 'Magento ver. 2.3.1', // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / 'Joomla! 2.5.17 VirtueMart 2.0.26d'
-            'app_url'       => '', // URL your site is hosted on
-            'user_email'    => $username,
-            'user_password' => $password,
-            'demo'          => false,
-        ];
-
-        $this->_collivery = new MdsCollivery($config);
+        $collivery = new Connection($username, $password);
+        $this->_collivery = $collivery->getConnection();
     }
 
     public function getAllowedMethods()
