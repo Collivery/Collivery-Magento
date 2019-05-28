@@ -40,9 +40,11 @@
                 </field>
                 <field id="username" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="text">
                     <label>Username</label>
+                    <validate>required-entry validate-email</validate>
                 </field>
                 <field id="password" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="text">
                     <label>Password</label>
+                    <validate>required-entry</validate>
                 </field>
             </group>
         </section>
