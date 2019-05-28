@@ -11,6 +11,8 @@
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
                 <sallowspecific>1</sallowspecific>
                 <specificcountry>ZA</specificcountry>
+                <username>api@collivery.co.za</username>
+                <password>api123</password>
             </collivery>
         </carriers>
     </default>
