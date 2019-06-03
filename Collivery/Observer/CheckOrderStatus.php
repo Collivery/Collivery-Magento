@@ -59,7 +59,7 @@ class CheckOrderStatus implements ObserverInterface
             $customAttributes = $this->getCustomAttributes($shippingAddressArray['customer_address_id']);
         }
 
-        if ($order->getState() == "processing") {
+        if ($order->getState() == "complete") {
             $fullname = $shippingAddressArray['firstname'] . ' ' . $shippingAddressArray['lastname'];
             $addAddressData = [
                 'company_name' =>$shippingAddressArray['company']
