@@ -69,19 +69,53 @@ class InstallData implements InstallDataInterface
             );
             $customAttribute->save();
 
-            $installer->getConnection()->addColumn(
-                $installer->getTable('quote_address'),
+            //Add ['location', 'town', 'suburb'] in quote_address
+            $this->addTableColumns(
+                $setup,
+                'quote_address',
                 $field,
-                [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                    'length' => 100,
-                    'comment' => 'custom field ' . $field,
-                ]
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                100,
+                'custom field ' . $field
             );
 
             $position += 1;
         }
 
+        //Add collivery_id in sales order for tracking
+        $this->addTableColumns(
+            $setup,
+            'sales_order',
+            'collivery_id',
+            \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+            11,
+            'MDS Collivery waybill no'
+        );
+
         $installer->endSetup();
+    }
+
+    /**
+     * @param ModuleDataSetupInterface $setup
+     * @param string                   $table
+     * @param string                   $column
+     * @param                          $type
+     * @param int                      $length
+     * @param string                   $comment
+     *
+     * @return void
+     */
+    public function addTableColumns(ModuleDataSetupInterface $setup, $table, $column, $type, $length, $comment)
+    {
+        $installer = $setup;
+        $installer->getConnection()->addColumn(
+            $installer->getTable($table),
+            $column,
+            [
+                'type' => $type,
+                'length' => $length,
+                'comment' => $comment,
+            ]
+        );
     }
 }
