@@ -112,6 +112,14 @@ class CheckOrderStatus implements ObserverInterface
             //accept collivery
             $acceptCollivery = $this->_processOrder->acceptWaybill($waybill);
 
+            try {
+                //store waybill in sales order
+                $order->setColliveryId($waybill);
+                $order->save();
+            } catch (\Exception $e) {
+                $this->messageManager->addErrorMessage($e->getMessage());
+            }
+
             if ($acceptCollivery['result'] == 'Accepted') {
                 $this->messageManager->addSuccess(__('waybill: ' . $waybill . ' created successfully'));
             }
