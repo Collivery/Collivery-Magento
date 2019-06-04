@@ -4,6 +4,7 @@ namespace MDS\Collivery\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Sales\Model\Order;
 use MDS\Collivery\Model\orderStatusProcess;
 
 class CheckOrderStatus implements ObserverInterface
@@ -16,8 +17,11 @@ class CheckOrderStatus implements ObserverInterface
      * @var \Magento\Framework\App\Response\RedirectInterface
      */
     protected $redirect;
+
+    /**
+     * @var \MDS\Collivery\Model\orderStatusProcess
+     */
     private $_processOrder;
-    private $quote;
 
     public function __construct(
         \Magento\Framework\App\Response\RedirectInterface $redirect,
@@ -27,12 +31,17 @@ class CheckOrderStatus implements ObserverInterface
         $this->messageManager = $messageManager;
         $this->_processOrder = new orderStatusProcess();
     }
+
+    /**
+     * @param Observer $observer
+     *
+     * @return void
+     */
     public function execute(Observer $observer)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $order = $observer->getEvent()->getOrder();
         $orderItems = $order->getAllItems();
-
         foreach ($orderItems as $item) {
             $product = $objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
             $parcels[] = [
@@ -126,6 +135,11 @@ class CheckOrderStatus implements ObserverInterface
         }
     }
 
+    /**
+     * @param $customerAddressId
+     *
+     * @return array
+     */
     private function getCustomAttributes($customerAddressId)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
