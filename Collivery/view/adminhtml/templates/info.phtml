@@ -1,0 +1,68 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php /** @var \MDS\Collivery\Block\Sales\Email\Shipment\Tracking $block */ ?>
+<?php $order = $block->getOrder() ?>
+<?php if ($order->getIsVirtual()) : return '';endif; ?>
+
+<?php /* Shipping Method */ ?>
+<div class="admin__page-section-item order-shipping-method">
+  <div class="admin__page-section-item-title">
+    <span class="title"><?= /* @escapeNotVerified */ __('Shipping &amp; Handling Information') ?></span>
+  </div>
+  <div class="admin__page-section-item-content">
+      <?php  if ($order->getTracksCollection()->count()) : ?>
+        <p><a href="#" id="linkId" onclick="popWin('<?= /* @escapeNotVerified */ $this->helper('Magento\Shipping\Helper\Data')->getTrackingPopupUrlBySalesModel($order) ?>','trackorder','width=800,height=600,resizable=yes,scrollbars=yes')" title="<?= /* @escapeNotVerified */ __('Track Order') ?>"><?= /* @escapeNotVerified */ __('Track Order') ?></a></p>
+      <?php endif; ?>
+      <?php if ($order->getShippingDescription()): ?>
+        <strong><?= $block->escapeHtml($order->getShippingDescription()) ?></strong>
+
+          <?php if ($this->helper('Magento\Tax\Helper\Data')->displayShippingPriceIncludingTax()): ?>
+              <?php $_excl = $block->displayShippingPriceInclTax($order); ?>
+          <?php else: ?>
+              <?php $_excl = $block->displayPriceAttribute('shipping_amount', false, ' '); ?>
+          <?php endif; ?>
+          <?php $_incl = $block->displayShippingPriceInclTax($order); ?>
+
+          <?= /* @escapeNotVerified */ $_excl ?>
+          <?php if ($this->helper('Magento\Tax\Helper\Data')->displayShippingBothPrices() && $_incl != $_excl): ?>
+          (<?= /* @escapeNotVerified */ __('Incl. Tax') ?> <?= /* @escapeNotVerified */ $_incl ?>)
+          <?php endif; ?>
+      <?php else: ?>
+          <?= /* @escapeNotVerified */ __('No shipping information available') ?>
+      <?php endif; ?>
+
+      <p><a href="#" id="click-me">Track Waybill : <?= $this->getOrder()->getColliveryId()?></a></p>
+
+    <div id="popup-mpdal" >
+      <p><img src="https://collivery.net/img/collivery.net-logo.svg" alt="Collivery logo" style="margin-left: auto; margin-right: auto; display: block"/></p>
+      <h1><strong>Tracking for Waybill <?= $this->getOrder()->getColliveryId()?></strong></h1>
+      <h1><?= $block->getTrackingInfo() ?></h1>
+
+    </div>
+  </div>
+</div>
+<script>
+  require(
+      [
+        'jquery',
+        'Magento_Ui/js/modal/modal'
+      ],
+      function($, modal) {
+        var options = {
+          type: 'popup',
+          responsive: true,
+          innerScroll: true,
+        };
+
+        var popup = modal(options, $('#popup-mpdal'));
+        $("#click-me").on('click', () => $("#popup-mpdal").modal("openModal"));
+      }
+  );
+</script>
