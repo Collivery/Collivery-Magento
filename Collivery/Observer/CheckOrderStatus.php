@@ -5,9 +5,10 @@ namespace MDS\Collivery\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
-use MDS\Collivery\Model\orderStatusProcess;
+use MDS\Collivery\Model\Connection;
+use MDS\Collivery\Orders\ProcessOrder;
 
-class CheckOrderStatus implements ObserverInterface
+class CheckOrderStatus extends ProcessOrder implements ObserverInterface
 {
     /**
      * @var \Magento\Framework\Message\ManagerInterface
@@ -18,18 +19,13 @@ class CheckOrderStatus implements ObserverInterface
      */
     protected $redirect;
 
-    /**
-     * @var \MDS\Collivery\Model\orderStatusProcess
-     */
-    private $_processOrder;
-
     public function __construct(
         \Magento\Framework\App\Response\RedirectInterface $redirect,
         \Magento\Framework\Message\ManagerInterface $messageManager
     ) {
+        parent::__construct();
         $this->redirect = $redirect;
         $this->messageManager = $messageManager;
-        $this->_processOrder = new orderStatusProcess();
     }
 
     /**
@@ -83,7 +79,9 @@ class CheckOrderStatus implements ObserverInterface
                 'email' => $shippingAddressArray['email'],
             ];
 
-            $insertedAddress = $this->_processOrder->addAddress($addAddressData);
+            //add address
+            $insertedAddress = $this->addAddress($addAddressData);
+
             $rateLimitExceededMessage = __('Daily Rate Limit Exceeded, please feel free to contact MDS Collivery to discuss custom limits');
 
             if (!$insertedAddress) {
@@ -95,10 +93,10 @@ class CheckOrderStatus implements ObserverInterface
                 ] + array_intersect_key($addAddressData, array_flip(['full_name', 'phone', 'cellphone', 'email']));
 
             //add contact address
-            $addedContact = $this->_processOrder->addContactAddress($addContactdata);
+            $addedContact = $this->addContactAddress($addContactdata);
 
             //validate collivery
-            $client = $this->_processOrder->getShopperOwnerDetails();
+            $client = $this->getShopOwnerDetails();
             $client = reset($client);
 
             $validateData = [
@@ -113,13 +111,13 @@ class CheckOrderStatus implements ObserverInterface
                 'parcels' => $parcels
             ];
 
-            $validatedCollivery = $this->_processOrder->validateCollivery($validateData);
+            $validatedCollivery = $this->validateCollivery($validateData);
 
             //add collivery
-            $waybill = $this->_processOrder->addCollivery($validatedCollivery);
+            $waybill = $this->addCollivery($validatedCollivery);
 
             //accept collivery
-            $acceptCollivery = $this->_processOrder->acceptWaybill($waybill);
+            $acceptCollivery = $this->acceptWaybill($waybill);
 
             try {
                 //store waybill in sales order
