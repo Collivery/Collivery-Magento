@@ -3,4 +3,7 @@
     <type name="Magento\Quote\Model\BillingAddressManagement">
         <plugin disabled="false" name="Magento_Quote_Model_BillingAddressManagement" sortOrder="10" type="MDS\Collivery\Plugin\Magento\Quote\Model\BillingAddressManagement"/>
     </type>
+    <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="checkout_shipping" type="MDS\Collivery\Plugin\Checkout\Model\LayoutProcessor" sortOrder="150"/>
+    </type>
 </config>
