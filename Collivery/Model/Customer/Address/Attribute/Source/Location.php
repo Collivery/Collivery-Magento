@@ -8,9 +8,10 @@ class Location extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
 {
     public $_collivery;
 
-    public function __construct(Connection $collivery)
+    public function __construct()
     {
-        $this->_collivery = $collivery->getConnection();
+        $connection = new Connection();
+        $this->_collivery = $connection->getConnection();
     }
 
     public function getAllOptions($withEmpty = true, $defaultValues = false)
