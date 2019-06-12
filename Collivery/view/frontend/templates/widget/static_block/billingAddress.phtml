@@ -2,7 +2,7 @@
 
 <script type="text/javascript">
   require(['jquery','mage/url','domReady!'], function ($,url) {
-    getAddress();
+    setTimeout(() => getAddress(), 200);
     $(document).on('click', '.action-update', function () {
       var fields = $('fieldset[data-form="billing-new-address"]').serialize();
       $.ajax({
