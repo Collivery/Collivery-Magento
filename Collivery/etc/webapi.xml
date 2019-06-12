@@ -24,4 +24,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route method="GET" url="/V1/fetch-shipping-address">
+        <service class="MDS\Collivery\Api\Address" method="getShippingAddress"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>
