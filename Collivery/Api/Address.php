@@ -54,4 +54,26 @@ class Address
 
         return $billingAddress;
     }
+
+    /**
+     * Get shipping Address from quote_address table.
+     *
+     * @return string
+     */
+    public function getShippingAddress()
+    {
+        $quoteShippingAddress = $this->cart->getQuote()->getShippingAddress();
+        $locationType = Location::getLocationById($quoteShippingAddress->getLocation());
+        $town = Town::getTownById($quoteShippingAddress->getTown());
+        $suburb = Suburb::getSuburbById($quoteShippingAddress->getSuburb());
+        $street = implode(', ', $quoteShippingAddress->getStreet());
+
+        $shippingAddress = $quoteShippingAddress->getFirstname() . ' ' . $quoteShippingAddress->getLastname();
+        $shippingAddress .= $quoteShippingAddress->getCompany() ? "<br> {$quoteShippingAddress->getCompany()}" : "";
+        $shippingAddress .= "<br> $street";
+        $shippingAddress .= "<br> $suburb, $locationType";
+        $shippingAddress .= "<br>$town, {$quoteShippingAddress->getPostcode()}";
+
+        return $shippingAddress;
+    }
 }
