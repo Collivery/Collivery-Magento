@@ -7,13 +7,19 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="cms_block_provider" xsi:type="object">MDS\Collivery\Model\BillingAddressProvider</item>
+                <item name="cms_block_billing_address_provider" xsi:type="object">MDS\Collivery\Model\BillingAddressProvider</item>
+                <item name="cms_block_shipping_address_provider" xsi:type="object">MDS\Collivery\Model\ShippingAddressProvider</item>
             </argument>
         </arguments>
     </type>
     <type name="MDS\Collivery\Model\BillingAddressProvider">
         <arguments>
             <argument name="blockIdentifier" xsi:type="string">billing_address</argument>
+        </arguments>
+    </type>
+    <type name="MDS\Collivery\Model\ShippingAddressProvider">
+        <arguments>
+            <argument name="blockIdentifier" xsi:type="string">shipping_address</argument>
         </arguments>
     </type>
 </config>
