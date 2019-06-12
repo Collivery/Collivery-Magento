@@ -1,0 +1,19 @@
+<span id="shipping-address"></span>
+
+<script type="text/javascript">
+  require(['jquery','mage/url','domReady!'], function ($,url) {
+    setTimeout(() => getAddress(), 200);
+
+    function getAddress(){
+      $.ajax({
+        url: url.build('rest/V1/fetch-shipping-address'),
+        type: "GET",
+        dataType: 'json',
+        showLoader: true,
+        success : function(result) {
+          $('#shipping-address').html(result);
+        }
+      });
+    }
+  });
+</script>
