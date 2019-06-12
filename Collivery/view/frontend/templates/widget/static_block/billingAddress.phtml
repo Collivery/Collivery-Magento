@@ -1,0 +1,29 @@
+<span id="billing-address"></span>
+
+<script type="text/javascript">
+  require(['jquery','mage/url','domReady!'], function ($,url) {
+    getAddress();
+    $(document).on('click', '.action-update', function () {
+      var fields = $('fieldset[data-form="billing-new-address"]').serialize();
+      $.ajax({
+        url: url.build('rest/V1/update-billing-address?'+fields),
+        type: "POST",
+        contentType: "application/json",
+        showLoader: true,
+        success : () => getAddress()
+      });
+    });
+
+    function getAddress(){
+      $.ajax({
+        url: url.build('rest/V1/fetch-billing-address'),
+        type: "GET",
+        dataType: 'json',
+        showLoader: true,
+        success : function(result) {
+          $('#billing-address').html(result);
+        }
+      });
+    }
+  });
+</script>
