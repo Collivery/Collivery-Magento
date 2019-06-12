@@ -4,4 +4,16 @@
         <plugin name="MDS\Collivery\Customer\AddressEditPlugin"
                 type="MDS\Collivery\Plugin\Customer\AddressEditPlugin"/>
     </type>
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="cms_block_provider" xsi:type="object">MDS\Collivery\Model\BillingAddressProvider</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MDS\Collivery\Model\BillingAddressProvider">
+        <arguments>
+            <argument name="blockIdentifier" xsi:type="string">billing_address</argument>
+        </arguments>
+    </type>
 </config>
