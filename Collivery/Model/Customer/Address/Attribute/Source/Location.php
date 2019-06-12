@@ -25,10 +25,7 @@ class Location extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
 
     public function getLocations()
     {
-        $locations = $this->_collivery->getLocationTypes();
-        if (!$locations) {
-            return false;
-        }
+        $locations = $this->colliveryLocationTypes();
 
         foreach ($locations as $key => $location) {
             $locations_types[] =
@@ -39,5 +36,21 @@ class Location extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
         }
 
         return $locations_types;
+    }
+
+    private function colliveryLocationTypes()
+    {
+        $locations = $this->_collivery->getLocationTypes();
+        if (!$locations) {
+            return false;
+        }
+        return $locations;
+    }
+
+    public static function getLocationById($id)
+    {
+        $locationTypes = (new Location())->colliveryLocationTypes();
+
+        return $locationTypes[$id];
     }
 }

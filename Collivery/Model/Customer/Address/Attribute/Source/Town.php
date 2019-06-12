@@ -23,12 +23,26 @@ class Town extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
         return $this->_options;
     }
 
-    public function getTowns()
+    private function colliveryTown()
     {
         $towns = $this->_collivery->getTowns();
         if (!$towns) {
             return false;
         }
+
+        return $towns;
+    }
+
+    public static function getTownById($id)
+    {
+        $towns = (new Town())->colliveryTown();
+
+        return $towns[$id];
+    }
+
+    public function getTowns()
+    {
+        $towns = $this->colliveryTown();
 
         foreach ($towns as $key => $town) {
             $towns_field[] =

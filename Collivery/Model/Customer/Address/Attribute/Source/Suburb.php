@@ -16,7 +16,6 @@ class Suburb extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
         $this->_collivery = $collivery->getConnection();
     }
 
-
     public function getAllOptions($withEmpty = true, $defaultValues = false)
     {
         if (!$this->_options) {
@@ -26,12 +25,26 @@ class Suburb extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
         return $this->_options;
     }
 
-    public function getSuburbs()
+    private function colliverySuburbs()
     {
         $suburbs = $this->_collivery->getSuburbs($this->_town);
         if (!$suburbs) {
             return false;
         }
+
+        return $suburbs;
+    }
+
+    public static function getSuburbById($id)
+    {
+        $suburbs = (new Suburb())->colliverySuburbs();
+
+        return $suburbs[$id];
+    }
+
+    public function getSuburbs()
+    {
+        $suburbs = $this->colliverySuburbs();
 
         foreach ($suburbs as $key => $suburb) {
             $suburb_field[] =
