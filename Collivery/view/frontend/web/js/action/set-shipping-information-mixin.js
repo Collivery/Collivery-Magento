@@ -26,6 +26,8 @@ define([
       });
       setCustomAttribute();
     }
+    $(document).find('input[name="city"]').val('').trigger('keypress');
+    $(document).find('div[name="shippingAddress.city"]').hide()
   });
 
   function setCustomAttribute()

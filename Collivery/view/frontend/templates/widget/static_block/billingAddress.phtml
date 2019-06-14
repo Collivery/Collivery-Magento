@@ -5,6 +5,8 @@
     setTimeout(() => getAddress(), 200);
     $(document).on('click', '.action-update', function () {
       var fields = $('fieldset[data-form="billing-new-address"]').serialize();
+      $(document).find('input[name="city"]').val('').trigger('keypress');
+      $(document).find('div[name="billingAddresscheckmo.city"]').hide()
       $.ajax({
         url: url.build('rest/V1/update-billing-address?'+fields),
         type: "POST",
