@@ -1,53 +1,51 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mosa
- * Date: 2019/05/03
- * Time: 11:28 AM
- */
 
 namespace MDS\Collivery\Api;
 
 use Magento\Checkout\Model\Cart;
-use Magento\Customer\Model\Session;
-use Magento\Quote\Api\Data\AddressInterface;
 use Psr\Log\LoggerInterface;
 
 class CustomAttributes
 {
     private $cart;
     private $logger;
-    private $session;
-    private $address;
 
     public function __construct(
-        Session $session,
         Cart $cart,
-        LoggerInterface $logger,
-        AddressInterface $address
+        LoggerInterface $logger
     ) {
         $this->cart = $cart;
         $this->logger = $logger;
-        $this->session = $session;
-        $this->address  = $address;
     }
 
     /**
      * @return void
-     * @throws \Exception
      */
     public function insertCustomAttributes()
     {
         $quote = $this->cart->getQuote();
 
-        $address = $quote->getShippingAddress();
         $data = [
-            'location' => $_GET['location_type'],
+            'location' => $_GET['location'],
             'town' => $_GET['town'],
             'suburb' => $_GET['suburb']
         ];
-        $address->load($address->getAddressId())->addData($data);
-        $address->setId($address->getAddressId())->save();
+
+        if (isset($_GET['address_type']) && $_GET['address_type'] == 'shipping_address') {
+            echo 'update shipping';
+            $addresses = [$quote->getShippingAddress()];
+        } elseif (isset($_GET['address_type']) && $_GET['address_type'] == 'billing_address') {
+            $addresses = [$quote->getBillingAddress()];
+            echo 'update billing';
+        } else {
+            echo 'update All';
+            $addresses = [$quote->getShippingAddress(), $quote->getBillingAddress()];
+        }
+
+        foreach ($addresses as $address) {
+            $address->load($address->getAddressId())->addData($data);
+            $address->setId($address->getAddressId())->save();
+        }
 
         return;
     }
