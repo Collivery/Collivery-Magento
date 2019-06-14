@@ -33,7 +33,7 @@ class Tracking extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
     public function getTrackingInfo()
     {
         $waybill = $this->getOrder()->getColliveryId();
-        $trackInfo =  $this->_collivery->getStatus($waybill);
+        $trackInfo =  $this->_collivery->getStatus((int)$waybill);
 
         if ($trackInfo) {
             $info = "Collivery $waybill is in status: {$trackInfo['status_text']}</br>";
@@ -51,6 +51,7 @@ class Tracking extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
 
             return $info;
         }
+
         return '';
     }
 }
