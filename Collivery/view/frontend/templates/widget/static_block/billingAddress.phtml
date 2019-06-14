@@ -1,30 +1,35 @@
 <span id="billing-address"></span>
 
 <script type="text/javascript">
-  require(['jquery','mage/url','domReady!'], function ($,url) {
-    setTimeout(() => getAddress(), 200);
+  require(['jquery','mage/url','Magento_Checkout/js/model/quote','domReady!'], function ($,url,quote) {
+    $('fieldset[data-form="billing-new-address"]').trigger('reset');
+    setTimeout(() => window.getBillingAddress('#billing-address'), 200);
     $(document).on('click', '.action-update', function () {
       var fields = $('fieldset[data-form="billing-new-address"]').serialize();
+      updateBillingAddress(fields)
+    });
+
+    $(document).on('change', "fieldset[class='fieldset'] select[name='town']", function () {
+      setTimeout(() => window.getSuburbs($('fieldset[class="fieldset"] select[name="suburb"]') ,$(this).val()), 200);
+    });
+
+    $('input[type=checkbox][name=billing-address-same-as-shipping]').change(function() {
+      if(this.checked) {
+        var address = quote.shippingAddress();
+        window.getCustomAttribute('shipping_address', true, 'billing_address', '#billing-address');
+        var queryStrings = $.param(JSON.parse(JSON.stringify(address)));
+        updateBillingAddress(queryStrings)
+      }
       $(document).find('input[name="city"]').val('').trigger('keypress');
       $(document).find('div[name="billingAddresscheckmo.city"]').hide()
+    });
+
+    function updateBillingAddress(fields){
       $.ajax({
         url: url.build('rest/V1/update-billing-address?'+fields),
         type: "POST",
         contentType: "application/json",
-        showLoader: true,
-        success : () => getAddress()
-      });
-    });
-
-    function getAddress(){
-      $.ajax({
-        url: url.build('rest/V1/fetch-billing-address'),
-        type: "GET",
-        dataType: 'json',
-        showLoader: true,
-        success : function(result) {
-          $('#billing-address').html(result);
-        }
+        success : setTimeout(() => window.getBillingAddress('#billing-address'), 200)
       });
     }
   });
