@@ -51,4 +51,22 @@ class CustomAttributes
 
         return;
     }
+
+    /**
+     * @param string $param
+     *
+     * @return array
+     */
+    public function getCustomAttribute($param)
+    {
+        $quote = $this->cart->getQuote();
+        $address = $param === 'shipping_address' ? $quote->getShippingAddress() : $quote->getBillingAddress();
+
+        $data = new \stdClass();
+        $data->location = $address->getLocation();
+        $data->town = $address->getTown();
+        $data->suburb = $address->getSuburb();
+
+        return json_encode($data);
+    }
 }
