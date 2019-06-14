@@ -12,6 +12,12 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route method="GET" url="/V1/get-custom-attributes">
+        <service class="MDS\Collivery\Api\CustomAttributes" method="getCustomAttribute"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
     <route method="POST" url="/V1/update-billing-address">
         <service class="MDS\Collivery\Api\Address" method="updateBillingAddress"/>
         <resources>
