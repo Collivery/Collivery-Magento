@@ -1,4 +1,7 @@
 var config = {
+  deps:[
+    "MDS_Collivery/js/action/shared-ajax-mixin",
+  ],
   map: {
     '*':{
       'Magento_Checkout/template/billing-address/details.html':
