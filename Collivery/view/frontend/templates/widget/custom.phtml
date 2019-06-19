@@ -61,22 +61,10 @@
 </div>
 
 <script type="text/javascript">
-  require(['jquery','mage/url','domReady!'], function ($,url) {
+  require(['jquery','mage/url','domReady!'], function ($) {
+    window.hideCity('form[class="form-address-edit"] div[class="field city"]');
     $('select[name="town"]').change(function () {
-      $.ajax({
-        url: url.build('rest/V1/mds-collivery/suburbs'),
-        type: "GET",
-        data: { param: $(this).val() },
-        dataType: 'json',
-        showLoader: true,
-        success : function(result) {
-          var suburbField = $('select[name="suburb"]');
-          suburbField.empty();
-          $.each(result, function( index) {
-            suburbField.append("<option value="+result[index].value+">"+result[index].label+"</option>");
-          });
-        }
-      });
+      window.getSuburbs($('form[class="form-address-edit"] select[name="suburb"]') ,$(this).val());
     });
   });
 </script>
