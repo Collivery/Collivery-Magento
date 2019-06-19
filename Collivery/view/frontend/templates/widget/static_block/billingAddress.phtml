@@ -10,18 +10,20 @@
     });
 
     $(document).on('change', "fieldset[class='fieldset'] select[name='town']", function () {
+      $(document).find('input[name="city"]').empty().trigger('keyup').val('not-required').attr('aria-required', false).attr('aria-required', false);
+      $(document).find('div[name="billingAddresscheckmo.city"]').hide();
+      quote.shippingAddress().city = 'not-required';
       setTimeout(() => window.getSuburbs($('fieldset[class="fieldset"] select[name="suburb"]') ,$(this).val()), 200);
     });
 
     $('input[type=checkbox][name=billing-address-same-as-shipping]').change(function() {
       if(this.checked) {
-        var address = quote.shippingAddress();
         window.getCustomAttribute('shipping_address', true, 'billing_address', '#billing-address');
+        var address = quote.shippingAddress();
         var queryStrings = $.param(JSON.parse(JSON.stringify(address)));
         updateBillingAddress(queryStrings)
       }
-      $(document).find('input[name="city"]').val('').trigger('keypress');
-      $(document).find('div[name="billingAddresscheckmo.city"]').hide()
+      $("fieldset[class='fieldset'] select[name='town']").trigger('change');
     });
 
     function updateBillingAddress(fields){
