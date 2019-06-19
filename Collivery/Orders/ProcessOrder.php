@@ -74,4 +74,29 @@ abstract class ProcessOrder
     {
         return $this->_collivery->getContacts($this->_collivery->getDefaultAddressId());
     }
+
+    /**
+     * @param $waybillId
+     * @param $recId
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function saveWaybill($waybillId, $recId)
+    {
+        $resource = $this->objectManager->get('Magento\Framework\App\ResourceConnection');
+        $connection = $resource->getConnection();
+        $table = $resource->getTableName('sales_order');
+        $connection->beginTransaction();
+        try {
+            $sql = "UPDATE $table SET collivery_id = $waybillId WHERE entity_id = $recId LIMIT 1";
+            $connection->query($sql);
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollBack();
+        }
+
+        return;
+    }
+
 }
