@@ -5,7 +5,6 @@ namespace MDS\Collivery\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
-use MDS\Collivery\Model\Connection;
 use MDS\Collivery\Orders\ProcessOrder;
 
 class CheckOrderStatus extends ProcessOrder implements ObserverInterface
@@ -15,29 +14,32 @@ class CheckOrderStatus extends ProcessOrder implements ObserverInterface
      */
     protected $messageManager;
     /**
-     * @var \Magento\Framework\App\Response\RedirectInterface
+     * @var \Psr\Log\LoggerInterface $logger
      */
-    protected $redirect;
+    private $logger;
 
     public function __construct(
-        \Magento\Framework\App\Response\RedirectInterface $redirect,
-        \Magento\Framework\Message\ManagerInterface $messageManager
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        \Psr\Log\LoggerInterface $logger
     ) {
         parent::__construct();
-        $this->redirect = $redirect;
         $this->messageManager = $messageManager;
+        $this->logger = $logger;
     }
 
     /**
      * @param Observer $observer
      *
      * @return void
+     * @throws \Exception
      */
     public function execute(Observer $observer)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        /** @var \Magento\Sales\Model\Order $order */
         $order = $observer->getEvent()->getOrder();
         $orderItems = $order->getAllItems();
+
         foreach ($orderItems as $item) {
             $product = $objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
             $parcels[] = [
@@ -81,12 +83,7 @@ class CheckOrderStatus extends ProcessOrder implements ObserverInterface
 
             //add address
             $insertedAddress = $this->addAddress($addAddressData);
-
-            $rateLimitExceededMessage = __('Daily Rate Limit Exceeded, please feel free to contact MDS Collivery to discuss custom limits');
-
-            if (!$insertedAddress) {
-                $this->messageManager->addErrorMessage($rateLimitExceededMessage);
-            }
+            is_null($insertedAddress) && $this->returnBack($this->getErrors());
 
             $addContactdata = [
                 'address_id' => $insertedAddress['address_id']
@@ -94,6 +91,7 @@ class CheckOrderStatus extends ProcessOrder implements ObserverInterface
 
             //add contact address
             $addedContact = $this->addContactAddress($addContactdata);
+            is_null($addedContact) && $this->returnBack($this->getErrors());
 
             //validate collivery
             $client = $this->getShopOwnerDetails();
@@ -112,19 +110,17 @@ class CheckOrderStatus extends ProcessOrder implements ObserverInterface
             ];
 
             $validatedCollivery = $this->validateCollivery($validateData);
+            is_null($validatedCollivery) && $this->returnBack($this->getErrors());
 
             //add collivery
             $waybill = $this->addCollivery($validatedCollivery);
+            !is_numeric($waybill) && $this->returnBack($this->getErrors());
 
             //accept collivery
-            $acceptCollivery = $this->acceptWaybill($waybill);
+            !$this->acceptWaybill($waybill) && $this->returnBack($this->getErrors());
 
-            }
-
-            if ($acceptCollivery['result'] == 'Accepted') {
-                $this->messageManager->addSuccess(__('waybill: ' . $waybill . ' created successfully'));
-            }
             $this->saveWaybill($waybill, $order->getId());
+            $this->messageManager->addSuccess(__('waybill: ' . $waybill . ' created successfully'));
         }
     }
 
@@ -143,5 +139,17 @@ class CheckOrderStatus extends ProcessOrder implements ObserverInterface
         $suburb = $address->getCustomAttribute('suburb')->getValue();
 
         return compact('location', 'town', 'suburb');
+    }
+
+    /**
+     * @param $error
+     *
+     * @return void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function returnBack($error)
+    {
+        $this->logger->error($error);
+        throw new \Magento\Framework\Exception\NoSuchEntityException(__($error));
     }
 }
