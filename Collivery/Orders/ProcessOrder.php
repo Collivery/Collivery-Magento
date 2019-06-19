@@ -10,11 +10,17 @@ abstract class ProcessOrder
      * @var \MDS\Collivery\Model\Connection
      */
     private $_collivery;
+    private $objectManager;
+
+    /** @var \Psr\Log\LoggerInterface $logger */
+    private $logger;
 
     public function __construct()
     {
         $collivery = new Connection();
         $this->_collivery = $collivery->getConnection();
+        $this->objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $this->logger = $this->objectManager->get('Psr\Log\LoggerInterface');
     }
 
     /**
@@ -99,4 +105,10 @@ abstract class ProcessOrder
         return;
     }
 
+    public function getErrors()
+    {
+        $this->logger->error(print_r($this->_collivery->getErrors(), true));
+
+        return implode(' ', $this->_collivery->getErrors());
+    }
 }
