@@ -32,13 +32,10 @@ class CustomAttributes
         ];
 
         if (isset($_GET['address_type']) && $_GET['address_type'] == 'shipping_address') {
-            echo 'update shipping';
             $addresses = [$quote->getShippingAddress()];
         } elseif (isset($_GET['address_type']) && $_GET['address_type'] == 'billing_address') {
             $addresses = [$quote->getBillingAddress()];
-            echo 'update billing';
         } else {
-            echo 'update All';
             $addresses = [$quote->getShippingAddress(), $quote->getBillingAddress()];
         }
 
@@ -46,8 +43,6 @@ class CustomAttributes
             $address->load($address->getAddressId())->addData($data);
             $address->setId($address->getAddressId())->save();
         }
-
-        return;
     }
 
     /**
