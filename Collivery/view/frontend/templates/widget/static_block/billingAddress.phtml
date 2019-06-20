@@ -1,7 +1,12 @@
 <span id="billing-address"></span>
 
 <script type="text/javascript">
-  require(['jquery','mage/url','Magento_Checkout/js/model/quote','domReady!'], function ($,url,quote) {
+  require([
+    'jquery',
+    'mage/url',
+    'Magento_Checkout/js/model/quote',
+    'Magento_Customer/js/customer-data',
+    'domReady!'], function ($,url,quote, customerData) {
     $('fieldset[data-form="billing-new-address"]').trigger('reset');
     setTimeout(() => window.getBillingAddress('#billing-address'), 200);
     $(document).on('click', '.action-update', function () {
@@ -31,7 +36,16 @@
         url: url.build('rest/V1/update-billing-address?'+fields),
         type: "POST",
         contentType: "application/json",
-        success : setTimeout(() => window.getBillingAddress('#billing-address'), 200)
+        success : setTimeout(() => window.getBillingAddress('#billing-address'), 200),
+        error: (xhr, status, errorThrown) => {
+          var errorResponse = $.parseJSON( xhr.responseText );
+          customerData.set('messages', {
+            messages: [{
+              type: 'error',
+              text: errorResponse.message
+            }]
+          });
+        }
       });
     }
   });
