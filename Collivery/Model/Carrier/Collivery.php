@@ -62,26 +62,18 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
     public function getAllowedMethods()
     {
-        $customerAddress = [];
-        if ($this->_session->isLoggedIn()) {
-            foreach ($this->_customer->getAddresses() as $address) {
-                $customerAddress[] = $address->toArray();
-            }
-        } else {
-            $quote = $this->_cart->getQuote();
-            $address = $quote->getShippingAddress();
-            $data = [
+        $quote = $this->_cart->getQuote();
+        $address = $quote->getShippingAddress();
+        $customerAddress = [
                 'town' => $address->getTown(),
                 'location' => $address->getLocation()
             ];
-            array_push($customerAddress, $data);
-        }
 
-        if (empty($customerAddress[0])) {
+        if (empty($customerAddress)) {
             return $this->_collivery->getServices();
         }
 
-        return $this->getServices($customerAddress[0]);
+        return $this->getServices($customerAddress);
     }
 
     public function collectRates(RateRequest $request)
