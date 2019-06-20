@@ -69,8 +69,9 @@ class CheckOrderStatus extends ProcessOrder implements ObserverInterface
         if ($order->getState() == Order::STATE_COMPLETE) {
             $fullname = $shippingAddressArray['firstname'] . ' ' . $shippingAddressArray['lastname'];
             $addAddressData = [
-                'company_name' =>$shippingAddressArray['company']
-                    ?? $fullname,
+                'company_name' =>isset($shippingAddressArray['company'])
+                    ? $shippingAddressArray['company']
+                    : $fullname,
                 'street' => $shippingAddressArray['street'],
                 'location_type' => $customAttributes['location'],
                 'suburb_id' => $customAttributes['suburb'],

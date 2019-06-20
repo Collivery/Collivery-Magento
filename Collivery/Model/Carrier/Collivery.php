@@ -99,11 +99,11 @@ class Collivery extends AbstractCarrier implements CarrierInterface
             $test = $this->_rateMethodFactory->create();
             $test->setCarrier($this->getCarrierCode());
             $test->setCarrierTitle($this->getConfigData('title'));
-            $test->setMethod($service['code'] ?? $key);
-            $test->setMethodTitle($service['title'] ?? $service);
+            $test->setMethod(isset($service['code']) ? $service['code'] : $key);
+            $test->setMethodTitle(isset($service['title']) ? $service['title'] : $service);
 
-            $test->setPrice($service['price'] ?? 0);
-            $test->setCost($service['cost'] ?? 0);
+            $test->setPrice(isset($service['price']) ? $service['price'] : 0);
+            $test->setCost(isset($service['cost']) ? $service['cost'] : 0);
 
             $result->append($test);
         }
