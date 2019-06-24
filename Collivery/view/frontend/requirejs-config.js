@@ -4,6 +4,8 @@ var config = {
   ],
   map: {
     '*':{
+      'Magento_Checkout/template/shipping-address/address-renderer/default.html':
+          'MDS_Collivery/template/shipping-address/address-renderer/default.html'
     }
   },
   config: {
@@ -13,7 +15,10 @@ var config = {
       },
       'Magento_Checkout/js/action/set-shipping-information': {
         'MDS_Collivery/js/action/set-shipping-information-mixin': true
-      }
+      },
+      'Magento_Checkout/js/view/billing-address': {
+        'MDS_Collivery/js/view/billing-address': true
+      },
     }
   }
 };
