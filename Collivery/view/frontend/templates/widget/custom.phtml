@@ -5,9 +5,10 @@
   </label>
   <div class="control">
     <select name="<?php echo $block->escapeHtml($block->getFieldName('location'));?>"
+            required=""
             id="<?php echo $block->escapeHtml($block->getFieldId('location'));?>">
         <?php /* @escapeNotVerified  */ echo $block->getFieldParams()?>
-      <option value="">Select location type</option>
+      <option disabled="" selected="">Select location type</option>
       <?php
       $locations = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Location())->getAllOptions(true, false);
       foreach ($locations as $location) {
@@ -24,9 +25,10 @@
   </label>
   <div class="control">
     <select name="<?php echo $block->escapeHtml($block->getFieldName('town'));?>"
+            required=""
             id="<?php echo $block->escapeHtml($block->getFieldId('town'));?>">
         <?php /* @escapeNotVerified  */ echo $block->getFieldParams()?>
-      <option value="">Select Town</option>
+      <option disabled="" selected="">Select Town</option>
         <?php
         $towns = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Town())->getAllOptions(true, false);
         foreach ($towns as $town) {
@@ -43,6 +45,7 @@
   </label>
   <div class="control">
     <select name="<?php echo $block->escapeHtml($block->getFieldName('suburb'));?>"
+            required=""
             id="<?php echo $block->escapeHtml($block->getFieldId('suburb'));?>">
         <?php /* @escapeNotVerified  */ echo $block->getFieldParams()?>
         <?php

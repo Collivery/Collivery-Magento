@@ -53,7 +53,7 @@ class InstallData implements InstallDataInterface
                     'input' => 'select',
                     'source' => $source,
                     'visible' => true,
-                    'required' => true,
+                    'required' => false,
                     'position' => $position,
                     'sort_order' => 150,
                     'system' => false
