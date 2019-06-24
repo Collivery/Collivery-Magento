@@ -62,12 +62,31 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
     public function getAllowedMethods()
     {
-        $quote = $this->_cart->getQuote();
-        $address = $quote->getShippingAddress();
-        $customerAddress = [
+        $customerAddress = [];
+        if ($this->_session->isLoggedIn()) {
+            foreach ($this->_customer->getAddresses() as $address) {
+                $customerAddress[] = [
+                    'town' => $address['town'],
+                    'location' => $address['location']
+                ];
+            }
+            $customerAddress = reset($customerAddress);
+
+            if (!$customerAddress['location'] || !$customerAddress['town']) {
+                $error = "Please set location type in address book to get shipping estimates (My Account --> Address Book)";
+
+                throw new \Magento\Framework\Exception\NoSuchEntityException(__($error));
+            }
+        } else {
+            $quote = $this->_cart->getQuote();
+            $address = $quote->getShippingAddress();
+            $data = [
                 'town' => $address->getTown(),
                 'location' => $address->getLocation()
             ];
+            array_push($customerAddress, $data);
+            $customerAddress = reset($customerAddress);
+        }
 
         if (empty($customerAddress)) {
             return $this->_collivery->getServices();
@@ -103,11 +122,22 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         return $result;
     }
 
+    /**
+     * @param $addressId
+     *
+     * @return array
+     */
     public function getAddress($addressId)
     {
         return $this->_collivery->getAddress($addressId);
     }
 
+    /**
+     * @param $customerAddress
+     * @param $service
+     *
+     * @return array
+     */
     public function shippingPrice($customerAddress, $service)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -116,6 +146,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         if ($state->getAreaCode() !== 'adminhtml') {
             $items = $this->_rateRequest->getAllItems();
             $parcelDimensions = $this->getProductDimensions($items);
+
             $data = [
                 'collivery_from'   => $this->_collivery->getDefaultAddressId(),
                 'to_town_id'       => (int)$customerAddress['town'],
@@ -134,6 +165,11 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         }
     }
 
+    /**
+     * @param $customerAddress
+     *
+     * @return array
+     */
     public function getServices($customerAddress)
     {
         $services = $this->_collivery->getServices();
@@ -157,6 +193,9 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         return $response;
     }
 
+    /**
+     * @return array
+     */
     private function getCustomer()
     {
         $customerId = $this->_session->getCustomerId();
@@ -165,10 +204,15 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         return $objectManager->create('Magento\Customer\Model\Customer')->load($customerId);
     }
 
+    /**
+     * @param $items
+     *
+     * @return array
+     */
     public function getProductDimensions($items)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
+        $parcels = [];
         foreach ($items as $item) {
             $product = $objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
             for ($x = 1; $x <= $item->getQty(); $x++) {
