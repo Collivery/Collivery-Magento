@@ -5,6 +5,12 @@ define([
 ], function ($, url, customerData) {
   'use strict';
 
+  $( document ).ajaxComplete(function() {
+    $('body').trigger('processStop');
+  });
+  $( document ).ajaxStart(function() {
+    $('body').trigger('processStart');
+  });
 
   window.getSuburbs = function(suburbField, townId) {
     $.ajax({
