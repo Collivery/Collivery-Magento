@@ -65,9 +65,16 @@
 
 <script type="text/javascript">
   require(['jquery','mage/url','domReady!'], function ($) {
-    window.hideCity('form[class="form-address-edit"] div[class="field city"]');
+    $(document).find('div.field.city, #street_2, #street_3').hide();
+    var suburb = $('select[name="suburb"]');
     $('select[name="town"]').change(function () {
+      var city = $('select[name="town"] option:selected').text();
+      $(document).find('input[name="city"]').val(city).trigger('focus').trigger('keyup');
       window.getSuburbs($('form[class="form-address-edit"] select[name="suburb"]') ,$(this).val());
+      suburb.trigger('change');
+    });
+    suburb.change(function () {
+      $('#street_2').attr('value', $('option:selected',this).text())
     });
   });
 </script>
