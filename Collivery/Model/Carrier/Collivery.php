@@ -3,11 +3,14 @@
 namespace MDS\Collivery\Model\Carrier;
 
 use Magento\Checkout\Model\Cart;
+use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
+use Magento\Sales\Model\OrderFactory;
 use Magento\Shipping\Model\Carrier\AbstractCarrier;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Shipping\Model\Rate\ResultFactory;
@@ -34,6 +37,9 @@ class Collivery extends AbstractCarrier implements CarrierInterface
     private $_customer;
     private $_rateRequest;
     private $_cart;
+    private $orderFactory;
+    private $addressRepository;
+    private $logger;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -43,6 +49,8 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         MethodFactory $rateMethodFactory,
         Session $session,
         Cart $cart,
+        OrderFactory $orderFactory,
+        AddressRepositoryInterface $addressRepository,
         $data = []
     ) {
         $this->_rateResultFactory = $rateResultFactory;
@@ -50,7 +58,10 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         $this->_scopeConfig = $scopeConfig;
         $this->_session = $session;
         $this->_cart = $cart;
+        $this->orderFactory = $orderFactory;
+        $this->addressRepository = $addressRepository;
         $this->_customer = $this->getCustomer();
+        $this->logger = $logger;
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
@@ -62,37 +73,37 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
     public function getAllowedMethods()
     {
-        $customerAddress = [];
-        if ($this->_session->isLoggedIn()) {
-            foreach ($this->_customer->getAddresses() as $address) {
-                $customerAddress[] = [
-                    'town' => $address['town'],
-                    'location' => $address['location']
+        if ($this->_session->isLoggedIn() && $this->_customer->getDefaultShipping()) {
+            try {
+                $defaultShippingAddress = $this->addressRepository->getById($this->_customer->getDefaultShipping());
+                $defaultShippingCustomAttributes = $defaultShippingAddress->getCustomAttributes();
+                if (!array_key_exists('location', $defaultShippingCustomAttributes)) {
+                    $error = "Please set location type in your default address in address book to get shipping estimates (My Account --> Address Book)";
+                    throw new \Magento\Framework\Exception\NoSuchEntityException(__($error));
+                }
+
+                $customAddress = [
+                    'town' => $defaultShippingCustomAttributes['town']->getValue(),
+                    'location' => $defaultShippingCustomAttributes['location']->getValue()
                 ];
-            }
-            $customerAddress = reset($customerAddress);
-
-            if (!$customerAddress['location'] || !$customerAddress['town']) {
-                $error = "Please set location type in address book to get shipping estimates (My Account --> Address Book)";
-
-                throw new \Magento\Framework\Exception\NoSuchEntityException(__($error));
+            } catch (LocalizedException $e) {
+                $this->logger->critical($e->getMessage());
+                throw new \Magento\Framework\Exception\NoSuchEntityException(__($e->getMessage()));
             }
         } else {
             $quote = $this->_cart->getQuote();
             $address = $quote->getShippingAddress();
-            $data = [
+            $customAddress = [
                 'town' => $address->getTown(),
                 'location' => $address->getLocation()
             ];
-            array_push($customerAddress, $data);
-            $customerAddress = reset($customerAddress);
         }
 
-        if (empty($customerAddress)) {
+        if (empty($customAddress)) {
             return $this->_collivery->getServices();
         }
 
-        return $this->getServices($customerAddress);
+        return $this->getServices($customAddress);
     }
 
     public function collectRates(RateRequest $request)
