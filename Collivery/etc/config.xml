@@ -4,10 +4,11 @@
         <carriers>
             <collivery>
                 <model>MDS\Collivery\Model\Carrier\Collivery</model>
-                <active>1</active>
+                <active>0</active>
                 <title>collivery</title>
                 <name>collivery</name>
                 <markup>10</markup>
+                <price>0</price>
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
                 <sallowspecific>1</sallowspecific>
                 <specificcountry>ZA</specificcountry>
@@ -15,21 +16,5 @@
                 <password>api123</password>
             </collivery>
         </carriers>
-        <customer>
-            <address_templates>
-                <html><![CDATA[{{depend prefix}}{{var prefix}} {{/depend}}{{var firstname}} {{depend middlename}}{{var middlename}} {{/depend}}{{var lastname}}{{depend suffix}} {{var suffix}}{{/depend}}{{depend firstname}}<br />{{/depend}}
-                    {{depend company}}{{var company}}<br />{{/depend}}
-                    {{if street1}}{{var street1}}<br />{{/if}}
-                    {{depend street2}}{{var street2}}<br />{{/depend}}
-                    {{depend street3}}{{var street3}}<br />{{/depend}}
-                    {{depend street4}}{{var street4}}<br />{{/depend}}
-                    {{if town}}{{var town}}, {{if suburb}}{{var suburb}},  {{/if}}{{if region}}{{var region}}, {{/if}}{{if postcode}}{{var postcode}}{{/if}}<br />
-                    {{var location}}<br />
-                    {{var country}}<br />
-                    {{depend telephone}}T: <a href="tel:{{var telephone}}">{{var telephone}}</a>{{/depend}}
-                    {{depend fax}}<br />F: {{var fax}}{{/depend}}
-                    {{depend vat_id}}<br />VAT: {{var vat_id}}{{/depend}}]]></html>
-            </address_templates>
-        </customer>
     </default>
 </config>
