@@ -12,4 +12,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route method="POST" url="/V1/set-default-shipping-address">
+        <service class="MDS\Collivery\Api\Address" method="setCustomerDefaultAddress"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>
