@@ -5,7 +5,11 @@ var config = {
   map: {
     '*':{
       'Magento_Checkout/template/shipping-address/address-renderer/default.html':
-          'MDS_Collivery/template/shipping-address/address-renderer/default.html'
+          'MDS_Collivery/template/shipping-address/address-renderer/default.html',
+      'Magento_Checkout/template/shipping-information/address-renderer/default.html':
+          'MDS_Collivery/template/shipping-information/address-renderer/default.html',
+      'Magento_Checkout/template/billing-address/details.html':
+          'MDS_Collivery/template/billing-address/details.html',
     }
   },
   config: {
