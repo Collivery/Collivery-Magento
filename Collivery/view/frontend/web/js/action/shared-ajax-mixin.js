@@ -63,4 +63,29 @@ define([
       })
     }
   };
+
+  window.setDefaultAddress = function(addressId, customerId, quote, rateRegistry) {
+    if (typeof addressId != 'undefined' && typeof customerId != 'undefined') {
+      $.ajax({
+        url: url.build('rest/V1/set-default-shipping-address?address_id='+addressId+'&customer_id='+customerId),
+        type: "POST",
+        contentType: "application/json",
+        success : () => {
+          let address = quote.shippingAddress();
+          rateRegistry.set(address.getKey(), null);
+          rateRegistry.set(address.getCacheKey(), null);
+          quote.shippingAddress(address);
+        },
+        error: (xhr, status, errorThrown) => {
+          var errorResponse = $.parseJSON( xhr.responseText );
+          customerData.set('messages', {
+            messages: [{
+              type: 'error',
+              text: errorResponse.message
+            }]
+          });
+        }
+      })
+    }
+  };
 });
