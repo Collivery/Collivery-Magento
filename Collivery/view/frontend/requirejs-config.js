@@ -23,6 +23,9 @@ var config = {
       'Magento_Checkout/js/view/billing-address': {
         'MDS_Collivery/js/view/billing-address': true
       },
+      'Magento_Checkout/js/view/shipping-address/address-renderer/default' : {
+        'MDS_Collivery/js/view/address-renderer-extension' : true
+      },
     }
   }
 };
