@@ -3,19 +3,15 @@
 namespace MDS\Collivery\Api;
 
 use Magento\Checkout\Model\Cart;
-use Psr\Log\LoggerInterface;
 
 class CustomAttributes
 {
     private $cart;
-    private $logger;
 
     public function __construct(
-        Cart $cart,
-        LoggerInterface $logger
+        Cart $cart
     ) {
         $this->cart = $cart;
-        $this->logger = $logger;
     }
 
     /**
