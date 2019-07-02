@@ -16,24 +16,17 @@ use Psr\Log\LoggerInterface;
 
 class Collivery extends AbstractCarrier implements CarrierInterface
 {
+    public $collivery;
     protected $_code = 'collivery';
     protected $_isFixed = true;
-    protected $_rateResultFactory;
-    protected $_rateMethodFactory;
-    protected $_scopeConfig;
-    public $_collivery;
+    protected $rateResultFactory;
+    protected $rateMethodFactory;
     protected $cache;
-
-    /**
-     * Rate result data
-     *
-     * @var Result
-     */
-    protected $_result;
-    private $_session;
-    private $_customer;
-    private $_rateRequest;
-    private $_cart;
+    protected $result;
+    private $session;
+    private $customer;
+    private $rateRequest;
+    private $cart;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -45,26 +38,25 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         Cart $cart,
         $data = []
     ) {
-        $this->_rateResultFactory = $rateResultFactory;
-        $this->_rateMethodFactory = $rateMethodFactory;
-        $this->_scopeConfig = $scopeConfig;
-        $this->_session = $session;
-        $this->_cart = $cart;
-        $this->_customer = $this->getCustomer();
+        $this->rateResultFactory = $rateResultFactory;
+        $this->rateMethodFactory = $rateMethodFactory;
+        $this->session = $session;
+        $this->cart = $cart;
+        $this->customer = $this->getCustomer();
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
         $username = $this->getConfigData('username');
         $password = $this->getConfigData('password');
         $collivery = new Connection($username, $password);
-        $this->_collivery = $collivery->getConnection();
+        $this->collivery = $collivery->getConnection();
     }
 
     public function getAllowedMethods()
     {
         $customerAddress = [];
-        if ($this->_session->isLoggedIn()) {
-            foreach ($this->_customer->getAddresses() as $address) {
+        if ($this->session->isLoggedIn()) {
+            foreach ($this->customer->getAddresses() as $address) {
                 $customerAddress[] = [
                     'town' => $address['town'],
                     'location' => $address['location']
@@ -78,7 +70,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
                 throw new \Magento\Framework\Exception\NoSuchEntityException(__($error));
             }
         } else {
-            $quote = $this->_cart->getQuote();
+            $quote = $this->cart->getQuote();
             $address = $quote->getShippingAddress();
             $data = [
                 'town' => $address->getTown(),
@@ -89,7 +81,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         }
 
         if (empty($customerAddress)) {
-            return $this->_collivery->getServices();
+            return $this->collivery->getServices();
         }
 
         return $this->getServices($customerAddress);
@@ -100,14 +92,14 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         if (!$this->isActive()) {
             return false;
         }
-        $this->_rateRequest = $request;
+        $this->rateRequest = $request;
 
-        $this->_result = $this->_rateResultFactory->create();
+        $this->result = $this->rateResultFactory->create();
 
-        $result = $this->_rateResultFactory->create();
+        $result = $this->rateResultFactory->create();
 
         foreach ($this->getAllowedMethods() as $key => $service) {
-            $test = $this->_rateMethodFactory->create();
+            $test = $this->rateMethodFactory->create();
             $test->setCarrier($this->getCarrierCode());
             $test->setCarrierTitle($this->getConfigData('title'));
             $test->setMethod(isset($service['code']) ? $service['code'] : $key);
@@ -129,7 +121,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
      */
     public function getAddress($addressId)
     {
-        return $this->_collivery->getAddress($addressId);
+        return $this->collivery->getAddress($addressId);
     }
 
     /**
@@ -144,18 +136,18 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         $state = $objectManager->get('Magento\Framework\App\State');
 
         if ($state->getAreaCode() !== 'adminhtml') {
-            $items = $this->_rateRequest->getAllItems();
+            $items = $this->rateRequest->getAllItems();
             $parcelDimensions = $this->getProductDimensions($items);
 
             $data = [
-                'collivery_from'   => $this->_collivery->getDefaultAddressId(),
+                'collivery_from'   => $this->collivery->getDefaultAddressId(),
                 'to_town_id'       => (int)$customerAddress['town'],
                 'to_location_type' => (int)$customerAddress['location'],
                 'service'          => $service,
                 'parcels'          => $parcelDimensions
             ];
 
-            $prices = $this->_collivery->getPrice($data);
+            $prices = $this->collivery->getPrice($data);
 
             if (!is_array($prices)) {
                 return false;
@@ -172,7 +164,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
      */
     public function getServices($customerAddress)
     {
-        $services = $this->_collivery->getServices();
+        $services = $this->collivery->getServices();
         $response = [];
         foreach ($services as $key => $value) {
             // Get Shipping Estimate for current service
@@ -198,7 +190,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
      */
     private function getCustomer()
     {
-        $customerId = $this->_session->getCustomerId();
+        $customerId = $this->session->getCustomerId();
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
         return $objectManager->create('Magento\Customer\Model\Customer')->load($customerId);

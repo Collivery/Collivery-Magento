@@ -6,7 +6,7 @@ use MDS\Collivery\Model\Connection;
 
 class Tracking extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
 {
-    private $_collivery;
+    private $collivery;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
@@ -23,7 +23,7 @@ class Tracking extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
         Connection $collivery
     ) {
         parent::__construct($context, $registry, $adminHelper, $data);
-        $this->_collivery = $collivery->getConnection();
+        $this->collivery = $collivery->getConnection();
     }
 
     /**
@@ -33,7 +33,7 @@ class Tracking extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
     public function getTrackingInfo()
     {
         $waybill = $this->getOrder()->getColliveryId();
-        $trackInfo =  $this->_collivery->getStatus((int)$waybill);
+        $trackInfo =  $this->collivery->getStatus((int)$waybill);
 
         if ($trackInfo) {
             $info = "Collivery $waybill is in status: {$trackInfo['status_text']}</br>";

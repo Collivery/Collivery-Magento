@@ -6,7 +6,7 @@ use MDS\Collivery\Model\Customer\Address\Attribute\Source\Suburb;
 
 class SuburbsManagement
 {
-    protected $_town;
+    protected $town;
 
     /**
      * GET for suburbs api
@@ -15,8 +15,8 @@ class SuburbsManagement
      */
     public function getSuburbs($param)
     {
-        $this->_town = new Suburb($param);
-        $suburbs = $this->_town->getAllOptions(false);
+        $this->town = new Suburb($param);
+        $suburbs = $this->town->getAllOptions(false);
 
         return $suburbs;
     }
