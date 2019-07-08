@@ -4,11 +4,11 @@ namespace MDS\Collivery\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Sales\Model\Order;
 use MDS\Collivery\Orders\ProcessOrder;
 
-class CheckOrderStatus extends ProcessOrder implements ObserverInterface
+class Shipment extends ProcessOrder implements ObserverInterface
 {
+
     /**
      * @var \Magento\Framework\Message\ManagerInterface
      */
@@ -66,9 +66,8 @@ class CheckOrderStatus extends ProcessOrder implements ObserverInterface
             $customAttributes = $this->getCustomAttributes($shippingAddressArray['customer_address_id']);
         }
 
-        if ($order->getState() == Order::STATE_COMPLETE) {
-            $fullname = $shippingAddressArray['firstname'] . ' ' . $shippingAddressArray['lastname'];
-            $addAddressData = [
+        $fullname = $shippingAddressArray['firstname'] . ' ' . $shippingAddressArray['lastname'];
+        $addAddressData = [
                 'company_name' =>isset($shippingAddressArray['company'])
                     ? $shippingAddressArray['company']
                     : $fullname,
@@ -82,23 +81,23 @@ class CheckOrderStatus extends ProcessOrder implements ObserverInterface
                 'email' => $shippingAddressArray['email'],
             ];
 
-            //add address
-            $insertedAddress = $this->addAddress($addAddressData);
-            is_null($insertedAddress) && $this->returnBack($this->getErrors());
+        //add address
+        $insertedAddress = $this->addAddress($addAddressData);
+        is_null($insertedAddress) && $this->returnBack($this->getErrors());
 
-            $addContactdata = [
-                'address_id' => $insertedAddress['address_id']
+        $addContactdata = [
+                    'address_id' => $insertedAddress['address_id']
                 ] + array_intersect_key($addAddressData, array_flip(['full_name', 'phone', 'cellphone', 'email']));
 
-            //add contact address
-            $addedContact = $this->addContactAddress($addContactdata);
-            is_null($addedContact) && $this->returnBack($this->getErrors());
+        //add contact address
+        $addedContact = $this->addContactAddress($addContactdata);
+        is_null($addedContact) && $this->returnBack($this->getErrors());
 
-            //validate collivery
-            $client = $this->getShopOwnerDetails();
-            $client = reset($client);
+        //validate collivery
+        $client = $this->getShopOwnerDetails();
+        $client = reset($client);
 
-            $validateData = [
+        $validateData = [
                 'collivery_from' => $client['address_id'],
                 'contact_from' => $client['contact_id'],
                 'collivery_to' => $insertedAddress['address_id'],
@@ -110,19 +109,18 @@ class CheckOrderStatus extends ProcessOrder implements ObserverInterface
                 'parcels' => $parcels
             ];
 
-            $validatedCollivery = $this->validateCollivery($validateData);
-            is_null($validatedCollivery) && $this->returnBack($this->getErrors());
+        $validatedCollivery = $this->validateCollivery($validateData);
+        is_null($validatedCollivery) && $this->returnBack($this->getErrors());
 
-            //add collivery
-            $waybill = $this->addCollivery($validatedCollivery);
-            !is_numeric($waybill) && $this->returnBack($this->getErrors());
+        //add collivery
+        $waybill = $this->addCollivery($validatedCollivery);
+        !is_numeric($waybill) && $this->returnBack($this->getErrors());
 
-            //accept collivery
-            !$this->acceptWaybill($waybill) && $this->returnBack($this->getErrors());
+        //accept collivery
+        !$this->acceptWaybill($waybill) && $this->returnBack($this->getErrors());
 
-            $this->saveWaybill($waybill, $order->getId());
-            $this->messageManager->addSuccess(__('waybill: ' . $waybill . ' created successfully'));
-        }
+        $this->saveWaybill($waybill, $order->getId());
+        $this->messageManager->addSuccess(__('waybill: ' . $waybill . ' created successfully'));
     }
 
     /**
