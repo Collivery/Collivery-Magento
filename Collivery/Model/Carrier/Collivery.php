@@ -7,6 +7,7 @@ use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
@@ -40,6 +41,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
     private $orderFactory;
     private $addressRepository;
     private $logger;
+    private $messageManager;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -51,6 +53,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         Cart $cart,
         OrderFactory $orderFactory,
         AddressRepositoryInterface $addressRepository,
+        ManagerInterface $messageManager,
         $data = []
     ) {
         $this->_rateResultFactory = $rateResultFactory;
@@ -62,6 +65,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         $this->addressRepository = $addressRepository;
         $this->_customer = $this->getCustomer();
         $this->logger = $logger;
+        $this->messageManager = $messageManager;
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
@@ -100,7 +104,10 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         }
 
         if (empty($customAddress)) {
-            return $this->_collivery->getServices();
+            $services =  $this->_collivery->getServices();
+            empty($services) && $this->showErrorMessage($this->_collivery->getErrors());
+
+            return $services;
         }
 
         return $this->getServices($customAddress);
@@ -169,7 +176,8 @@ class Collivery extends AbstractCarrier implements CarrierInterface
             $prices = $this->_collivery->getPrice($data);
 
             if (!is_array($prices)) {
-                return false;
+                $this->showErrorMessage($this->_collivery->getErrors());
+                return [];
             }
 
             return $prices['price']['ex_vat'];
@@ -237,5 +245,11 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         }
 
         return $parcels;
+    }
+
+    private function showErrorMessage($error)
+    {
+        $this->messageManager->addErrorMessage('An error occurred, please contact the shop owner');
+        $this->logger->error($error);
     }
 }
