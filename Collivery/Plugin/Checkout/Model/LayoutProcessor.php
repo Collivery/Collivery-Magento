@@ -6,17 +6,13 @@ class LayoutProcessor
 {
     public function aroundProcess(\Magento\Checkout\Block\Checkout\LayoutProcessor $subject, \Closure $proceed, $jsLayout)
     {
-        $jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']
+        $layout = $jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']
         ['children']['shippingAddress']['children']['shipping-address-fieldset']
-        ['children']['town']['sortOrder'] = 70;
+        ['children'];
 
-        $jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']
-        ['children']['shippingAddress']['children']['shipping-address-fieldset']
-        ['children']['suburb']['sortOrder'] = 80;
-
-        $jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']
-        ['children']['shippingAddress']['children']['shipping-address-fieldset']
-        ['children']['country_id']['sortOrder'] = 90;
+        $layout['country_id']['sortOrder'] = 70;
+        $layout['town']['sortOrder'] = 80;
+        $layout['suburb']['sortOrder'] = 90;
 
         $customJsLayout = $proceed($jsLayout);
 
