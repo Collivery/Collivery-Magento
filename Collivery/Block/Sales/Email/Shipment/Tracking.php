@@ -3,6 +3,7 @@
 namespace MDS\Collivery\Block\Sales\Email\Shipment;
 
 use MDS\Collivery\Model\Connection;
+use MDS\Collivery\Model\Constants;
 
 class Tracking extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
 {
@@ -37,13 +38,13 @@ class Tracking extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
 
         if ($trackInfo) {
             $info = "Collivery $waybill is in status: {$trackInfo['status_text']}</br>";
-            $time = array_key_exists('delivery_time', $trackInfo) ? $trackInfo['delivery_time'] : '16:00';
+            $time = array_key_exists('delivery_time', $trackInfo) ? $trackInfo['delivery_time'] : Constants::LATEST_TIME;
             $date = $trackInfo['delivery_date'] . '' . $time;
             $formatedDate = date('j F Y,  H:i', strtotime($date));
 
-            if ($trackInfo['status_id'] == 15) {
+            if ($trackInfo['status_id'] == Constants::DELIVERY_DRIVER_DISPATCHED) {
                 $info .= "Delivery will be before $formatedDate";
-            } elseif ($trackInfo['status_id'] == 9 || $trackInfo['status_id'] == 21) {
+            } elseif ($trackInfo['status_id'] == Constants::IN_TRANSIT || $trackInfo['status_id'] == Constants::RECEIVED_BY_COURIER) {
                 $info .= "Will be before $formatedDate";
             } else {
                 $info .= '';
