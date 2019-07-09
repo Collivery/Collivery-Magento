@@ -7,6 +7,7 @@ use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory;
@@ -15,6 +16,7 @@ use Magento\Sales\Model\OrderFactory;
 use Magento\Shipping\Model\Carrier\AbstractCarrier;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Shipping\Model\Rate\ResultFactory;
+use MDS\Collivery\Exceptions\NoShippingException;
 use MDS\Collivery\Model\Connection;
 use Psr\Log\LoggerInterface;
 
@@ -83,7 +85,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
                 $defaultShippingCustomAttributes = $defaultShippingAddress->getCustomAttributes();
                 if (!array_key_exists('location', $defaultShippingCustomAttributes)) {
                     $error = "Please set location type in your default address in address book to get shipping estimates (My Account --> Address Book)";
-                    throw new \Magento\Framework\Exception\NoSuchEntityException(__($error));
+                    throw new NoSuchEntityException(__($error));
                 }
 
                 $customAddress = [
@@ -92,7 +94,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
                 ];
             } catch (LocalizedException $e) {
                 $this->logger->critical($e->getMessage());
-                throw new \Magento\Framework\Exception\NoSuchEntityException(__($e->getMessage()));
+                throw new NoSuchEntityException(__($e->getMessage()));
             }
         } else {
             $quote = $this->_cart->getQuote();
@@ -123,8 +125,9 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         $this->_result = $this->_rateResultFactory->create();
 
         $result = $this->_rateResultFactory->create();
+        $shippingMethods = $this->getAllowedMethods();
 
-        foreach ($this->getAllowedMethods() as $key => $service) {
+        foreach ($shippingMethods as $key => $service) {
             $carrier = $this->_rateMethodFactory->create();
             $carrier->setCarrier($this->getCarrierCode());
             $carrier->setCarrierTitle($this->getConfigData('title'));
@@ -155,6 +158,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
      * @param $service
      *
      * @return array
+     * @throws NoShippingException
      */
     public function shippingPrice($customerAddress, $service)
     {
@@ -175,12 +179,9 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
             $prices = $this->_collivery->getPrice($data);
 
-            if (!is_array($prices)) {
-                $this->showErrorMessage($this->_collivery->getErrors());
-                return [];
-            }
+            !$prices && $this->showErrorMessage($this->_collivery->getErrors());
 
-            return $prices['price']['ex_vat'];
+            return $prices ? $prices['price']['ex_vat'] : [];
         }
     }
 
@@ -188,24 +189,26 @@ class Collivery extends AbstractCarrier implements CarrierInterface
      * @param $customerAddress
      *
      * @return array
+     * @throws NoShippingException
      */
     public function getServices($customerAddress)
     {
         $services = $this->_collivery->getServices();
         $response = [];
+
         foreach ($services as $key => $value) {
             // Get Shipping Estimate for current service
             $i = $this->shippingPrice($customerAddress, $key);
 
-            if ($i>1) {
+            if ($i) {
                 // Create Response Array
                 $response[] =
-                    [
-                        'code'    => $key,
-                        'title'   => $value,
-                        'cost'    => $i,
-                        'price'   => $i * (1+($this->getConfigData('markup')/100)),
-                    ];
+                        [
+                            'code'    => $key,
+                            'title'   => $value,
+                            'cost'    => $i,
+                            'price'   => $i * (1+($this->getConfigData('markup')/100)),
+                        ];
             }
         }
 
@@ -249,7 +252,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
     private function showErrorMessage($error)
     {
-        $this->messageManager->addErrorMessage('An error occurred, please contact the shop owner');
-        $this->logger->error($error);
+        $this->logger->error(json_encode($error));
+        throw new NoShippingException();
     }
 }
