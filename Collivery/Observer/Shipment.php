@@ -36,8 +36,9 @@ class Shipment extends ProcessOrder implements ObserverInterface
     public function execute(Observer $observer)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $shipment = $observer->getEvent()->getShipment();
         /** @var \Magento\Sales\Model\Order $order */
-        $order = $observer->getEvent()->getOrder();
+        $order = $shipment->getOrder();
         $orderItems = $order->getAllItems();
 
         foreach ($orderItems as $item) {
