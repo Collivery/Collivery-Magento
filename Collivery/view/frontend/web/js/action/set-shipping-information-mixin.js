@@ -3,10 +3,11 @@ define([
   'mage/utils/wrapper',
   'mage/url',
   'Magento_Checkout/js/model/quote',
-  'Magento_Checkout/js/model/shipping-rate-registry'
+  'Magento_Checkout/js/model/shipping-rate-registry',
 ], function ($, wrapper, url, quote, rateRegistry) {
   'use strict';
 
+  setTimeout(() => $('[name="country_id"]').trigger('change'), 1200);
   $(document).on('change', ".form-shipping-address select[name='town']", function () {
     var element = $('.form-shipping-address select[name="suburb"]');
     setTimeout(() => window.getSuburbs(element ,$(this).val()), 200);
@@ -14,7 +15,6 @@ define([
 
   function setCustomAttribute()
   {
-    $(document).find('div[name="shippingAddress.city"], #co-shipping-form input[name="street[1]"], #co-shipping-form input[name="street[2]"]').hide();
       var locationType = $('#co-shipping-form select[name="location"]').val();
       var town = $('#co-shipping-form select[name="town"]').val();
       var suburb = $('#co-shipping-form select[name="suburb"]').val();
@@ -32,8 +32,20 @@ define([
     setCustomAttribute();
   });
 
+  $(document).on('change', '[name="country_id"]', function() {
+    var customAttributes =  $(document).find('div[name="shippingAddress.town"], div[name="shippingAddress.suburb"], div[name="shippingAddress.location"]');
+    var magentoAttributes = $(document).find('div[name="shippingAddress.city"], #co-shipping-form input[name="street[1]"], #co-shipping-form input[name="street[2]"]');
+    if($(this).val() === 'ZA'){
+      magentoAttributes.hide();
+      customAttributes.show();
+    }else{
+      magentoAttributes.show();
+      customAttributes.hide();
+    }
+  });
+
   return function (targetModule) {
-    targetModule.crazyPropertyAddedHere = 'yes';
+    targetModule.setTrue = 'yes';
     return targetModule;
   }
 });
