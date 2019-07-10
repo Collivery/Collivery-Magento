@@ -8,7 +8,6 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Message\ManagerInterface;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory;
 use Magento\Quote\Model\Quote\Address\RateResult\MethodFactory;
@@ -55,7 +54,6 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         Cart $cart,
         OrderFactory $orderFactory,
         AddressRepositoryInterface $addressRepository,
-        ManagerInterface $messageManager,
         $data = []
     ) {
         $this->_rateResultFactory = $rateResultFactory;
@@ -67,7 +65,6 @@ class Collivery extends AbstractCarrier implements CarrierInterface
         $this->addressRepository = $addressRepository;
         $this->_customer = $this->getCustomer();
         $this->logger = $logger;
-        $this->messageManager = $messageManager;
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
