@@ -7,7 +7,7 @@ use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 
-class Custom extends Template
+class CustomAddressEditWidget extends Template
 {
     /**
      * @var AddressMetadataInterface
@@ -33,7 +33,7 @@ class Custom extends Template
     protected function _construct()
     {
         parent::_construct();
-        $this->setTemplate('widget/custom.phtml');
+        $this->setTemplate('widget/customAddressEdit.phtml');
     }
 
     /**

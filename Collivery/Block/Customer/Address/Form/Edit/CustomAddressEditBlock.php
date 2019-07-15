@@ -9,7 +9,7 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 
-class Custom extends Template
+class CustomAddressEditBlock extends Template
 {
     /**
      * @var AddressInterface
@@ -85,7 +85,7 @@ class Custom extends Template
     protected function _toHtml()
     {
         $customWidgetBlock = $this->getLayout()->createBlock(
-            'MDS\Collivery\Block\Customer\Widget\Custom'
+            'MDS\Collivery\Block\Customer\Widget\CustomAddressEditWidget'
         );
         $customWidgetBlock->setAddress($this->address);
 

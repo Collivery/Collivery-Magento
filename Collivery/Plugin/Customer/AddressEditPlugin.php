@@ -31,7 +31,7 @@ class AddressEditPlugin
     public function afterGetNameBlockHtml(Edit $edit, $result)
     {
         $customBlock = $this->layout->createBlock(
-            'MDS\Collivery\Block\Customer\Address\Form\Edit\Custom',
+            'MDS\Collivery\Block\Customer\Address\Form\Edit\CustomAddressEditBlock',
             'Collivery_Custom_Attribute'
         );
 
