@@ -1,5 +1,5 @@
 <?php /** @var \MDS\Collivery\Block\Customer\Widget\CustomAddressEditWidget $block */ ?>
-<div class="field custom">
+<div class="field custom" style="display: none;">
   <label class="label" for="<?php echo $block->escapeHtml($block->getFieldId('location')) ?>">
     <span><?php echo $block->escapeHtml($block->getFieldLabel('location')) ?></span>
   </label>
@@ -19,7 +19,7 @@
     </select>
   </div>
 </div>
-<div class="field custom">
+<div class="field custom" style="display: none;">
   <label class="label" for="<?php echo $block->escapeHtml($block->getFieldId('town')) ?>">
     <span><?php echo $block->escapeHtml($block->getFieldLabel('Town')) ?></span>
   </label>
@@ -39,7 +39,7 @@
     </select>
   </div>
 </div>
-<div class="field custom">
+<div class="field custom" style="display: none;">
   <label class="label" for="<?php echo $block->escapeHtml($block->getFieldId('suburb')) ?>">
     <span><?php echo $block->escapeHtml($block->getFieldLabel('Suburb')) ?></span>
   </label>
