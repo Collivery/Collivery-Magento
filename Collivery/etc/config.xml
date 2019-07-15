@@ -5,8 +5,8 @@
             <collivery>
                 <model>MDS\Collivery\Model\Carrier\Collivery</model>
                 <active>0</active>
-                <title>collivery</title>
-                <name>collivery</name>
+                <title>Collivery.net</title>
+                <name>Collivery.net</name>
                 <markup>10</markup>
                 <price>0</price>
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
