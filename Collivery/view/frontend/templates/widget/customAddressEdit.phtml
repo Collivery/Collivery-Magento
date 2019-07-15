@@ -65,7 +65,8 @@
 
 <script type="text/javascript">
   require(['jquery','mage/url','domReady!'], function ($) {
-    $(document).find('div.field.city, #street_2, #street_3').hide();
+
+    setTimeout(() => $('[name="country_id"]').trigger('change'), 200);
     var suburb = $('select[name="suburb"]');
     $('select[name="town"]').change(function () {
       var city = $('select[name="town"] option:selected').text();
@@ -75,6 +76,15 @@
     });
     suburb.change(function () {
       $('#street_2').attr('value', $('option:selected',this).text())
+    });
+    $(document).on('change', '[name="country_id"]', function() {
+      if ($(this).val() === 'ZA'){
+        $(document).find('div.custom').show();
+        $(document).find('div.field.city, #street_2, #street_3').hide();
+      }else{
+        $(document).find('div.custom').hide();
+        $(document).find('div.field.city, #street_2, #street_3').show();
+      }
     });
   });
 </script>
