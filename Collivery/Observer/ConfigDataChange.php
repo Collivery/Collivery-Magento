@@ -41,11 +41,12 @@ class ConfigDataChange
         $newPassword = $subject->getDataByKey('groups')['collivery']['fields']['password']['value'];
 
         //if password or username changed by admin user delete authentication file
-        if ($databaseUsername === $newUsername || $databasePassword === $newPassword) {
+        if ($databaseUsername !== $newUsername || $databasePassword !== $newPassword) {
             $filename = 'collivery.auth';
             $filepath = $this->filesystem->getDirectoryRead(DirectoryList::ROOT)->getAbsolutePath('cache/mds_collivery');
-            if ($this->file->isExists($filepath, $filename)) {
-                $this->file->deleteFile($filepath, $filename);
+
+            if ($this->file->isExists("$filepath/$filename")) {
+                $this->file->deleteFile("$filepath/$filename");
             }
         }
 
