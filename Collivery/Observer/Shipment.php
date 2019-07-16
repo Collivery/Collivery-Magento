@@ -122,7 +122,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
         !$this->acceptWaybill($waybill) && $this->returnBack($this->getErrors());
 
         $this->saveWaybill($waybill, $order->getId());
-        $this->messageManager->addSuccess(__('waybill: ' . $waybill . ' created successfully'));
+        $this->messageManager->addSuccessMessage(__('waybill: ' . $waybill . ' created successfully'));
     }
 
     /**
