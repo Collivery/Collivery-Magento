@@ -14,5 +14,5 @@ class Constants
     const DELIVERY_DRIVER_DISPATCHED = 15;
     const IN_TRANSIT = 9;
     const RECEIVED_BY_COURIER = 21;
-    const PACKAGE = 2;
+    const DEFAULT_PACKAGE = 2;
 }

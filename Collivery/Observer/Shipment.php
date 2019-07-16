@@ -4,6 +4,7 @@ namespace MDS\Collivery\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use MDS\Collivery\Model\Constants;
 use MDS\Collivery\Orders\ProcessOrder;
 
 class Shipment extends ProcessOrder implements ObserverInterface
@@ -103,7 +104,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
                 'contact_from' => $client['contact_id'],
                 'collivery_to' => $insertedAddress['address_id'],
                 'contact_to' => $addedContact['contact_id'],
-                'collivery_type' => 2, //Use default Package as collivery type
+                'collivery_type' => Constants::DEFAULT_PACKAGE, //Use default Package as collivery type
                 'service' => (int)$order->getShippingMethod('data')->getData('method'),
                 'cover' => false,
                 'rica' => false,
