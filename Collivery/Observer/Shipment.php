@@ -105,8 +105,8 @@ class Shipment extends ProcessOrder implements ObserverInterface
                 'contact_to' => $addedContact['contact_id'],
                 'collivery_type' => 2, //Use default Package as collivery type
                 'service' => (int)$order->getShippingMethod('data')->getData('method'),
-                'cover' => true,
-                'rica' => true,
+                'cover' => false,
+                'rica' => false,
                 'parcels' => $parcels
             ];
 
