@@ -95,8 +95,9 @@ abstract class ProcessOrder
         $table = $resource->getTableName('sales_order');
         $connection->beginTransaction();
         try {
-            $sql = "UPDATE $table SET collivery_id = $waybillId WHERE entity_id = $recId LIMIT 1";
-            $connection->query($sql);
+            $sql = "UPDATE $table SET collivery_id = ? WHERE entity_id = ? LIMIT 1";
+            $bindings = [$waybillId, $recId];
+            $connection->query($sql, $bindings);
             $connection->commit();
         } catch (\Exception $e) {
             $connection->rollBack();
