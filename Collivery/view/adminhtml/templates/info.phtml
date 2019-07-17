@@ -37,12 +37,14 @@
       <?php else: ?>
           <?= /* @escapeNotVerified */ __('No shipping information available') ?>
       <?php endif; ?>
-
-      <p><a href="#" id="click-me">Track Waybill : <?= $this->getOrder()->getColliveryId()?></a></p>
+    <?php $waybill = $this->getOrder()->getColliveryId() ?>
+    <?php if ($waybill): ?>
+      <p><a href="#" id="click-me">Track Waybill : <?= $waybill ?></a></p>
+    <?php endif; ?>
 
     <div id="popup-mpdal" >
       <p><img src="https://collivery.net/img/collivery.net-logo.svg" alt="Collivery logo" style="margin-left: auto; margin-right: auto; display: block"/></p>
-      <h1><strong>Tracking for Waybill <?= $this->getOrder()->getColliveryId()?></strong></h1>
+      <h1><strong>Tracking for Waybill <?= $waybill ?></strong></h1>
       <h1><?= $block->getTrackingInfo() ?></h1>
 
     </div>
