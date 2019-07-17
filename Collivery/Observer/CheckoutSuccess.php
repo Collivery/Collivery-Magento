@@ -30,25 +30,28 @@ class CheckoutSuccess implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $observer->getEvent()->getOrder();
-        $shippingAddressObj = $order->getShippingAddress();
+        if ($this->session->isLoggedIn()) {
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            /** @var \Magento\Sales\Model\Order $order */
+            $order = $observer->getEvent()->getOrder();
+            $shippingAddressObj = $order->getShippingAddress();
 
-        $shippingAddressArray = $shippingAddressObj->getData();
-        $options = $objectManager->create('Magento\Quote\Api\Data\AddressInterface');
-        /** @var \Magento\Quote\Api\Data\AddressInterface $quote */
-        $quote = $options->load($shippingAddressArray['quote_address_id']);
+            $shippingAddressArray = $shippingAddressObj->getData();
+            $options = $objectManager->create('Magento\Quote\Api\Data\AddressInterface');
+            /** @var \Magento\Quote\Api\Data\AddressInterface $quote */
+            $quote = $options->load($shippingAddressArray['quote_address_id']);
 
-        $location = $quote->getLocation();
-        $suburb = $quote->getSuburb();
-        $town = $quote->getTown();
-
-        $address = $this->addressRepository->getById($shippingAddressArray['customer_address_id']);
-        $address->setCustomAttribute('location', $location);
-        $address->setCustomAttribute('suburb', $suburb);
-        $address->setCustomAttribute('town', $town);
-        $this->addressRepository->save($address);
+            $location = $quote->getLocation();
+            $suburb = $quote->getSuburb();
+            $town = $quote->getTown();
+            $address = $this->addressRepository->getById($shippingAddressArray['customer_address_id']);
+            if (!$address->getCustomAttributes()) {
+                $address->setCustomAttribute('location', $location);
+                $address->setCustomAttribute('suburb', $suburb);
+                $address->setCustomAttribute('town', $town);
+                $this->addressRepository->save($address);
+            }
+        }
 
         return;
     }
