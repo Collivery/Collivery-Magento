@@ -100,16 +100,17 @@ class Shipment extends ProcessOrder implements ObserverInterface
         $client = reset($client);
 
         $validateData = [
-                'collivery_from' => $client['address_id'],
-                'contact_from' => $client['contact_id'],
-                'collivery_to' => $insertedAddress['address_id'],
-                'contact_to' => $addedContact['contact_id'],
-                'collivery_type' => Constants::DEFAULT_PACKAGE, //Use default Package as collivery type
-                'service' => (int)$order->getShippingMethod('data')->getData('method'),
-                'cover' => false,
-                'rica' => false,
-                'parcels' => $parcels
-            ];
+            'collivery_from' => $client['address_id'],
+            'contact_from' => $client['contact_id'],
+            'collivery_to' => $insertedAddress['address_id'],
+            'contact_to' => $addedContact['contact_id'],
+            'collivery_type' => Constants::DEFAULT_PACKAGE, //Use default Package as collivery type
+            'service' => (int)$order->getShippingMethod('data')->getData('method'),
+            'cover' => false,
+            'rica' => false,
+            'parcels' => $parcels,
+            'cust_ref' => $order->getRealOrderId()
+        ];
 
         $validatedCollivery = $this->validateCollivery($validateData);
         is_null($validatedCollivery) && $this->returnBack($this->getErrors());
