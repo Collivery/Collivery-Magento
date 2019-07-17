@@ -130,12 +130,20 @@ class Shipment extends ProcessOrder implements ObserverInterface
      * @param $customerAddressId
      *
      * @return array
+     * @throws NoSuchEntityException
      */
     private function getCustomAttributes($customerAddressId)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $addressRepoInterface = $objectManager->get('Magento\Customer\Api\AddressRepositoryInterface');
-        $address = $addressRepoInterface->getById($customerAddressId);
+
+        try {
+            $address = $addressRepoInterface->getById($customerAddressId);
+        } catch (\Exception $e) {
+            $this->messageManager->addErrorMessage('Delivery Address could not be found');
+            $this->returnBack($e->getMessage());
+        }
+
         $location = $address->getCustomAttribute('location')->getValue();
         $town = $address->getCustomAttribute('town')->getValue();
         $suburb = $address->getCustomAttribute('suburb')->getValue();
