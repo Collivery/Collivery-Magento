@@ -82,30 +82,8 @@ abstract class ProcessOrder
     }
 
     /**
-     * @param $waybillId
-     * @param $recId
-     *
-     * @return void
-     * @throws \Exception
+     * @return string
      */
-    public function saveWaybill($waybillId, $recId)
-    {
-        $resource = $this->objectManager->get('Magento\Framework\App\ResourceConnection');
-        $connection = $resource->getConnection();
-        $table = $resource->getTableName('sales_order');
-        $connection->beginTransaction();
-        try {
-            $sql = "UPDATE $table SET collivery_id = ? WHERE entity_id = ? LIMIT 1";
-            $bindings = [$waybillId, $recId];
-            $connection->query($sql, $bindings);
-            $connection->commit();
-        } catch (\Exception $e) {
-            $connection->rollBack();
-        }
-
-        return;
-    }
-
     public function getErrors()
     {
         $this->logger->error(print_r($this->_collivery->getErrors(), true));
