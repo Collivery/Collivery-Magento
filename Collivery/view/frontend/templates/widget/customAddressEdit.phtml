@@ -71,7 +71,7 @@
     $('select[name="town"]').change(function () {
       var city = $('select[name="town"] option:selected').text();
       $(document).find('input[name="city"]').val(city).trigger('focus').trigger('keyup');
-      window.getSuburbs($('form[class="form-address-edit"] select[name="suburb"]') ,$(this).val());
+      window.getSuburbs('form[class="form-address-edit"] select[name="suburb"]' ,$(this).val());
       suburb.trigger('change');
     });
     suburb.change(function () {

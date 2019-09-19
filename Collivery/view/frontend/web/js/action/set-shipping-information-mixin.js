@@ -9,8 +9,8 @@ define([
 
   setTimeout(() => $('[name="country_id"]').trigger('change'), 1200);
   $(document).on('change', ".form-shipping-address select[name='town']", function () {
-    var element = $('.form-shipping-address select[name="suburb"]');
-    setTimeout(() => window.getSuburbs(element ,$(this).val()), 200);
+    var elementClass = '.form-shipping-address select[name="suburb"]';
+    setTimeout(() => window.getSuburbs(elementClass ,$(this).val()), 200);
   });
 
   function setCustomAttribute()
