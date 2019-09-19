@@ -12,18 +12,18 @@ define([
     $('body').trigger('processStart');
   });
 
-  window.getSuburbs = function(suburbField, townId) {
+  window.getSuburbs = function(suburbFieldClass, townId) {
     $.ajax({
       url: url.build('rest/V1/mds-collivery/suburbs'),
       type: "GET",
       data: { param: townId },
       dataType: 'json',
       success : function(result) {
-        suburbField.empty();
-        $.each(result, function( index) {
-          suburbField.append("<option value="+result[index].value+">"+result[index].label+"</option>");
+        $(suburbFieldClass+' option').remove();
+        $.each(result, function(index, option) {
+          $(suburbFieldClass).append("<option value="+option.value+">"+option.label+"</option>");
         });
-        suburbField.trigger('change');
+        $(suburbFieldClass).trigger('change');
       },
       error: (xhr, status, errorThrown) => {
         var errorResponse = $.parseJSON( xhr.responseText );
