@@ -37,39 +37,44 @@ class Shipment extends ProcessOrder implements ObserverInterface
     public function execute(Observer $observer)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $shipment = $observer->getEvent()->getShipment();
-        /** @var \Magento\Sales\Model\Order $order */
-        $order = $shipment->getOrder();
-        $orderItems = $order->getAllItems();
+        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+        $connection = $resource->getConnection();
 
-        foreach ($orderItems as $item) {
-            $product = $objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
-            $parcels[] = [
-                'weight' => $item->getWeight(),
-                'height' => $product->getTsDimensionsHeight(),
-                'length' => $product->getTsDimensionsLength(),
-                'width' => $product->getTsDimensionsWidth(),
-            ];
-        }
+        try {
+            $connection->beginTransaction();
+            $shipment = $observer->getEvent()->getShipment();
+            /** @var \Magento\Sales\Model\Order $order */
+            $order = $shipment->getOrder();
+            $orderItems = $order->getAllItems();
 
-        $shippingAddressObj = $order->getShippingAddress();
+            foreach ($orderItems as $item) {
+                $product = $objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
+                $parcels[] = [
+                    'weight' => $item->getWeight(),
+                    'height' => $product->getTsDimensionsHeight(),
+                    'length' => $product->getTsDimensionsLength(),
+                    'width' => $product->getTsDimensionsWidth(),
+                ];
+            }
 
-        $shippingAddressArray = $shippingAddressObj->getData();
+            $shippingAddressObj = $order->getShippingAddress();
 
-        if (is_null($shippingAddressArray['customer_address_id'])) {
-            $options = $objectManager->create('Magento\Quote\Api\Data\AddressInterface');
-            $quote = $options->load($shippingAddressArray['quote_address_id']);
-            $customAttributes = [
-                'location' => $quote->getLocation(),
-                'town' => $quote->getTown(),
-                'suburb' => $quote->getSuburb(),
-            ];
-        } else {
-            $customAttributes = $this->getCustomAttributes($shippingAddressArray['customer_address_id']);
-        }
+            $shippingAddressArray = $shippingAddressObj->getData();
 
-        $fullname = $shippingAddressArray['firstname'] . ' ' . $shippingAddressArray['lastname'];
-        $addAddressData = [
+            if (is_null($shippingAddressArray['customer_address_id'])) {
+                $options = $objectManager->create('Magento\Quote\Api\Data\AddressInterface');
+                $quote = $options->load($shippingAddressArray['quote_address_id']);
+                $customAttributes = [
+                    'location' => $quote->getLocation(),
+                    'town' => $quote->getTown(),
+                    'suburb' => $quote->getSuburb(),
+                ];
+            } else {
+                $customAttributes = $this->getCustomAttributes($shippingAddressArray['customer_address_id']);
+            }
+
+            $fullname = $shippingAddressArray['firstname'] . ' ' . $shippingAddressArray['lastname'];
+            $addAddressData = [
                 'company_name' =>isset($shippingAddressArray['company'])
                     ? $shippingAddressArray['company']
                     : $fullname,
@@ -83,49 +88,53 @@ class Shipment extends ProcessOrder implements ObserverInterface
                 'email' => $shippingAddressArray['email'],
             ];
 
-        //add address
-        $insertedAddress = $this->addAddress($addAddressData);
-        is_null($insertedAddress) && $this->returnBack($this->getErrors());
+            //add address
+            $insertedAddress = $this->addAddress($addAddressData);
+            is_null($insertedAddress) && $this->errorBag($this->getErrors());
 
-        $addContactdata = [
+            $addContactdata = [
                     'address_id' => $insertedAddress['address_id']
                 ] + array_intersect_key($addAddressData, array_flip(['full_name', 'phone', 'cellphone', 'email']));
 
-        //add contact address
-        $addedContact = $this->addContactAddress($addContactdata);
-        is_null($addedContact) && $this->returnBack($this->getErrors());
+            //add contact address
+            $addedContact = $this->addContactAddress($addContactdata);
+            is_null($addedContact) && $this->errorBag($this->getErrors());
 
-        //validate collivery
-        $client = $this->getShopOwnerDetails();
-        $client = reset($client);
+            //validate collivery
+            $client = $this->getShopOwnerDetails();
+            $client = reset($client);
 
-        $validateData = [
-            'collivery_from' => $client['address_id'],
-            'contact_from' => $client['contact_id'],
-            'collivery_to' => $insertedAddress['address_id'],
-            'contact_to' => $addedContact['contact_id'],
-            'collivery_type' => Constants::DEFAULT_PACKAGE, //Use default Package as collivery type
-            'service' => (int)$order->getShippingMethod('data')->getData('method'),
-            'cover' => false,
-            'rica' => false,
-            'parcels' => $parcels,
-            'cust_ref' => $order->getRealOrderId()
-        ];
+            $validateData = [
+                'collivery_from' => $client['address_id'],
+                'contact_from' => $client['contact_id'],
+                'collivery_to' => $insertedAddress['address_id'],
+                'contact_to' => $addedContact['contact_id'],
+                'collivery_type' => Constants::DEFAULT_PACKAGE, //Use default Package as collivery type
+                'service' => (int)$order->getShippingMethod('data')->getData('method'),
+                'cover' => false,
+                'rica' => false,
+                'parcels' => $parcels,
+                'cust_ref' => $order->getRealOrderId()
+            ];
 
-        $validatedCollivery = $this->validateCollivery($validateData);
-        is_null($validatedCollivery) && $this->returnBack($this->getErrors());
+            $validatedCollivery = $this->validateCollivery($validateData);
+            is_null($validatedCollivery) && $this->errorBag($this->getErrors());
 
-        //add collivery
-        $waybill = $this->addCollivery($validatedCollivery);
-        !is_numeric($waybill) && $this->returnBack($this->getErrors());
+            //add collivery
+            $waybill = $this->addCollivery($validatedCollivery);
+            !is_numeric($waybill) && $this->errorBag($this->getErrors());
 
-        //accept collivery
-        !$this->acceptWaybill($waybill) && $this->returnBack($this->getErrors());
+            //accept collivery
+            !$this->acceptWaybill($waybill) && $this->errorBag($this->getErrors());
 
-        $this->saveWaybill($waybill, $order->getId());
-        $this->messageManager->addSuccessMessage(__('waybill: ' . $waybill . ' created successfully'));
             $order->setData('collivery_id', $waybill);
             $order->afterSave();
+            $this->messageManager->addSuccessMessage(__('waybill: ' . $waybill . ' created successfully'));
+            $connection->commit();
+        } catch (\InvalidArgumentException $e) {
+            $connection->rollBack();
+            $this->errorBag($e->getMessage());
+        }
     }
 
     /**
@@ -143,7 +152,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
             $address = $addressRepoInterface->getById($customerAddressId);
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage('Delivery Address could not be found');
-            $this->returnBack($e->getMessage());
+            $this->errorBag($e->getMessage());
         }
 
         $location = $address->getCustomAttribute('location')->getValue();
@@ -159,7 +168,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
      * @return void
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function returnBack($error)
+    public function errorBag($error)
     {
         $this->logger->error($error);
         throw new \Magento\Framework\Exception\NoSuchEntityException(__($error));
