@@ -57,12 +57,16 @@ class Address
     public function addAddress()
     {
         $customerId = $this->getCustomer()->getId();
+        $objectManager = ObjectManager::getInstance();
+        $region = $objectManager->create(RegionInterface::class);
+        $region->setRegion($_GET['region']);
         $address = $this->address->setCustomerId($customerId)
             ->setFirstname($_GET['firstname'])
             ->setLastname($_GET['lastname'])
             ->setCountryId($_GET['country_id'])
             ->setCompany($_GET['company'])
             ->setPostcode($_GET['postcode'])
+            ->setRegion($region)
             ->setCity($_GET['city'])
             ->setTelephone($_GET['telephone'])
             ->setStreet($_GET['street'])
