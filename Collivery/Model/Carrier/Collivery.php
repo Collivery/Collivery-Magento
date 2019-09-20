@@ -42,7 +42,6 @@ class Collivery extends AbstractCarrier implements CarrierInterface
     private $orderFactory;
     private $addressRepository;
     private $logger;
-    private $messageManager;
 
     public function __construct(
         ScopeConfigInterface $scopeConfig,

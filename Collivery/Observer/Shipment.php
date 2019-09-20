@@ -4,7 +4,6 @@ namespace MDS\Collivery\Observer;
 
 use Magento\Catalog\Model\Product;
 use Magento\Customer\Api\AddressRepositoryInterface;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -37,7 +36,8 @@ class Shipment extends ProcessOrder implements ObserverInterface
      * @param Observer $observer
      *
      * @return void
-     * @throws \Exception
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \InvalidArgumentException
      */
     public function execute(Observer $observer)
     {
@@ -145,7 +145,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
      * @param $customerAddressId
      *
      * @return array
-     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getCustomAttributes($customerAddressId)
     {

@@ -6,6 +6,7 @@ use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\Data\AddressInterfaceFactory;
 use Magento\Customer\Model\Session;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 
@@ -55,7 +56,7 @@ class CustomAddressEditBlock extends Template
 
     /**
      * @return Template
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     protected function _prepareLayout()
     {
@@ -66,7 +67,7 @@ class CustomAddressEditBlock extends Template
                 if ($this->address->getCustomerId() != $this->customerSession->getCustomerId()) {
                     $this->address = null;
                 }
-            } catch (NoSuchEntityException $e) {
+            } catch (LocalizedException $e) {
                 $this->address = null;
             }
         }
@@ -80,7 +81,7 @@ class CustomAddressEditBlock extends Template
 
     /**
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     protected function _toHtml()
     {
