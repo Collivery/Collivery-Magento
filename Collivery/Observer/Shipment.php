@@ -2,8 +2,13 @@
 
 namespace MDS\Collivery\Observer;
 
+use Magento\Catalog\Model\Product;
+use Magento\Customer\Api\AddressRepositoryInterface;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Quote\Api\Data\AddressInterface;
 use MDS\Collivery\Model\Constants;
 use MDS\Collivery\Orders\ProcessOrder;
 
@@ -36,8 +41,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+        $resource = $this->objectManager->get(ResourceConnection::class);
         $connection = $resource->getConnection();
 
         try {
@@ -48,7 +52,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
             $orderItems = $order->getAllItems();
 
             foreach ($orderItems as $item) {
-                $product = $objectManager->create('Magento\Catalog\Model\Product')->load($item->getProductId());
+                $product = $this->objectManager->create(Product::class)->load($item->getProductId());
                 $parcels[] = [
                     'weight' => $item->getWeight(),
                     'height' => $product->getTsDimensionsHeight(),
@@ -62,7 +66,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
             $shippingAddressArray = $shippingAddressObj->getData();
 
             if (is_null($shippingAddressArray['customer_address_id'])) {
-                $options = $objectManager->create('Magento\Quote\Api\Data\AddressInterface');
+                $options = $this->objectManager->create(AddressInterface::class);
                 $quote = $options->load($shippingAddressArray['quote_address_id']);
                 $customAttributes = [
                     'location' => $quote->getLocation(),
@@ -145,8 +149,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
      */
     private function getCustomAttributes($customerAddressId)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $addressRepoInterface = $objectManager->get('Magento\Customer\Api\AddressRepositoryInterface');
+        $addressRepoInterface = $this->objectManager->get(AddressRepositoryInterface::class);
 
         try {
             $address = $addressRepoInterface->getById($customerAddressId);

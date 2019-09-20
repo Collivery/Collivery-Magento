@@ -2,6 +2,7 @@
 
 namespace MDS\Collivery\Orders;
 
+use Magento\Framework\App\ObjectManager;
 use MDS\Collivery\Model\Connection;
 
 abstract class ProcessOrder
@@ -10,7 +11,7 @@ abstract class ProcessOrder
      * @var \MDS\Collivery\Model\Connection
      */
     private $_collivery;
-    private $objectManager;
+    protected $objectManager;
 
     /** @var \Psr\Log\LoggerInterface $logger */
     private $logger;
@@ -19,7 +20,7 @@ abstract class ProcessOrder
     {
         $collivery = new Connection();
         $this->_collivery = $collivery->getConnection();
-        $this->objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $this->objectManager = ObjectManager::getInstance();
         $this->logger = $this->objectManager->get('Psr\Log\LoggerInterface');
     }
 
