@@ -15,7 +15,7 @@ define([
     }
   });
 
-  $(document).on('click', 'span:contains("Save Address")', function() {
+  $(document).on('click', '.action-save-address span', function() {
     var newAddress = checkoutData.getNewCustomerShippingAddress();
     var storage = $.parseJSON(localStorage.getItem('mage-cache-storage'));
     $.ajax({
