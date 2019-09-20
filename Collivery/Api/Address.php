@@ -9,8 +9,11 @@
 namespace MDS\Collivery\Api;
 
 use Magento\Checkout\Model\Session;
+use Magento\Customer\Api\Data\RegionInterface;
 use Magento\Customer\Model\Customer;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Psr\Log\LoggerInterface;
 
 class Address
@@ -37,6 +40,8 @@ class Address
 
     /**
      * @return void
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function setCustomerDefaultAddress()
     {
@@ -53,6 +58,8 @@ class Address
 
     /**
      * @return bool
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function addAddress()
     {
@@ -87,6 +94,8 @@ class Address
 
     /**
      * @return Customer
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getCustomer()
     {
