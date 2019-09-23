@@ -4,7 +4,7 @@
         <carriers>
             <collivery>
                 <model>MDS\Collivery\Model\Carrier\Collivery</model>
-                <active>0</active>
+                <active>1</active>
                 <title>Collivery.net</title>
                 <name>Collivery.net</name>
                 <markup>10</markup>
