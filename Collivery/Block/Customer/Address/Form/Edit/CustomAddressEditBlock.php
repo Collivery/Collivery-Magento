@@ -45,10 +45,9 @@ class CustomAddressEditBlock extends Template
         Template\Context $context,
         AddressRepositoryInterface $addressRepository,
         AddressInterfaceFactory $addressFactory,
-        Session $session,
-        $data = []
+        Session $session
     ) {
-        parent::__construct($context, $data);
+        parent::__construct($context);
         $this->addressRepository = $addressRepository;
         $this->addressFactory = $addressFactory;
         $this->customerSession = $session;
