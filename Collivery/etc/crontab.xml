@@ -2,7 +2,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
         <job instance="MDS\Collivery\Cron\Job" method="execute" name="install_module_cron">
-            <schedule>* * * * *</schedule>
         </job>
     </group>
 </config>
