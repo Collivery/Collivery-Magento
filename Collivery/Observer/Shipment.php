@@ -7,9 +7,11 @@ use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\Data\AddressInterface;
 use MDS\Collivery\Model\Constants;
 use MDS\Collivery\Orders\ProcessOrder;
+use Throwable;
 
 class Shipment extends ProcessOrder implements ObserverInterface
 {
@@ -36,7 +38,7 @@ class Shipment extends ProcessOrder implements ObserverInterface
      * @param Observer $observer
      *
      * @return void
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      * @throws \InvalidArgumentException
      */
     public function execute(Observer $observer)
@@ -145,7 +147,8 @@ class Shipment extends ProcessOrder implements ObserverInterface
      * @param $customerAddressId
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
+     * @throws Throwable
      */
     private function getCustomAttributes($customerAddressId)
     {
@@ -153,9 +156,11 @@ class Shipment extends ProcessOrder implements ObserverInterface
 
         try {
             $address = $addressRepoInterface->getById($customerAddressId);
-        } catch (\Exception $e) {
+        } catch (NoSuchEntityException $e) {
             $this->messageManager->addErrorMessage('Delivery Address could not be found');
             $this->errorBag($e->getMessage());
+        } catch (Throwable $e) {
+            throw $e;
         }
 
         $location = $address->getCustomAttribute('location')->getValue();
@@ -169,11 +174,11 @@ class Shipment extends ProcessOrder implements ObserverInterface
      * @param $error
      *
      * @return void
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function errorBag($error)
     {
         $this->logger->error($error);
-        throw new \Magento\Framework\Exception\NoSuchEntityException(__($error));
+        throw new NoSuchEntityException(__($error));
     }
 }
