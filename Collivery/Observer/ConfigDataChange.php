@@ -2,25 +2,30 @@
 
 namespace MDS\Collivery\Observer;
 
-use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File;
+use MDS\Collivery\Model\Cache;
 
 class ConfigDataChange
 {
     private $file;
     private $filesystem;
+    private $cache;
+    private $path;
 
     /**
      * ConfigDataChange constructor.
      *
      * @param File       $file
      * @param Filesystem $filesystem
+     * @param Cache      $cache
      */
-    public function __construct(File $file, Filesystem $filesystem)
+    public function __construct(File $file, Filesystem $filesystem, Cache $cache)
     {
         $this->file = $file;
         $this->filesystem = $filesystem;
+        $this->cache = $cache;
+        $this->path = 'cache/mds_collivery/collivery.auth';
     }
 
     /**
@@ -43,11 +48,8 @@ class ConfigDataChange
 
             //if password or username changed by admin user delete authentication file
             if ($databaseUsername !== $newUsername || $databasePassword !== $newPassword) {
-                $filename = 'collivery.auth';
-                $filepath = $this->filesystem->getDirectoryRead(DirectoryList::ROOT)->getAbsolutePath('cache/mds_collivery');
-
-                if ($this->file->isExists("$filepath/$filename")) {
-                    $this->file->deleteFile("$filepath/$filename");
+                if ($this->cache->has('collivery.auth')) {
+                    $this->file->deleteFile($this->path);
                 }
             }
         }
