@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mosa
- * Date: 2019/04/02
- * Time: 9:33 AM
- */
 
 namespace MDS\Collivery\Plugin\Magento\Quote\Model;
 

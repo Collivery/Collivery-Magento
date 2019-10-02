@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mosa
- * Date: 2019/03/29
- * Time: 1:27 PM
- */
 
 namespace MDS\Collivery\Model;
 

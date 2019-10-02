@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mosa
- * Date: 2019/07/09
- * Time: 1:34 PM
- */
 
 namespace MDS\Collivery\Exceptions;
 

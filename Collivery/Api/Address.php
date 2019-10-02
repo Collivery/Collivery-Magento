@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mosa
- * Date: 2019/06/27
- * Time: 12:21 PM
- */
 
 namespace MDS\Collivery\Api;
 
