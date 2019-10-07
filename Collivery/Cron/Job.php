@@ -17,13 +17,11 @@ class Job
 
     public function execute()
     {
-        $this->logger->debug('Enabled MDS_Collivery module.');
-        exec('php ../../../../bin/magento module:enable MDS_Collivery');
         $this->logger->debug('Run indexer:reindex.');
-        exec('php ../../../../bin/magento indexer:reindex');
+        exec('php -f ' . BP . '/bin/magento indexer:reindex');
         $this->logger->debug('Run setup:upgrade.');
-        exec('php ../../../../bin/magento setup:upgrade');
+        exec('php -f ' . BP . '/bin/magento setup:upgrade');
         $this->logger->debug('Run cache:flush.');
-        exec('php ../../../../bin/magento bin/magento cache:flush');
+        exec('php -f ' . BP . '/bin/magento bin/magento cache:flush');
     }
 }
