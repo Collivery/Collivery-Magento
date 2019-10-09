@@ -4,4 +4,11 @@
         <plugin name="MDS\Collivery\Customer\AddressEditPlugin"
                 type="MDS\Collivery\Plugin\Customer\AddressEditPlugin"/>
     </type>
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="checkout_check_module_status" xsi:type="object">MDS\Collivery\Model\ModuleStatusConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
