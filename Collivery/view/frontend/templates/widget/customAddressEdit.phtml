@@ -68,26 +68,30 @@ $isModuleActive = $block->isModuleActive();
 
 <script type="text/javascript">
   require(['jquery','mage/url','domReady!'], function ($) {
+    var isModuleActive = "<?= $isModuleActive ?>";
 
-    setTimeout(() => $('[name="country_id"]').trigger('change'), 200);
-    var suburb = $('select[name="suburb"]');
-    $('select[name="town"]').change(function () {
-      var city = $('select[name="town"] option:selected').text();
-      $(document).find('input[name="city"]').val(city).trigger('focus').trigger('keyup');
-      window.getSuburbs('form[class="form-address-edit"] select[name="suburb"]' ,$(this).val());
-      suburb.trigger('change');
-    });
-    suburb.change(function () {
-      $('#street_2').attr('value', $('option:selected',this).text())
-    });
-    $(document).on('change', '[name="country_id"]', function() {
-      if ($(this).val() === 'ZA'){
-        $(document).find('div.custom').show();
-        $(document).find('div.field.city, #street_2, #street_3').hide();
-      }else{
-        $(document).find('div.custom').hide();
-        $(document).find('div.field.city, #street_2, #street_3').show();
-      }
-    });
+    if (isModuleActive == 1){
+      setTimeout(() => $('[name="country_id"]').trigger('change'), 200);
+      var suburb = $('select[name="suburb"]');
+      $('select[name="town"]').change(function () {
+        var city = $('select[name="town"] option:selected').text();
+        $(document).find('input[name="city"]').val(city).trigger('focus').trigger('keyup');
+        window.getSuburbs('form[class="form-address-edit"] select[name="suburb"]' ,$(this).val());
+        suburb.trigger('change');
+      });
+      suburb.change(function () {
+        $('#street_2').attr('value', $('option:selected',this).text())
+      });
+      $(document).on('change', '[name="country_id"]', function() {
+        if ($(this).val() === 'ZA'){
+          $(document).find('div.custom').show();
+          $(document).find('div.field.city, #street_2, #street_3').hide();
+        }else{
+          $(document).find('div.custom').hide();
+          $(document).find('div.field.city, #street_2, #street_3').show();
+        }
+      });
+    }
+
   });
 </script>
