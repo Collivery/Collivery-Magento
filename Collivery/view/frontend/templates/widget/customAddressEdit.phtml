@@ -1,21 +1,25 @@
-<?php /** @var \MDS\Collivery\Block\Customer\Widget\CustomAddressEditWidget $block */ ?>
+<?php
+/** @var \MDS\Collivery\Block\Customer\Widget\CustomAddressEditWidget $block */
+$isModuleActive = $block->isModuleActive();
+?>
+<?php if ($isModuleActive) {
+    ?>
 <div class="field custom" style="display: none;">
   <label class="label" for="<?php echo $block->escapeHtml($block->getFieldId('location')) ?>">
     <span><?php echo $block->escapeHtml($block->getFieldLabel('location')) ?></span>
   </label>
   <div class="control">
-    <select name="<?php echo $block->escapeHtml($block->getFieldName('location'));?>"
+    <select name="<?php echo $block->escapeHtml($block->getFieldName('location')); ?>"
             required=""
-            id="<?php echo $block->escapeHtml($block->getFieldId('location'));?>">
+            id="<?php echo $block->escapeHtml($block->getFieldId('location')); ?>">
         <?php /* @escapeNotVerified  */ echo $block->getFieldParams()?>
       <option disabled="" selected="">Select location type</option>
       <?php
       $locations = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Location())->getAllOptions(true, false);
-      foreach ($locations as $location) {
-          $selected =  $location['value'] == $block->escapeHtml($block->getValue('location')) ? 'selected="selected"' : '';
-          echo '<option value="' . $location['value'] . '" ' . $selected . '>' . $location['label'] . '</option>';
-      }
-      ?>
+    foreach ($locations as $location) {
+        $selected =  $location['value'] == $block->escapeHtml($block->getValue('location')) ? 'selected="selected"' : '';
+        echo '<option value="' . $location['value'] . '" ' . $selected . '>' . $location['label'] . '</option>';
+    } ?>
     </select>
   </div>
 </div>
@@ -24,18 +28,17 @@
     <span><?php echo $block->escapeHtml($block->getFieldLabel('Town')) ?></span>
   </label>
   <div class="control">
-    <select name="<?php echo $block->escapeHtml($block->getFieldName('town'));?>"
+    <select name="<?php echo $block->escapeHtml($block->getFieldName('town')); ?>"
             required=""
-            id="<?php echo $block->escapeHtml($block->getFieldId('town'));?>">
+            id="<?php echo $block->escapeHtml($block->getFieldId('town')); ?>">
         <?php /* @escapeNotVerified  */ echo $block->getFieldParams()?>
       <option disabled="" selected="">Select Town</option>
         <?php
         $towns = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Town())->getAllOptions(true, false);
-        foreach ($towns as $town) {
-            $selected =  $town['value'] == $block->escapeHtml($block->getValue('town')) ? 'selected="selected"' : '';
-            echo '<option value="' . $town['value'] . '" ' . $selected . ' >' . $town['label'] . '</option>';
-        }
-        ?>
+    foreach ($towns as $town) {
+        $selected =  $town['value'] == $block->escapeHtml($block->getValue('town')) ? 'selected="selected"' : '';
+        echo '<option value="' . $town['value'] . '" ' . $selected . ' >' . $town['label'] . '</option>';
+    } ?>
     </select>
   </div>
 </div>
@@ -44,24 +47,24 @@
     <span><?php echo $block->escapeHtml($block->getFieldLabel('Suburb')) ?></span>
   </label>
   <div class="control">
-    <select name="<?php echo $block->escapeHtml($block->getFieldName('suburb'));?>"
+    <select name="<?php echo $block->escapeHtml($block->getFieldName('suburb')); ?>"
             required=""
-            id="<?php echo $block->escapeHtml($block->getFieldId('suburb'));?>">
+            id="<?php echo $block->escapeHtml($block->getFieldId('suburb')); ?>">
         <?php /* @escapeNotVerified  */ echo $block->getFieldParams()?>
         <?php
         $suburbs = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Suburb($block->escapeHtml($block->getValue('town'))))
             ->getAllOptions(true, false);
-        if ($suburbs) {
-            foreach ($suburbs as $suburb) {
-                $selected =  $suburb['value'] == $block->escapeHtml($block->getValue('suburb')) ? 'selected="selected"' : '';
-                echo '<option value="' . $suburb['value'] . '" ' . $selected . '>' . $suburb['label'] . '</option>';
-            }
+    if ($suburbs) {
+        foreach ($suburbs as $suburb) {
+            $selected =  $suburb['value'] == $block->escapeHtml($block->getValue('suburb')) ? 'selected="selected"' : '';
+            echo '<option value="' . $suburb['value'] . '" ' . $selected . '>' . $suburb['label'] . '</option>';
         }
-
-        ?>
+    } ?>
     </select>
   </div>
 </div>
+<?php
+} ?>
 
 <script type="text/javascript">
   require(['jquery','mage/url','domReady!'], function ($) {
