@@ -2,32 +2,40 @@
 
 namespace MDS\Collivery\Block\Customer\Widget;
 
+use Magento\Config\Model\Config;
 use Magento\Customer\Api\AddressMetadataInterface;
 use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
+use MDS\Collivery\Model\ModuleStatus;
 
 class CustomAddressEditWidget extends Template
 {
+    use ModuleStatus;
+
     /**
      * @var AddressMetadataInterface
      */
     private $addressMetadata;
+    private $subject;
 
     /**
      * Custom constructor.
      *
-     * @param Template\Context         $context
-     * @param array                    $data
-     * @param AddressMetadataInterface $metadata
+     * @param Template\Context             $context
+     * @param array                        $data
+     * @param AddressMetadataInterface     $metadata
+     * @param Config $subject
      */
     public function __construct(
         Template\Context $context,
         array $data = [],
-        AddressMetadataInterface $metadata
+        AddressMetadataInterface $metadata,
+        Config $subject
     ) {
         parent::__construct($context, $data);
         $this->addressMetadata = $metadata;
+        $this->subject = $subject;
     }
 
     protected function _construct()
@@ -112,5 +120,15 @@ class CustomAddressEditWidget extends Template
         }
 
         return $attribute;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isModuleActive()
+    {
+        $status = $this->isActive();
+
+        return $status;
     }
 }
