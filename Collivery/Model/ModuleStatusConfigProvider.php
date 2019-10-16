@@ -15,6 +15,8 @@ class ModuleStatusConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        return $config['IsColliveryActive'] = $this->isActive();
+        $config['IsColliveryActive'] = $this->isActive();
+
+        return $config;
     }
 }
