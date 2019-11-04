@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <collivery>
+                <model>MDS\Collivery\Model\Carrier\Collivery</model>
+                <active>0</active>
+                <title>Collivery.net</title>
+                <name>Collivery.net</name>
+                <markup>10</markup>
+                <price>0</price>
+                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
+                <sallowspecific>1</sallowspecific>
+                <specificcountry>ZA</specificcountry>
+                <username></username>
+                <password></password>
+            </collivery>
+        </carriers>
+    </default>
+</config>

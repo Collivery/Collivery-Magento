@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route method="GET" url="/V1/mds-collivery/suburbs">
+        <service class="MDS\Collivery\Api\SuburbsManagement" method="getSuburbs"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/custom-attributes">
+        <service class="MDS\Collivery\Api\CustomAttributes" method="insertCustomAttributes"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/set-default-shipping-address">
+        <service class="MDS\Collivery\Api\Address" method="setCustomerDefaultAddress"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/add-new-shipping-address">
+        <service class="MDS\Collivery\Api\Address" method="addAddress"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+</routes>
