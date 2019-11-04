@@ -67,9 +67,7 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
-        $username = $this->getConfigData('username');
-        $password = $this->getConfigData('password');
-        $collivery = new Connection($username, $password);
+        $collivery = new Connection();
         $this->_collivery = $collivery->getConnection();
     }
 
