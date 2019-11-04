@@ -4,7 +4,7 @@
         <carriers>
             <collivery>
                 <model>MDS\Collivery\Model\Carrier\Collivery</model>
-                <active>1</active>
+                <active>0</active>
                 <title>Collivery.net</title>
                 <name>Collivery.net</name>
                 <markup>10</markup>
@@ -12,8 +12,8 @@
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
                 <sallowspecific>1</sallowspecific>
                 <specificcountry>ZA</specificcountry>
-                <username>api@collivery.co.za</username>
-                <password>api123</password>
+                <username></username>
+                <password></password>
             </collivery>
         </carriers>
     </default>
