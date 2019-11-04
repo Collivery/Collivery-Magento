@@ -2,7 +2,6 @@
 
 namespace MDS\Collivery\Orders;
 
-use Magento\Config\Model\Config;
 use Magento\Framework\App\ObjectManager;
 use MDS\Collivery\Exceptions\NoConfigCredentialsException;
 use MDS\Collivery\Model\Connection;
@@ -20,8 +19,6 @@ abstract class ProcessOrder
 
     /**
      * ProcessOrder constructor.
-     *
-     * @throws NoConfigCredentialsException
      */
     public function __construct()
     {
