@@ -1,9 +1,6 @@
 <?php
 namespace MDS\Collivery\Model;
 
-//use MdsExceptions\SoapConnectionException;
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\App\ProductMetadataInterface;
 use SoapClient; // Use PHP Soap Client
 use SoapFault;  // Use PHP Soap Fault
 
@@ -28,9 +25,6 @@ class MdsCollivery
      */
     public function __construct(array $config = [], $cache = null)
     {
-        $this->objectManager = ObjectManager::getInstance();
-        $productMetadata = $this->objectManager->get(ProductMetadataInterface::class);
-
         if (is_null($cache)) {
             $cache_dir = array_key_exists('cache_dir', $config) ? $config['cache_dir'] : null;
             $this->cache = new Cache($cache_dir);
@@ -38,15 +32,7 @@ class MdsCollivery
             $this->cache = $cache;
         }
 
-        $this->config = (object) [
-            'app_name'      => $productMetadata->getName(), // Application Name
-            'app_version'   => $productMetadata->getVersion(), // Application Version
-            'app_host'      => "{$productMetadata->getVersion()} Version. {$productMetadata->getVersion()}", // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / 'Joomla! 2.5.17 VirtueMart 2.0.26d'
-            'app_url'       => '', // URL your site is hosted on
-            'user_email'    => 'api@collivery.co.za',
-            'user_password' => 'api123',
-            'demo'          => false,
-        ];
+        $this->config = (object) $config;
 
         foreach ($config as $key => $value) {
             $this->config->$key = $value;
