@@ -2,7 +2,9 @@
 
 namespace MDS\Collivery\Orders;
 
+use Magento\Config\Model\Config;
 use Magento\Framework\App\ObjectManager;
+use MDS\Collivery\Exceptions\NoConfigCredentialsException;
 use MDS\Collivery\Model\Connection;
 
 abstract class ProcessOrder
@@ -10,18 +12,25 @@ abstract class ProcessOrder
     /**
      * @var \MDS\Collivery\Model\Connection
      */
-    private $_collivery;
+    private $collivery;
     protected $objectManager;
 
     /** @var \Psr\Log\LoggerInterface $logger */
     private $logger;
 
+    /**
+     * ProcessOrder constructor.
+     *
+     * @throws NoConfigCredentialsException
+     */
     public function __construct()
     {
-        $collivery = new Connection();
-        $this->_collivery = $collivery->getConnection();
         $this->objectManager = ObjectManager::getInstance();
         $this->logger = $this->objectManager->get('Psr\Log\LoggerInterface');
+
+        $connection = new Connection();
+        $this->collivery = $connection->getConnection();
+
     }
 
     /**
@@ -31,7 +40,7 @@ abstract class ProcessOrder
      */
     public function addAddress($params)
     {
-        return $this->_collivery->addAddress($params);
+        return $this->collivery->addAddress($params);
     }
 
     /**
@@ -41,7 +50,7 @@ abstract class ProcessOrder
      */
     public function addContactAddress($params)
     {
-        return $this->_collivery->addContact($params);
+        return $this->collivery->addContact($params);
     }
 
     /**
@@ -51,7 +60,7 @@ abstract class ProcessOrder
      */
     public function validateCollivery($params)
     {
-        return $this->_collivery->validate($params);
+        return $this->collivery->validate($params);
     }
 
     /**
@@ -61,7 +70,7 @@ abstract class ProcessOrder
      */
     public function addCollivery($params)
     {
-        return $this->_collivery->addCollivery($params);
+        return $this->collivery->addCollivery($params);
     }
 
     /**
@@ -71,7 +80,7 @@ abstract class ProcessOrder
      */
     public function acceptWaybill($params)
     {
-        return $this->_collivery->acceptCollivery($params);
+        return $this->collivery->acceptCollivery($params);
     }
 
     /**
@@ -79,7 +88,7 @@ abstract class ProcessOrder
      */
     public function getShopOwnerDetails()
     {
-        return $this->_collivery->getContacts($this->_collivery->getDefaultAddressId());
+        return $this->collivery->getContacts($this->collivery->getDefaultAddressId());
     }
 
     /**
@@ -87,8 +96,8 @@ abstract class ProcessOrder
      */
     public function getErrors()
     {
-        $this->logger->error(print_r($this->_collivery->getErrors(), true));
+        $this->logger->error(print_r($this->collivery->getErrors(), true));
 
-        return implode(' ', $this->_collivery->getErrors());
+        return implode(' ', $this->collivery->getErrors());
     }
 }

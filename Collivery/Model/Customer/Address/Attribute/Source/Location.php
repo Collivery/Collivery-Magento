@@ -6,12 +6,17 @@ use MDS\Collivery\Model\Connection;
 
 class Location extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
 {
-    public $_collivery;
+    public $collivery;
 
+    /**
+     * Location constructor.
+     *
+     * @throws \MDS\Collivery\Exceptions\NoConfigCredentialsException
+     */
     public function __construct()
     {
         $connection = new Connection();
-        $this->_collivery = $connection->getConnection();
+        $this->collivery = $connection->getConnection();
     }
 
     public function getAllOptions($withEmpty = true, $defaultValues = false)
@@ -40,7 +45,7 @@ class Location extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
 
     private function colliveryLocationTypes()
     {
-        $locations = $this->_collivery->getLocationTypes();
+        $locations = $this->collivery->getLocationTypes();
         if (!$locations) {
             return false;
         }
