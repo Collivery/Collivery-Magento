@@ -45,13 +45,13 @@ class Suburb extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
     public function getSuburbs()
     {
         $suburbs = $this->colliverySuburbs();
-
+        $suburbs = $this->_collivery->make_key_value_array($suburbs);
         foreach ($suburbs as $key => $suburb) {
             $suburb_field[] =
-                    [
-                        'value' => $key,
-                        'label' => $suburb,
-                    ];
+                [
+                    'value' => $key,
+                    'label' => $suburb,
+                ];
         }
 
         return $suburb_field;
