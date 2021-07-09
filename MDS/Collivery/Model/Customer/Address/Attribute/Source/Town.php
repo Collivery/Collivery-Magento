@@ -25,7 +25,7 @@ class Town extends \Magento\Eav\Model\Entity\Attribute\Source\AbstractSource
 
     private function colliveryTown()
     {
-        $towns = $this->_collivery->getTowns();
+        $towns = $this->_collivery->make_key_value_array($this->_collivery->getTowns());
         if (!$towns) {
             return false;
         }
