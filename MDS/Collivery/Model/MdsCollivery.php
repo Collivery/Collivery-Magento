@@ -1,7 +1,7 @@
 <?php
 namespace MDS\Collivery\Model;
 
-use SoapClient; // Use PHP Soap Client
+use Exception;
 use SoapFault;  // Use PHP Soap Fault
 
 class MdsCollivery
@@ -151,8 +151,6 @@ class MdsCollivery
             $client = curl_init($url.'?'.$query);
         }
 
-        curl_setopt($client, CURLOPT_SSL_VERIFYPEER, false);
-
         curl_setopt($client, CURLOPT_RETURNTRANSFER, true);
 
         $headerArray = [
@@ -161,7 +159,8 @@ class MdsCollivery
             'X-App-Host:'.$this->config->app_host,
             'X-App-Url'     => $this->config->app_url,
             'X-App-Lang:'.'PHP '.phpversion(),
-            'Content-Type: application/json'
+            'Content-Type: application/json',
+            'Accept: application/json'
         ];
         curl_setopt($client, CURLOPT_HTTPHEADER, $headerArray);
 
@@ -209,8 +208,8 @@ class MdsCollivery
             try {
 
                 $param = ["country" => $country, "per_page" => "0"];
-                if($province!=null)
-                    $param['province'] = $province;
+                if($province!=null){
+                    $param['province'] = $province;}
 
                 $result = $this->consumeAPI("towns", $param, 'GET');
 
@@ -226,7 +225,7 @@ class MdsCollivery
                     }
                 } else {
                     if ($this->check_cache != 0) {
-                        $this->cache->put('collivery.towns.' . $country . '.' . $province, $result['dat'], 60*24);
+                        $this->cache->put('collivery.towns.' . $country . '.' . $province, $result['data'], 60*24);
                     }
                 }
                 return $result['data'];
@@ -338,9 +337,9 @@ class MdsCollivery
         } else {
             try {
                 $param =["api_token" => ""];
-                if($this->token!=null)
-                    $param["api_token"]=$this->token;
-
+                if($this->token!=null) {
+                    $param["api_token"] = $this->token;
+                }
                 $result = $this->consumeAPI("location_types",$param, 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
@@ -1125,9 +1124,6 @@ class MdsCollivery
      */
     protected function catchSoapFault($e)
     {
-        //echo "<br>e<br><pre>";
-        //var_dump($e->faultcode);
-        //die();
         $this->setError($e->faultcode, $e->faultstring);
     }
 

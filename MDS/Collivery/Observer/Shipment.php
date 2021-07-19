@@ -128,9 +128,6 @@ class Shipment extends ProcessOrder implements ObserverInterface
                     'cust_ref' => $order->getRealOrderId()
                 ];
 
-                /*$validatedCollivery = $this->validateCollivery($validateData);
-                is_null($validatedCollivery) && $this->errorBag($this->getErrors());*/
-
                 //add collivery
                 $waybill = $this->addCollivery($validateData);
                 !is_numeric($waybill) && $this->errorBag($this->getErrors());

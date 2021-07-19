@@ -2,7 +2,6 @@
 
 namespace MDS\Collivery\Model\Carrier;
 
-use Klarna\Core\Model\Api\Rest\Service;
 use Magento\Checkout\Model\Cart;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Model\Session;
