@@ -164,9 +164,9 @@ class Collivery extends AbstractCarrier implements CarrierInterface
             $parcelDimensions = $this->getProductDimensions($items);
 
             $data = [
-                'collivery_from'   => $this->_collivery->getDefaultAddressId(),
-                'to_town_id'       => (int)$customerAddress['town'],
-                'to_location_type' => (int)$customerAddress['location'],
+                'collection_address'   => $this->_collivery->getDefaultAddressId(),
+                'delivery_town'       => (int)$customerAddress['town'],
+                'delivery_location_type' => (int)$customerAddress['location'],
                 'service'          => $service,
                 'parcels'          => $parcelDimensions
             ];
@@ -175,7 +175,14 @@ class Collivery extends AbstractCarrier implements CarrierInterface
 
             !$prices && $this->showErrorMessage($this->_collivery->getErrors());
 
-            return $prices ? $prices['price']['ex_vat'] : [];
+            foreach($prices as $price)
+            {
+                if($price['service_type']===$service)
+                {
+                    return $price['total'];
+                }
+            }
+            return $prices ? $prices[0]['total'] : [];
         }
     }
 
@@ -187,7 +194,8 @@ class Collivery extends AbstractCarrier implements CarrierInterface
      */
     public function getServices($customerAddress)
     {
-        $services = $this->_collivery->getServices();
+        $services = $this->_collivery->make_key_value_array($this->_collivery->getServices(),'id','text');
+
         $response = [];
 
         foreach ($services as $key => $value) {
@@ -197,12 +205,12 @@ class Collivery extends AbstractCarrier implements CarrierInterface
             if ($i) {
                 // Create Response Array
                 $response[] =
-                        [
-                            'code'    => $key,
-                            'title'   => $value,
-                            'cost'    => $i,
-                            'price'   => $i * (1+($this->getConfigData('markup')/100)),
-                        ];
+                    [
+                        'code'    => $key,
+                        'title'   => $value,
+                        'cost'    => $i,
+                        'price'   => $i * (1+($this->getConfigData('markup')/100)),
+                    ];
             }
         }
 
