@@ -5,9 +5,11 @@ namespace MDS\Collivery\Setup;
 use Magento\Customer\Api\AddressMetadataInterface;
 use Magento\Eav\Model\Config;
 use Magento\Eav\Setup\EavSetup;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Psr\Log\LoggerInterface;
 
 class InstallData implements InstallDataInterface
 {
@@ -23,6 +25,7 @@ class InstallData implements InstallDataInterface
      * @var Config
      */
     private $eavConfig;
+
     /**
      * InstallData constructor.
      * @param EavSetup $eavSetup
@@ -30,13 +33,18 @@ class InstallData implements InstallDataInterface
      */
     public function __construct(
         EavSetup $eavSetup,
-        Config $config
+        Config $config,
+        LoggerInterface $logger = null
     ) {
         $this->eavSetup = $eavSetup;
         $this->eavConfig = $config;
+        $this->logger = $logger;
     }
     public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
+
+        $this->logger->error('MDS Install started');
+
         $installer = $setup;
 
         $installer->startSetup();
@@ -44,21 +52,32 @@ class InstallData implements InstallDataInterface
         $customFields = ['location', 'town', 'suburb'];
         $position = 333;
         foreach ($customFields as $field) {
+            $this->logger->error('Adding Field'. $field);
+
             $source = 'MDS\Collivery\Model\Customer\Address\Attribute\Source\\' . ucfirst($field);
-            $this->eavSetup->addAttribute(
-                AddressMetadataInterface::ENTITY_TYPE_ADDRESS,
-                $field,
-                [
-                    'label' => ucfirst($field),
-                    'input' => 'select',
-                    'source' => $source,
-                    'visible' => true,
-                    'required' => false,
-                    'position' => $position,
-                    'sort_order' => 150,
-                    'system' => false
-                ]
-            );
+            try {
+                $this->eavSetup->addAttribute(
+                    AddressMetadataInterface::ENTITY_TYPE_ADDRESS,
+                    $field,
+                    [
+                        'label' => ucfirst($field),
+                        'input' => 'select',
+                        'source' => $source,
+                        'visible' => true,
+                        'required' => false,
+                        'position' => $position,
+                        'sort_order' => 150,
+                        'system' => false,
+                    ]
+                );
+            } catch (LocalizedException $e) {
+                $this->logger->error('MDS Field failed LocalizedException');
+                $this->logger->error($e->getMessage());
+
+            } catch (\Zend_Validate_Exception $e) {
+                $this->logger->error('MDS Field failed Zend_Validate_Exception');
+                $this->logger->error($e->getMessage());
+            }
             $customAttribute = $this->eavConfig->getAttribute(
                 AddressMetadataInterface::ENTITY_TYPE_ADDRESS,
                 $field
