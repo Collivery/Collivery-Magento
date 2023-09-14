@@ -4,7 +4,7 @@ $isModuleActive = $block->isModuleActive();
 ?>
 <?php if ($isModuleActive) {
     ?>
-<div class="field custom" style="display: none;">
+<div class="field custom" style="display: block;">
   <label class="label" for="<?php echo $block->escapeHtml($block->getFieldId('location')) ?>">
     <span><?php echo $block->escapeHtml($block->getFieldLabel('location')) ?></span>
   </label>
@@ -16,6 +16,7 @@ $isModuleActive = $block->isModuleActive();
       <option disabled="" selected="">Select location type</option>
       <?php
       $locations = (new MDS\Collivery\Model\Customer\Address\Attribute\Source\Location())->getAllOptions(true, false);
+
     foreach ($locations as $location) {
         $selected =  $location['value'] == $block->escapeHtml($block->getValue('location')) ? 'selected="selected"' : '';
         echo '<option value="' . $location['value'] . '" ' . $selected . '>' . $location['label'] . '</option>';
@@ -23,7 +24,7 @@ $isModuleActive = $block->isModuleActive();
     </select>
   </div>
 </div>
-<div class="field custom" style="display: none;">
+<div class="field custom" style="display: block;">
   <label class="label" for="<?php echo $block->escapeHtml($block->getFieldId('town')) ?>">
     <span><?php echo $block->escapeHtml($block->getFieldLabel('Town')) ?></span>
   </label>

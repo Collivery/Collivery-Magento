@@ -1015,7 +1015,7 @@ class MdsCollivery
      *
      * @return Array $key_value_array - {key:value, key:value} - Used for setting up dropdown lists.
      */
-    public function make_key_value_array($data, $key = 'id', $value = 'name', $isContact = false) {
+    public function make_key_value_array(array $data, string $key = 'id', string $value = 'name', bool $isContact = false) {
         $key_value_array = [];
         if (!is_array($data)) {
             return [];
