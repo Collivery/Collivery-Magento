@@ -8,6 +8,7 @@ class MdsCollivery
     protected $token;
     protected $client;
     protected $config;
+    protected $cache;
     protected $errors = [];
     protected $check_cache = 2;
 
@@ -1021,13 +1022,28 @@ class MdsCollivery
             return [];
         }
 
+        // Magento 2.4 / PHP 8.2 can hit cached keyed values here, not only row arrays.
+        if (isset($data['value']) && is_array($data['value'])) {
+            $data = $data['value'];
+        }
+
         if ($isContact) {
             foreach ($data as $item) {
+                if (!is_array($item) || !isset($item[$key])) {
+                    continue;
+                }
                 $key_value_array[$item[$key]] = $item['full_name'].", ".$item['cell_no'].", ".$item['work_no'].", ".$item['email'];
             }
         } else {
-            foreach ($data as $item) {
-                $key_value_array[$item[$key]] = $item[$value];
+            foreach ($data as $itemKey => $item) {
+                if (is_array($item) && isset($item[$key], $item[$value])) {
+                    $key_value_array[$item[$key]] = $item[$value];
+                    continue;
+                }
+
+                if (is_scalar($item)) {
+                    $key_value_array[$itemKey] = $item;
+                }
             }
         }
 
